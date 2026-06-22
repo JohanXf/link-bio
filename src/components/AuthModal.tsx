@@ -124,7 +124,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
               <button 
                 onClick={() => handleOAuthLogin('google')} 
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-3 bg-white text-black py-3 rounded-xl font-medium hover:bg-gray-100 transition-colors disabled:opacity-50"
+                className="w-full flex items-center justify-center gap-3 bg-white text-black py-3 rounded-xl font-josefin font-bold tracking-tight text-[17px] hover:bg-gray-100 transition-colors disabled:opacity-50"
               >
                 <GoogleIcon size={18} />
                 Continue with Google
@@ -133,7 +133,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
               <button 
                 onClick={() => handleOAuthLogin('discord')} 
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-3 bg-[#5865F2] text-white py-3 rounded-xl font-medium hover:bg-[#4752C4] transition-colors disabled:opacity-50"
+                className="w-full flex items-center justify-center gap-3 bg-[#5865F2] text-white py-3 rounded-xl font-josefin font-bold tracking-tight text-[17px] hover:bg-[#4752C4] transition-colors disabled:opacity-50"
               >
                 <DiscordIcon size={18} />
                 Continue with Discord
@@ -166,11 +166,11 @@ export function AuthModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
                   <button 
                     type="submit"
                     disabled={loading}
-                    className="w-full flex items-center justify-center gap-3 bg-white text-black py-3 rounded-xl font-medium hover:bg-gray-200 transition-colors disabled:opacity-50"
+                    className="w-full flex items-center justify-center gap-3 bg-white text-black py-3 rounded-xl font-josefin font-bold tracking-tight text-[17px] hover:bg-gray-200 transition-colors disabled:opacity-50"
                   >
                     {isSignUp ? 'Sign up' : 'Sign in'}
                   </button>
-                  <button type="button" onClick={() => setIsSignUp(!isSignUp)} className="w-full text-sm text-gray-400 hover:text-white transition-colors mt-2 pb-1">
+                  <button type="button" onClick={() => setIsSignUp(!isSignUp)} className="w-full text-[15px] font-josefin font-semibold tracking-tight text-gray-400 hover:text-white transition-colors mt-2 pb-1">
                     {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
                   </button>
                 </form>
@@ -178,7 +178,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
                 <button 
                   onClick={() => setShowEmailInput(true)}
                   disabled={loading}
-                  className="w-full flex items-center justify-center gap-3 bg-[#1a1a1a] border border-white/10 text-white py-3 rounded-xl font-medium hover:bg-[#252525] transition-colors disabled:opacity-50"
+                  className="w-full flex items-center justify-center gap-3 bg-[#1a1a1a] border border-white/10 text-white py-3 rounded-xl font-josefin font-bold tracking-tight text-[17px] hover:bg-[#252525] transition-colors disabled:opacity-50"
                 >
                   <Mail size={18} className="text-gray-400" />
                   Continue with Email

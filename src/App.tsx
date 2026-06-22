@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { motion, AnimatePresence } from 'motion/react';
-import { Sparkles, ArrowRight, Music, BarChart2, Image as ImageIcon, Zap, Github, Twitter, Instagram, Play, ArrowLeft, Eye, Crown, Menu, Sun, Upload, ExternalLink, Trash2, Plus, X, Home, User, Settings, HelpCircle, LogOut, Globe, Mail, Youtube, Linkedin, Facebook, Twitch, Link as LinkIcon, MessageCircle, BookOpen, FileText, Briefcase } from 'lucide-react';
+import { Sparkles, ArrowRight, Music, BarChart2, Image as ImageIcon, Zap, Github, Twitter, Instagram, Play, ArrowLeft, Eye, Crown, Menu, Sun, Upload, ExternalLink, Trash2, Plus, X, Home, User, Settings, HelpCircle, LogOut, Globe, Mail, Youtube, Linkedin, Facebook, Twitch, Link as LinkIcon, MessageCircle, BookOpen, FileText, Briefcase , Trophy } from 'lucide-react';
 import React, { useState, useRef, useEffect } from 'react';
 
 import { AuthModal } from './components/AuthModal';
@@ -80,10 +80,10 @@ function Navbar({ onLoginClick, userEmail, onSignOut, onDashboardClick }: { onLo
     <nav className="fixed top-0 left-0 right-0 z-50 bg-[#f0f0f0]/90 backdrop-blur-md border-b border-[#e5e5e5]">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-josefin font-bold text-xl">
+          <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-josefin font-bold text-[15px]">
             n
           </div>
-          <span className="font-josefin font-bold text-xl tracking-tight text-black">nads.io</span>
+          <span className="font-josefin font-bold text-[15px] tracking-tight text-black">nads.io</span>
         </div>
         <div className="flex items-center gap-4">
           {userEmail ? (
@@ -91,14 +91,14 @@ function Navbar({ onLoginClick, userEmail, onSignOut, onDashboardClick }: { onLo
               <button onClick={onDashboardClick} className="text-sm font-semibold text-gray-700 hover:text-black transition-colors cursor-pointer">
                 Editor
               </button>
-              <button onClick={onSignOut} className="font-josefin font-bold text-sm bg-black text-white px-4 py-2 rounded-full hover:bg-neutral-800 transition-colors cursor-pointer">
+              <button onClick={onSignOut} className="font-josefin font-bold text-[15px] bg-black text-white px-4 py-2 rounded-full hover:bg-neutral-800 transition-colors cursor-pointer shadow-sm tracking-tight">
                 Sign out
               </button>
             </>
           ) : (
             <>
-              <button onClick={onLoginClick} className="text-sm font-medium text-gray-700 hover:text-black transition-colors hidden sm:block cursor-pointer">Log in</button>
-              <button onClick={onLoginClick} className="bg-white text-black px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors border border-gray-200 cursor-pointer">
+              <button onClick={onLoginClick} className="font-josefin font-bold text-[15px] text-gray-700 hover:text-black transition-colors hidden sm:block cursor-pointer">Log in</button>
+              <button onClick={onLoginClick} className="font-josefin font-bold bg-white text-black px-5 py-2.5 rounded-full text-[15px] hover:bg-gray-200 transition-colors border border-gray-200 cursor-pointer shadow-sm tracking-tight">
                 Sign up
               </button>
             </>
@@ -327,10 +327,10 @@ function Footer() {
     <footer className="bg-[#e5e5e5] py-12 px-6 border-t border-[#d4d4d8]">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
         <div className="flex items-center gap-2">
-           <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-josefin font-bold text-xl shadow-sm">
+           <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-josefin font-bold text-[15px] shadow-sm">
              n
            </div>
-           <span className="font-josefin font-bold text-xl tracking-tight text-black">nads.io</span>
+           <span className="font-josefin font-bold text-[15px] tracking-tight text-black">nads.io</span>
         </div>
         <p className="text-gray-500 font-medium">© {new Date().getFullYear()} nads.io. All rights reserved.</p>
         <div className="flex gap-5 text-gray-400">
@@ -542,23 +542,37 @@ function UserPage({ onBack, onEdit, data }: { onBack: () => void, onEdit: () => 
   );
 }
 
-function EditPage({ onBack, onSignOut, data, onChange, userEmail }: { onBack: () => void, onSignOut: () => void, data: ProfileData, onChange: (d: ProfileData) => void, userEmail: string | null }) {
+function EditPage({ onBack, onSignOut, onHome, data, onChange, userEmail, userId }: { onBack: () => void, onSignOut: () => void, onHome: () => void, data: ProfileData, onChange: React.Dispatch<React.SetStateAction<ProfileData>>, userEmail: string | null, userId: string | null }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'home'|'edit'|'analytics'|'leaderboard'|'settings'|'help'>('edit');
+  const [leaderboardPeriod, setLeaderboardPeriod] = useState<'Daily'|'Weekly'|'Monthly'|'All Time'>('All Time');
   const [isSaving, setIsSaving] = useState(false);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsSaving(true);
-    setTimeout(() => {
+    try {
+      if (userId) {
+        const api = await import('./lib/api');
+        await api.saveProfile(userId, data);
+      } else {
+        // Fallback for demo users
+        await new Promise(r => setTimeout(r, 800));
+      }
       setIsSaving(false);
       onBack();
-    }, 800);
+    } catch (e) {
+      console.error('Failed to save', e);
+      alert('Failed to save profile. Please check console for details.');
+      setIsSaving(false);
+    }
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, field: 'avatarUrl' | 'bannerUrl' | 'audioUrl') => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: 'avatarUrl' | 'bannerUrl' | 'audioUrl') => {
     const file = e.target.files?.[0];
     if (file) {
       const title = file.name.replace(/\.[^/.]+$/, "");
       const reader = new FileReader();
+      // Optimistic visual update
       reader.onloadend = () => {
         if (field === 'audioUrl') {
            onChange({ ...data, audioUrl: reader.result as string, audioTitle: title });
@@ -567,6 +581,27 @@ function EditPage({ onBack, onSignOut, data, onChange, userEmail }: { onBack: ()
         }
       };
       reader.readAsDataURL(file);
+
+      if (userId) {
+        try {
+          const api = await import('./lib/api');
+          const bucketMap = { 'avatarUrl': 'avatars', 'bannerUrl': 'banners', 'audioUrl': 'audio' } as const;
+          const publicUrl = await api.uploadFile(bucketMap[field], file, userId);
+          // Wait for state to catch up to not override other quick changes
+          setTimeout(() => {
+            onChange(currentData => {
+              if (field === 'audioUrl') {
+                return { ...currentData, audioUrl: publicUrl, audioTitle: title };
+              } else {
+                return { ...currentData, [field]: publicUrl };
+              }
+            });
+          }, 500);
+        } catch (err) {
+          console.error(`Failed to upload ${field}`, err);
+          alert(`Failed to upload ${field}. Make sure your Supabase Storage buckets are public and have RLS disabled for inserts/updates (see supabase/schema.sql)`);
+        }
+      }
     }
   };
 
@@ -605,8 +640,8 @@ function EditPage({ onBack, onSignOut, data, onChange, userEmail }: { onBack: ()
              >
                 <div className="flex items-center justify-between p-5 border-b border-white/5">
                    <div className="flex items-center gap-2 text-white">
-                      <Sparkles size={20} />
-                      <span className="font-josefin font-bold text-lg hover:text-indigo-400 transition-colors cursor-pointer text-white">nads.io</span>
+                      <Sparkles size={18} />
+                      <span onClick={onHome} className="font-josefin font-bold text-[15px] hover:text-indigo-400 transition-colors cursor-pointer text-white">nads.io</span>
                    </div>
                    <button onClick={() => setIsSidebarOpen(false)} className="text-gray-400 hover:text-white transition-colors p-1">
                      <X size={20} />
@@ -622,36 +657,40 @@ function EditPage({ onBack, onSignOut, data, onChange, userEmail }: { onBack: ()
                   <div className="p-3">
                      <p className="text-[11px] text-gray-500 font-medium tracking-wider mb-2 px-2 uppercase mt-2">Menu</p>
                      
-                     <button onClick={onBack} className="w-full flex items-center gap-3 px-3 py-3.5 text-gray-300 hover:text-white hover:bg-[#252525] rounded-xl transition-colors mb-1 cursor-pointer">
+                     <button onClick={() => { onHome(); setIsSidebarOpen(false); }} className={`w-full flex items-center gap-3 px-3 py-3.5 rounded-xl transition-colors mb-1 cursor-pointer text-gray-300 hover:text-white hover:bg-[#252525]`}>
                         <Home size={18} />
-                        <span className="text-sm font-medium">Home</span>
+                        <span className="font-josefin font-semibold text-[15px]">Home</span>
                      </button>
                      
-                     <button onClick={() => setIsSidebarOpen(false)} className="w-full flex items-center gap-3 px-3 py-3.5 bg-[#252525] text-white rounded-xl transition-colors mb-1 group cursor-pointer border border-white/5">
+                     <button onClick={() => { setActiveTab('edit'); setIsSidebarOpen(false); }} className={`w-full flex items-center gap-3 px-3 py-3.5 rounded-xl transition-colors mb-1 cursor-pointer ${activeTab === 'edit' ? 'bg-[#252525] text-white border border-white/5' : 'text-gray-300 hover:text-white hover:bg-[#252525]'}`}>
                         <User size={18} />
-                        <span className="text-sm font-medium">Edit profile</span>
+                        <span className="font-josefin font-semibold text-[15px]">Edit profile</span>
                      </button>
                      
                      <button onClick={() => alert('Premium plan coming soon')} className="w-full flex items-center gap-3 px-3 py-3.5 text-gray-300 hover:text-white hover:bg-[#252525] rounded-xl transition-colors mb-1 group cursor-pointer">
                         <Crown size={18} />
-                        <span className="text-sm font-medium">Premium</span>
+                        <span className="font-josefin font-semibold text-[15px]">Premium</span>
                         <span className="ml-auto bg-[#333] group-hover:bg-white group-hover:text-black text-gray-300 transition-colors text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest">Pro</span>
                      </button>
                      
-                     <button onClick={() => alert('Analytics dashboard coming soon')} className="w-full flex items-center gap-3 px-3 py-3.5 text-gray-300 hover:text-white hover:bg-[#252525] rounded-xl transition-colors mb-1 group cursor-pointer">
+                     <button onClick={() => { setActiveTab('analytics'); setIsSidebarOpen(false); }} className={`w-full flex items-center gap-3 px-3 py-3.5 rounded-xl transition-colors mb-1 cursor-pointer ${activeTab === 'analytics' ? 'bg-[#252525] text-white border border-white/5' : 'text-gray-300 hover:text-white hover:bg-[#252525]'}`}>
                         <BarChart2 size={18} />
-                        <span className="text-sm font-medium">Analytics</span>
-                        <span className="ml-auto bg-[#333] group-hover:bg-white group-hover:text-black text-gray-300 transition-colors text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest">Pro</span>
+                        <span className="font-josefin font-semibold text-[15px]">Analytics</span>
                      </button>
                      
-                     <button onClick={() => alert('Settings coming soon')} className="w-full flex items-center gap-3 px-3 py-3.5 text-gray-300 hover:text-white hover:bg-[#252525] rounded-xl transition-colors mb-1 cursor-pointer mt-2">
+                     <button onClick={() => { setActiveTab('leaderboard'); setIsSidebarOpen(false); }} className={`w-full flex items-center gap-3 px-3 py-3.5 rounded-xl transition-colors mb-1 cursor-pointer ${activeTab === 'leaderboard' ? 'bg-[#252525] text-white border border-white/5' : 'text-gray-300 hover:text-white hover:bg-[#252525]'}`}>
+                        <Trophy size={18} />
+                        <span className="font-josefin font-semibold text-[15px]">Leaderboard</span>
+                     </button>
+                     
+                     <button onClick={() => { setActiveTab('settings'); setIsSidebarOpen(false); }} className={`w-full flex items-center gap-3 px-3 py-3.5 rounded-xl transition-colors mb-1 cursor-pointer mt-2 ${activeTab === 'settings' ? 'bg-[#252525] text-white border border-white/5' : 'text-gray-300 hover:text-white hover:bg-[#252525]'}`}>
                         <Settings size={18} />
-                        <span className="text-sm font-medium">Settings</span>
+                        <span className="font-josefin font-semibold text-[15px]">Settings</span>
                      </button>
                      
-                     <button onClick={() => alert('Help center coming soon')} className="w-full flex items-center gap-3 px-3 py-3.5 text-gray-300 hover:text-white hover:bg-[#252525] rounded-xl transition-colors mb-1 cursor-pointer">
+                     <button onClick={() => { setActiveTab('help'); setIsSidebarOpen(false); }} className={`w-full flex items-center gap-3 px-3 py-3.5 rounded-xl transition-colors mb-1 cursor-pointer ${activeTab === 'help' ? 'bg-[#252525] text-white border border-white/5' : 'text-gray-300 hover:text-white hover:bg-[#252525]'}`}>
                         <HelpCircle size={18} />
-                        <span className="text-sm font-medium">Help</span>
+                        <span className="font-josefin font-semibold text-[15px]">Help</span>
                      </button>
                   </div>
                 </div>
@@ -659,7 +698,7 @@ function EditPage({ onBack, onSignOut, data, onChange, userEmail }: { onBack: ()
                 <div className="p-5 border-t border-white/5 mt-auto">
                    <button onClick={onSignOut} className="w-full flex items-center gap-3 text-gray-300 hover:text-white hover:text-red-400 transition-colors p-2 -ml-2 rounded-xl hover:bg-white/5 cursor-pointer">
                       <LogOut size={18} />
-                      <span className="text-sm font-medium">Sign out</span>
+                      <span className="font-josefin font-semibold text-[15px]">Sign out</span>
                    </button>
                 </div>
              </motion.div>
@@ -670,21 +709,214 @@ function EditPage({ onBack, onSignOut, data, onChange, userEmail }: { onBack: ()
        {/* Top Navbar */}
        <header className="sticky top-0 z-50 bg-[#f0f0f0]/90 backdrop-blur-md p-4 md:px-8 flex items-center justify-between border-b border-[#e5e5e5]">
           <button onClick={() => setIsSidebarOpen(true)} className="bg-[#18181b] hover:bg-[#27272a] py-2 px-4 rounded-[1.5rem] flex items-center gap-2 transition-colors text-white shadow-md">
-             <Menu size={14} className="text-white" strokeWidth={2.5} />
-             <span className="font-josefin font-bold text-[14px] tracking-tight text-white">nads.io</span>
+             <Menu size={16} className="text-white" strokeWidth={2.5} />
+             <span className="font-josefin font-bold text-[15px] tracking-tight text-white">nads.io</span>
           </button>
           
           <div className="flex items-center gap-2">
             <button className="bg-[#18181b] hover:bg-[#27272a] w-[36px] h-[36px] rounded-full flex items-center justify-center transition-colors text-white shadow-md">
                <Sun size={16} strokeWidth={2.5} className="text-white" />
             </button>
-            <button onClick={onSignOut} className="bg-[#18181b] hover:bg-[#27272a] py-2 px-4 rounded-[1.5rem] text-[14px] font-medium transition-colors text-white shadow-md tracking-tight">
+            <button onClick={onSignOut} className="bg-[#18181b] hover:bg-[#27272a] py-2 px-4 rounded-[1.5rem] font-josefin font-bold text-[15px] transition-colors text-white shadow-md tracking-tight">
                Sign out
             </button>
           </div>
        </header>
 
        <main className="flex-1 w-full max-w-[400px] mx-auto px-4 pt-8">
+          {activeTab === 'home' && (
+             <div className="space-y-6 pb-12">
+                <div className="mb-8">
+                  <h1 className="text-[28px] font-josefin font-bold tracking-tight">Welcome to Nads!</h1>
+                  <p className="text-gray-400 mt-2 text-sm leading-relaxed">
+                     Your ultimate link-in-bio and personal landing page builder. Setup all your content links, featured music, and socials into one elegant, customizable page securely connected to your online identity.
+                  </p>
+                </div>
+                
+                <div className="bg-gradient-to-br from-[#252525] to-[#141414] border border-white/5 rounded-[1.5rem] p-6 relative overflow-hidden">
+                   <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/5 rounded-full blur-2xl"></div>
+                   <h3 className="text-lg font-josefin font-bold text-white relative z-10 flex items-center gap-2">
+                     <Sparkles size={18} className="text-yellow-400" /> Getting Started
+                   </h3>
+                   <p className="text-gray-400 text-sm mt-3 relative z-10 leading-relaxed mb-5">
+                      Ready to share your identity with the world? Your public profile is live and ready to be customized. Head over to the <strong className="text-white font-medium cursor-pointer" onClick={() => setActiveTab('edit')}>Edit Profile</strong> tab to add your links, configure your appearance, and set up your embedded audio player.
+                   </p>
+                   <div className="flex gap-4 items-center relative z-10">
+                     <a href="#" onClick={(e) => { e.preventDefault(); onBack(); }} className="bg-white text-black font-medium py-2.5 px-5 rounded-full hover:bg-gray-200 transition-colors flex items-center gap-2 text-sm">
+                       View My Public Page <ArrowRight size={16} />
+                     </a>
+                   </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 max-w-[400px]">
+                  <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6 text-center hover:bg-white/[0.02] transition-colors cursor-pointer" onClick={() => setActiveTab('analytics')}>
+                     <div className="text-3xl font-bold text-white mb-1">{Math.floor(Math.random() * 500) + 120}</div>
+                     <div className="text-gray-400 text-sm">Total Views</div>
+                  </div>
+                  <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6 text-center hover:bg-white/[0.02] transition-colors cursor-pointer" onClick={() => setActiveTab('edit')}>
+                     <div className="text-3xl font-bold text-white mb-1">{data.links.length}</div>
+                     <div className="text-gray-400 text-sm">Active Links</div>
+                  </div>
+                </div>
+
+                <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6 space-y-4">
+                   <h3 className="text-lg font-josefin font-bold text-white">What's new</h3>
+                   <div className="space-y-4">
+                      <div className="flex gap-3">
+                         <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center shrink-0">
+                            <Trophy size={14} className="text-blue-400" />
+                         </div>
+                         <div>
+                            <h4 className="text-white text-sm font-josefin font-bold">Leaderboards are live</h4>
+                            <p className="text-gray-400 text-[13px] mt-1">See how your page performs compared to other top creators on Nads.</p>
+                         </div>
+                      </div>
+                      <div className="flex gap-3">
+                         <div className="w-8 h-8 rounded-full bg-purple-500/10 flex items-center justify-center shrink-0">
+                            <Music size={14} className="text-purple-400" />
+                         </div>
+                         <div>
+                            <h4 className="text-white text-sm font-josefin font-bold">Enhaced audio player</h4>
+                            <p className="text-gray-400 text-[13px] mt-1">Add autoplaying background music or feature a specific track on your page.</p>
+                         </div>
+                      </div>
+                   </div>
+                </div>
+             </div>
+          )}
+          {activeTab === 'analytics' && (
+             <div className="space-y-6">
+                <div className="mb-8">
+                  <h1 className="text-[28px] font-josefin font-bold tracking-tight">Analytics</h1>
+                  <p className="text-gray-400 mt-2 text-sm">Track your performance</p>
+                </div>
+                <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6 flex flex-col items-center justify-center min-h-[300px] gap-4">
+                   <BarChart2 size={48} className="text-gray-600" />
+                   <p className="text-gray-400 text-center max-w-[250px]">Detailed analytics will be available in the upcoming Pro tier.</p>
+                   <button onClick={() => alert('Premium plan coming soon')} className="mt-4 bg-[#252525] hover:bg-[#333] text-white py-2 px-6 rounded-full font-medium transition-colors border border-white/5">
+                     Upgrade to Pro
+                   </button>
+                </div>
+             </div>
+          )}
+          {activeTab === 'leaderboard' && (
+             <div className="space-y-6">
+                <div className="mb-4">
+                  <h1 className="text-[28px] font-josefin font-bold tracking-tight">Leaderboard</h1>
+                  <p className="text-gray-400 mt-2 text-sm">See who has the most views.</p>
+                </div>
+                
+                <div className="flex items-center justify-between bg-[#141414] border border-white/5 p-2 rounded-full mb-6 w-full gap-1">
+                   {(['Daily', 'Weekly', 'Monthly', 'All Time'] as const).map(period => (
+                     <button 
+                       key={period} 
+                       onClick={() => setLeaderboardPeriod(period)} 
+                       className={`flex-1 py-3 px-2 rounded-full text-[15px] font-josefin font-bold tracking-tight whitespace-nowrap transition-all ${period === leaderboardPeriod ? 'bg-[#252525] text-white shadow-md' : 'text-gray-500 hover:text-gray-300 bg-transparent'}`}
+                     >
+                       {period}
+                     </button>
+                   ))}
+                </div>
+
+                <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-4 space-y-2">
+                   {({
+                      'Daily': [
+                         { name: 'Sarah L.', handle: '@sarah', views: '2.1K', rank: 1, img: 'https://i.pravatar.cc/100?img=9' },
+                         { name: 'Mike T.', handle: '@miket', views: '1.8K', rank: 2, img: 'https://i.pravatar.cc/100?img=12' },
+                         { name: 'Alice Smith', handle: '@alice', views: '1.5K', rank: 3, img: 'https://i.pravatar.cc/100?img=1' },
+                         { name: 'Eve', handle: '@eve_xyz', views: '1.2K', rank: 4, img: 'https://i.pravatar.cc/100?img=5' },
+                         { name: 'Bob Jones', handle: '@bobjones', views: '980', rank: 5, img: 'https://i.pravatar.cc/100?img=11' }
+                      ],
+                      'Weekly': [
+                         { name: 'Diana P.', handle: '@diana', views: '8.4K', rank: 1, img: 'https://i.pravatar.cc/100?img=44' },
+                         { name: 'Alice Smith', handle: '@alice', views: '7.5K', rank: 2, img: 'https://i.pravatar.cc/100?img=1' },
+                         { name: 'Charlie', handle: '@charlie_d', views: '6.1K', rank: 3, img: 'https://i.pravatar.cc/100?img=33' },
+                         { name: 'Sarah L.', handle: '@sarah', views: '5.8K', rank: 4, img: 'https://i.pravatar.cc/100?img=9' },
+                         { name: 'Mike T.', handle: '@miket', views: '4.2K', rank: 5, img: 'https://i.pravatar.cc/100?img=12' }
+                      ],
+                      'Monthly': [
+                         { name: 'Alice Smith', handle: '@alice', views: '24.5K', rank: 1, img: 'https://i.pravatar.cc/100?img=1' },
+                         { name: 'Charlie', handle: '@charlie_d', views: '22.1K', rank: 2, img: 'https://i.pravatar.cc/100?img=33' },
+                         { name: 'Bob Jones', handle: '@bobjones', views: '18.2K', rank: 3, img: 'https://i.pravatar.cc/100?img=11' },
+                         { name: 'Diana P.', handle: '@diana', views: '12.4K', rank: 4, img: 'https://i.pravatar.cc/100?img=44' },
+                         { name: 'Eve', handle: '@eve_xyz', views: '9.8K', rank: 5, img: 'https://i.pravatar.cc/100?img=5' }
+                      ],
+                      'All Time': [
+                         { name: 'Alice Smith', handle: '@alice', views: '145K', rank: 1, img: 'https://i.pravatar.cc/100?img=1' },
+                         { name: 'Bob Jones', handle: '@bobjones', views: '112K', rank: 2, img: 'https://i.pravatar.cc/100?img=11' },
+                         { name: 'Charlie', handle: '@charlie_d', views: '98K', rank: 3, img: 'https://i.pravatar.cc/100?img=33' },
+                         { name: 'Diana P.', handle: '@diana', views: '76K', rank: 4, img: 'https://i.pravatar.cc/100?img=44' },
+                         { name: 'Eve', handle: '@eve_xyz', views: '54K', rank: 5, img: 'https://i.pravatar.cc/100?img=5' }
+                      ]
+                   }[leaderboardPeriod]).map(user => (
+                      <div key={user.rank} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors">
+                         <div className="w-6 text-center font-bold text-gray-500 text-sm">{user.rank}</div>
+                         <img src={user.img} className="w-10 h-10 rounded-full object-cover border border-white/10" />
+                         <div className="flex-1 min-w-0">
+                            <div className="font-medium text-white truncate text-[15px]">{user.name}</div>
+                            <div className="text-gray-500 text-[13px] truncate">{user.handle}</div>
+                         </div>
+                         <div className="text-right">
+                            <div className="font-bold text-white text-[15px]">{user.views}</div>
+                            <div className="text-gray-500 text-[11px] uppercase">Views</div>
+                         </div>
+                      </div>
+                   ))}
+                </div>
+             </div>
+          )}
+          {activeTab === 'settings' && (
+             <div className="space-y-6">
+                <div className="mb-8">
+                  <h1 className="text-[28px] font-josefin font-bold tracking-tight">Settings</h1>
+                  <p className="text-gray-400 mt-2 text-sm">Manage your account preferences</p>
+                </div>
+                <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6 space-y-4">
+                   <div className="flex justify-between items-center pb-4 border-b border-white/5">
+                      <div>
+                         <p className="text-white font-medium">Email Address</p>
+                         <p className="text-gray-400 text-sm">{userEmail || 'Not signed in'}</p>
+                      </div>
+                   </div>
+                   <div className="flex justify-between items-center py-2">
+                      <div>
+                         <p className="text-white font-medium">Dark Mode</p>
+                         <p className="text-gray-400 text-sm">Default theme</p>
+                      </div>
+                      <div className="w-12 h-6 bg-[#333] rounded-full relative cursor-pointer">
+                        <div className="w-4 h-4 bg-white rounded-full absolute top-1 right-1"></div>
+                      </div>
+                   </div>
+                   <div className="pt-4 border-t border-white/5">
+                      <button className="text-red-500 font-medium text-sm hover:text-red-400 transition-colors">Delete Account</button>
+                   </div>
+                </div>
+             </div>
+          )}
+          {activeTab === 'help' && (
+             <div className="space-y-6">
+                <div className="mb-8">
+                  <h1 className="text-[28px] font-josefin font-bold tracking-tight">Help & FAQ</h1>
+                  <p className="text-gray-400 mt-2 text-sm">Find answers to common questions</p>
+                </div>
+                <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6 space-y-6">
+                   <div>
+                      <h4 className="text-white font-josefin font-bold mb-1">How do I change my username?</h4>
+                      <p className="text-gray-400 text-sm leading-relaxed">Go to the Edit Profile tab and update the username field. It can only be changed once every 7 days.</p>
+                   </div>
+                   <div>
+                      <h4 className="text-white font-josefin font-bold mb-1">How many links can I add?</h4>
+                      <p className="text-gray-400 text-sm leading-relaxed">Free users can add up to 5 links. Premium features are coming soon.</p>
+                   </div>
+                   <div>
+                      <h4 className="text-white font-josefin font-bold mb-1">How can I contact support?</h4>
+                      <p className="text-gray-400 text-sm leading-relaxed">Email us at support@nads.io.</p>
+                   </div>
+                </div>
+             </div>
+          )}
+          {activeTab === 'edit' && (
+             <>
           <div className="mb-8">
             <h1 className="text-[28px] font-josefin font-bold tracking-tight">Edit your page</h1>
             <a href="#" onClick={(e) => { e.preventDefault(); onBack(); }} className="inline-flex items-center gap-1.5 text-gray-500 hover:text-gray-900 mt-2 text-sm transition-colors cursor-pointer">
@@ -695,60 +927,60 @@ function EditPage({ onBack, onSignOut, data, onChange, userEmail }: { onBack: ()
           <div className="space-y-6">
              {/* Avatar Card */}
              <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6">
-                <div className="flex items-center gap-6">
+                <div className="flex flex-col items-center gap-4 text-center">
                    <div className="relative overflow-visible">
-                      <div className="w-20 h-20 rounded-full bg-[#1b1b1f] flex items-center justify-center overflow-hidden border border-white/5">
+                      <div className="w-24 h-24 rounded-full bg-[#1b1b1f] flex items-center justify-center overflow-hidden border border-white/5 mx-auto">
                          {data.avatarUrl ? (
                             <img src={data.avatarUrl} className="w-full h-full object-cover" />
                          ) : (
                             <User size={32} className="text-gray-400" />
                          )}
                       </div>
-                      <label className="absolute -bottom-1 -right-1 bg-[#252525] hover:bg-[#333] border-4 border-[#141414] w-9 h-9 rounded-full flex items-center justify-center transition-colors cursor-pointer">
-                         <Upload size={14} className="text-white relative z-10" />
+                      <label className="absolute -bottom-1 right-0 bg-[#252525] hover:bg-[#333] border-4 border-[#141414] w-10 h-10 rounded-full flex items-center justify-center transition-colors cursor-pointer">
+                         <Upload size={16} className="text-white relative z-10" />
                          <input type="file" accept="image/*" className="hidden" onChange={(e) => handleFileUpload(e, 'avatarUrl')} />
                       </label>
                    </div>
                    <div>
-                      <h3 className="text-lg font-semibold text-white">{data.displayName || 'No Name'}</h3>
-                      <p className="text-[#a1a1aa] text-sm">@{data.username.toLowerCase()}</p>
+                      <h3 className="text-[20px] font-josefin font-bold text-white tracking-tight">{data.displayName || 'No Name'}</h3>
+                      <p className="text-[#a1a1aa] text-[15px] mt-0.5">@{data.username.toLowerCase()}</p>
                    </div>
                 </div>
              </div>
 
              {/* Basic Info Card */}
-             <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6 space-y-5">
+             <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6 space-y-5 text-center">
                 <div>
-                   <label className="block text-sm text-gray-300 mb-2">Username</label>
+                   <label className="block text-[15px] font-josefin font-bold tracking-tight text-white mb-2">Username</label>
                    <div className="flex items-center bg-[#1a1a1a] rounded-xl border border-white/5 overflow-hidden focus-within:border-white/20 transition-colors">
-                      <div className="px-4 py-3.5 text-gray-500 border-r border-white/5 bg-[#171717] font-medium text-sm">nads.io/</div>
-                      <input type="text" value={data.username.toLowerCase()} onChange={e => onChange({ ...data, username: e.target.value.toLowerCase() })} className="bg-transparent flex-1 px-4 py-3 text-white outline-none w-full text-sm" />
+                      <div className="px-4 py-3.5 text-white border-r border-white/5 bg-[#171717] font-semibold text-[15px]">nads.io/</div>
+                      <input type="text" value={data.username.toLowerCase()} onChange={e => onChange({ ...data, username: e.target.value.toLowerCase() })} className="bg-transparent flex-1 px-4 py-3 text-white outline-none w-full text-[15px] font-semibold text-center" />
                    </div>
-                   <p className="text-[13px] text-gray-500 mt-2 px-1">Username can only be changed once every 7 days.</p>
+                   <p className="text-[13px] text-gray-500 mt-2 px-1 text-center">Username can only be changed once every 7 days.</p>
                 </div>
 
                 <div>
-                   <label className="block text-sm text-gray-300 mb-2">Display name</label>
-                   <input type="text" value={data.displayName} onChange={e => onChange({ ...data, displayName: e.target.value })} className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl px-4 py-3.5 text-white outline-none focus:border-white/20 transition-colors text-sm" />
+                   <label className="block text-[15px] font-josefin font-bold tracking-tight text-white mb-2">Display name</label>
+                   <input type="text" value={data.displayName} onChange={e => onChange({ ...data, displayName: e.target.value })} className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl px-4 py-3.5 text-white outline-none focus:border-white/20 transition-colors text-[15px] font-semibold text-center" />
                 </div>
 
                 <div>
-                   <label className="block text-sm text-gray-300 mb-2">Bio</label>
-                   <textarea rows={3} value={data.bio} onChange={e => onChange({ ...data, bio: e.target.value })} className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl px-4 py-3.5 text-white outline-none focus:border-white/20 transition-colors resize-none text-sm"></textarea>
-                   <p className="text-[12px] text-[#555] mt-1.5 text-right font-mono">{data.bio.length}/160</p>
+                   <label className="block text-[15px] font-josefin font-bold tracking-tight text-white mb-2">Bio</label>
+                   <textarea rows={3} value={data.bio} onChange={e => onChange({ ...data, bio: e.target.value })} className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl px-4 py-3.5 text-white outline-none focus:border-white/20 transition-colors resize-none text-[15px] font-semibold text-center"></textarea>
+                   <p className="text-[12px] text-[#555] mt-1.5 text-center font-mono">{data.bio.length}/160</p>
                 </div>
              </div>
 
              {/* Premium Features Card */}
              <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6">
-                <div className="flex items-center gap-2 mb-8 text-white font-medium">
-                   <Crown size={18} /> Premium features
-                   <button onClick={() => alert('Premium plan coming soon')} className="ml-auto bg-white text-black text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-widest hover:bg-gray-200 transition-colors shadow-sm cursor-pointer">Pro</button>
+                <div className="flex items-center gap-2 mb-8 text-white font-josefin font-bold text-lg">
+                   <Crown size={20} /> Premium features
+                   <button onClick={() => alert('Premium plan coming soon')} className="ml-auto bg-white text-black text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-widest hover:bg-gray-200 transition-colors shadow-sm cursor-pointer font-sans">Pro</button>
                 </div>
 
                 <div className="space-y-8">
                    <div className="text-center">
-                      <label className="block text-[17px] text-white mb-3 text-center">Custom banner</label>
+                      <label className="block text-[18px] font-josefin font-bold text-white mb-3 text-center tracking-tight">Custom banner</label>
                       <div className="w-full h-32 bg-[#141414] rounded-[1rem] relative overflow-hidden flex flex-col justify-between p-3 border border-white/5">
                          {data.bannerUrl ? <img src={data.bannerUrl} className="w-full h-full object-cover absolute inset-0" /> : null}
                          <div className="flex justify-end relative z-10 w-full">
@@ -769,9 +1001,9 @@ function EditPage({ onBack, onSignOut, data, onChange, userEmail }: { onBack: ()
                    </div>
 
                    <div className="text-center w-full">
-                      <label className="block text-[17px] text-white mb-3 text-center">Profile music</label>
+                      <label className="block text-[18px] font-josefin font-bold tracking-tight text-white mb-3 text-center">Profile music</label>
                       <div className="relative flex items-center mb-3">
-                         <label className="w-full bg-[#1a1a1a] hover:bg-[#252525] border border-white/5 py-3.5 rounded-full flex items-center justify-center gap-2 text-[15px] text-white transition-colors cursor-pointer">
+                         <label className="w-full bg-[#1a1a1a] hover:bg-[#252525] border border-white/5 py-3.5 rounded-full flex items-center justify-center gap-2 text-[15px] font-semibold text-white transition-colors cursor-pointer">
                             <Music size={20} /> {data.audioUrl ? 'Replace track' : 'Upload track'}
                             <input type="file" accept="audio/*" className="hidden" onChange={(e) => handleFileUpload(e, 'audioUrl')} />
                          </label>
@@ -783,16 +1015,16 @@ function EditPage({ onBack, onSignOut, data, onChange, userEmail }: { onBack: ()
                       </div>
                       {data.audioUrl && (
                         <div className="w-full bg-transparent border border-white/10 rounded-full px-5 py-3.5 text-gray-300 text-[15px] flex items-center justify-between">
-                           <span className="truncate w-full text-center text-[#ddd]">{data.audioTitle || 'No track selected'}</span>
+                           <span className="truncate w-full text-center text-[#ddd] font-semibold">{data.audioTitle || 'No track selected'}</span>
                         </div>
                       )}
                       <p className="text-[14px] text-[#888] mt-4 text-center leading-relaxed">MP3, WAV, or OGG · up to 8MB · plays on your public profile</p>
                    </div>
 
                    <div className="text-center">
-                      <label className="block text-sm text-gray-300 mb-3">Avatar decoration</label>
+                      <label className="block text-[18px] font-josefin font-bold tracking-tight text-white mb-3 text-center">Avatar decoration</label>
                       <div className="flex items-center justify-between bg-[#1a1a1a] border border-white/5 rounded-xl p-4">
-                         <span className="text-sm text-[#a1a1aa]">{data.isGlowing ? 'Glowing ring is ON' : 'Glowing ring is OFF'}</span>
+                         <span className="text-[15px] font-semibold text-[#a1a1aa]">{data.isGlowing ? 'Glowing ring is ON' : 'Glowing ring is OFF'}</span>
                          {/* Toggle Switch */}
                          <div onClick={() => onChange({...data, isGlowing: !data.isGlowing})} className={`w-12 h-6 rounded-full flex items-center p-0.5 cursor-pointer transition-colors ${data.isGlowing ? 'bg-white' : 'bg-[#333]'}`}>
                             <div className={`w-5 h-5 bg-black rounded-full shadow-sm transition-transform ${data.isGlowing ? 'translate-x-6' : 'translate-x-0'}`}></div>
@@ -805,7 +1037,7 @@ function EditPage({ onBack, onSignOut, data, onChange, userEmail }: { onBack: ()
              {/* Links Card */}
              <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6">
                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-white text-[17px]">Links</h3>
+                    <h3 className="text-white text-[17px] font-josefin font-bold tracking-tight">Links</h3>
                     <span className="text-[15px] text-[#888]">{data.links.length} / 5</span>
                  </div>
 
@@ -819,8 +1051,8 @@ function EditPage({ onBack, onSignOut, data, onChange, userEmail }: { onBack: ()
                           exit={{ opacity: 0, height: 0 }}
                           className="flex items-center gap-3 relative w-full pt-1"
                         >
-                           <input type="text" value={link.title} onChange={e => updateLink(link.id, 'title', e.target.value)} placeholder="Label" className="w-[120px] bg-transparent border border-white/10 rounded-full px-5 py-3.5 text-white text-[15px] outline-none focus:border-white/20 transition-colors shrink-0 text-center" />
-                           <input type="url" value={link.url} onChange={e => updateLink(link.id, 'url', e.target.value)} placeholder="https://..." className="flex-1 bg-transparent border border-white/10 rounded-full px-5 py-3.5 text-white text-[15px] outline-none focus:border-white/20 transition-colors min-w-0 text-center" />
+                           <input type="text" value={link.title} onChange={e => updateLink(link.id, 'title', e.target.value)} placeholder="Label" className="w-[120px] bg-transparent border border-white/10 rounded-full px-5 py-3.5 text-white text-[15px] font-semibold outline-none focus:border-white/20 transition-colors shrink-0 text-center" />
+                           <input type="url" value={link.url} onChange={e => updateLink(link.id, 'url', e.target.value)} placeholder="https://..." className="flex-1 bg-transparent border border-white/10 rounded-full px-5 py-3.5 text-white text-[15px] font-semibold outline-none focus:border-white/20 transition-colors min-w-0 text-center" />
                            <button onClick={() => removeLink(link.id)} className="p-2 text-[#ff4444] hover:bg-[#ff4444]/10 rounded-lg transition-colors flex shrink-0 items-center justify-center">
                               <Trash2 size={18} />
                            </button>
@@ -829,7 +1061,7 @@ function EditPage({ onBack, onSignOut, data, onChange, userEmail }: { onBack: ()
                     </AnimatePresence>
 
                     {data.links.length < 5 && (
-                      <button onClick={addLink} className="w-full mt-4 bg-transparent hover:bg-white/5 border border-white/10 border-dashed py-3.5 rounded-full flex items-center justify-center gap-2 text-white transition-colors text-[16px]">
+                      <button onClick={addLink} className="w-full mt-4 bg-transparent hover:bg-white/5 border border-white/10 border-dashed py-3.5 rounded-full flex items-center justify-center gap-2 text-white transition-colors text-[16px] font-josefin font-bold">
                          <Plus size={18} /> Add link
                       </button>
                     )}
@@ -837,12 +1069,14 @@ function EditPage({ onBack, onSignOut, data, onChange, userEmail }: { onBack: ()
              </div>
           </div>
           
-          <div className="mt-8 flex justify-center">
-             <button onClick={handleSave} disabled={isSaving} className="w-full max-w-[400px] bg-[#1a1a1a] text-white py-4 rounded-[1.5rem] font-semibold text-[15px] hover:bg-gray-100 hover:text-black transition-colors shadow-xl disabled:opacity-70 flex items-center justify-center gap-2">
+          <div className="mt-8 flex justify-center pb-12">
+             <button onClick={handleSave} disabled={isSaving} className="w-full max-w-[400px] bg-[#1a1a1a] text-white py-4 rounded-[1.5rem] font-josefin font-bold text-[18px] hover:bg-gray-100 hover:text-black transition-colors shadow-xl disabled:opacity-70 flex items-center justify-center gap-2">
                 {isSaving ? <Sparkles size={18} className="animate-pulse" /> : null}
                 {isSaving ? 'Saving...' : 'Save & publish'}
              </button>
           </div>
+          </>
+          )}
        </main>
     </div>
   );
@@ -864,12 +1098,27 @@ export default function App() {
   const [view, setView] = useState<'home' | 'profile' | 'edit'>('edit');
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    const handleSession = (session: any) => {
+    const handleSession = async (session: any) => {
       const name = session?.user?.email || session?.user?.user_metadata?.full_name || session?.user?.user_metadata?.custom_claims?.global_name || null;
       setUserEmail(name);
-      if (name) {
+      
+      const uid = session?.user?.id;
+      setUserId(uid || null);
+
+      if (uid) {
+        import('./lib/api').then(async (api) => {
+          const profile = await api.fetchProfile(uid);
+          if (profile) {
+            setProfileData(profile);
+          } else if (name) {
+            const username = name.split('@')[0].replace(/[^a-zA-Z0-9_]/g, '');
+            setProfileData(prev => prev.username === 'che' ? { ...prev, username: username, displayName: username, bio: '' } : prev);
+          }
+        });
+      } else if (!uid && name) {
         const username = name.split('@')[0].replace(/[^a-zA-Z0-9_]/g, '');
         setProfileData(prev => prev.username === 'che' ? { ...prev, username: username, displayName: username, bio: '' } : prev);
       }
@@ -927,7 +1176,7 @@ export default function App() {
         </div>
       )}
       {view === 'profile' && <UserPage data={profileData} onBack={() => setView('edit')} onEdit={() => setView('edit')} />}
-      {view === 'edit' && <EditPage data={profileData} onChange={setProfileData} onBack={() => setView('profile')} onSignOut={() => setView('home')} userEmail={userEmail} />}
+      {view === 'edit' && <EditPage data={profileData} onChange={setProfileData} onBack={() => setView('profile')} onSignOut={async () => { await supabase.auth.signOut(); setUserEmail(null); setUserId(null); setView('home'); }} onHome={() => setView('home')} userEmail={userEmail} userId={userId} />}
     </>
   );
 }
