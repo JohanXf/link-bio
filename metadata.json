@@ -1,0 +1,6 @@
+{
+  "name": "nads.io Clone",
+  "description": "A stunning landing page and interactive phone mockup of the nads.io link in bio application.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
