@@ -240,7 +240,7 @@ function MusicCard() {
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-white truncate group-hover:text-indigo-200 transition-colors">Lofi Beats to Code To</p>
-        <p className="text-xs text-indigo-200/70 truncate mt-0.5">Spotify</p>
+        <p className="text-xs text-indigo-200/70 truncate mt-0.5">Custom Audio Track</p>
       </div>
     </div>
   );
@@ -384,7 +384,7 @@ function Features() {
     },
     {
       title: "Music Player",
-      description: "Embed Spotify or Apple Music tracks right on your profile for immersive visits.",
+      description: "Embed custom background tracks or atmospheric soundscapes directly on your page.",
       icon: <Music size={24} />,
       color: "from-blue-500 to-cyan-500"
     },
@@ -497,7 +497,7 @@ function AudioPlayer({ audioTitle, audioUrl, isVideoBg }: { audioTitle: string, 
       transition={{ delay: 0.1 }}
       className={`w-full max-w-[400px] mt-3 rounded-[1.25rem] p-4 shadow-2xl transition-all duration-300 ${
         isVideoBg 
-          ? 'bg-[#141414]/30 backdrop-blur-xl border border-white/10' 
+          ? 'bg-[#141414]/10 backdrop-blur-xl border border-white/10' 
           : 'bg-[#141414] border border-white/5'
       }`}
     >
@@ -585,7 +585,7 @@ function UserPage({ onBack, onEdit, data }: { onBack: () => void, onEdit: () => 
         animate={{ opacity: 1, y: 0 }}
         className={`w-full max-w-[400px] rounded-[1.5rem] p-3 pb-8 shadow-2xl relative overflow-hidden transition-all duration-300 ${
           isVideoBg 
-            ? 'bg-[#141414]/30 backdrop-blur-md border border-white/10 z-10' 
+            ? 'bg-[#141414]/10 backdrop-blur-md border border-white/10 z-10' 
             : 'bg-[#141414] border border-white/5'
         }`}
       >
@@ -595,8 +595,8 @@ function UserPage({ onBack, onEdit, data }: { onBack: () => void, onEdit: () => 
           <span className="text-gray-100 font-medium text-[10px]">2</span>
         </div>
         
-        {/* 16:5 Banner with no separator border */}
-        <div className="relative w-[calc(100%+24px)] aspect-[16/5] -mx-3 -mt-3 overflow-hidden select-none">
+        {/* 15:6 Banner with no separator border */}
+        <div className="relative w-[calc(100%+24px)] aspect-[15/6] -mx-3 -mt-3 overflow-hidden select-none">
           {data.bannerUrl ? (
             <img src={data.bannerUrl} className="w-full h-full object-cover" />
           ) : (
@@ -632,19 +632,18 @@ function UserPage({ onBack, onEdit, data }: { onBack: () => void, onEdit: () => 
            </div>
 
            <h1 className="text-2xl font-josefin font-bold text-white tracking-tight leading-tight">{data.displayName || 'No Name'}</h1>
-           
-           <p className="text-[#888888] text-[15px] font-light mt-1 mb-2 text-center leading-normal">
+           {data.username && (
+             <p className="text-[13px] font-semibold text-gray-400 font-mono mt-1 hover:text-gray-300 transition-colors">
+               @{data.username.toLowerCase()}
+             </p>
+           )}
+           <p className="text-gray-500 text-[14px] font-light mt-2.5 mb-4 text-center leading-normal max-w-[280px]">
              {data.bio}
            </p>
 
-           <div className="w-full flex flex-col gap-2.5 px-2 mt-0">
+           <div className="w-full flex flex-col gap-2.5 px-2 mt-0 items-center justify-center">
              {data.links.length > 0 && (
-               <div className={`w-full grid gap-2.5 ${
-                 data.links.length === 5 || data.links.length >= 4 ? 'grid-cols-4' : 
-                 data.links.length === 3 ? 'grid-cols-3 max-w-[280px] mx-auto' : 
-                 data.links.length === 2 ? 'grid-cols-2 max-w-[180px] mx-auto' : 
-                 'grid-cols-1 max-w-[90px] mx-auto'
-               }`}>
+               <div className="flex flex-wrap items-center justify-center gap-2.5 w-full">
                  {data.links.slice(0, data.links.length === 5 ? 4 : data.links.length).map(link => (
                    <a 
                      key={link.id} 
@@ -652,14 +651,14 @@ function UserPage({ onBack, onEdit, data }: { onBack: () => void, onEdit: () => 
                      target="_blank" 
                      rel="noopener noreferrer" 
                      title={link.title || 'Link'} 
-                     className={`border flex items-center justify-center transition-all hover:scale-[1.05] active:scale-[0.95] aspect-[1.15/1] w-full shrink-0 rounded-2xl ${
+                     className={`flex items-center justify-center transition-all hover:scale-[1.05] active:scale-[0.95] w-[64px] h-[64px] shrink-0 rounded-2xl border ${
                        isVideoBg 
                          ? 'bg-white/15 hover:bg-white/25 border-white/20 hover:border-white/30 text-white backdrop-blur-md shadow-lg shadow-black/15' 
                          : 'bg-[#f0f0f0] hover:bg-[#e5e5e5] border-transparent text-black shadow-sm'
                      }`}
                    >
                      <div className={`flex items-center justify-center w-full h-full ${isVideoBg ? 'text-white' : 'text-gray-800'}`}>
-                       {getLinkIcon(link.url, link.title, 18)}
+                       {getLinkIcon(link.url, link.title, 20)}
                      </div>
                    </a>
                  ))}
@@ -711,7 +710,7 @@ function UserPage({ onBack, onEdit, data }: { onBack: () => void, onEdit: () => 
 
 function EditPage({ onBack, onSignOut, onHome, data, onChange, userEmail, userId }: { onBack: () => void, onSignOut: () => void, onHome: () => void, data: ProfileData, onChange: React.Dispatch<React.SetStateAction<ProfileData>>, userEmail: string | null, userId: string | null }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'home'|'edit'|'analytics'|'leaderboard'|'settings'|'help'>('edit');
+  const [activeTab, setActiveTab] = useState<'home'|'edit'|'analytics'|'leaderboard'|'settings'|'help'|'premium'>('edit');
   const [leaderboardPeriod, setLeaderboardPeriod] = useState<'Daily'|'Weekly'|'Monthly'|'All Time'>('All Time');
   const [isSaving, setIsSaving] = useState(false);
 
@@ -868,10 +867,10 @@ function EditPage({ onBack, onSignOut, onHome, data, onChange, userEmail, userId
                         <span className="font-josefin font-semibold text-[15px]">Edit profile</span>
                      </button>
                      
-                     <button onClick={() => alert('Premium plan coming soon')} className="w-full flex items-center gap-3 px-3 py-3.5 text-gray-300 hover:text-white hover:bg-[#252525] rounded-xl transition-colors mb-1 group cursor-pointer">
-                        <Crown size={18} />
+                     <button onClick={() => { setActiveTab('premium'); setIsSidebarOpen(false); }} className={`w-full flex items-center gap-3 px-3 py-3.5 rounded-xl transition-colors mb-1 cursor-pointer group ${activeTab === 'premium' ? 'bg-[#252525] text-white border border-white/5' : 'text-gray-300 hover:text-white hover:bg-[#252525]'}`}>
+                        <Crown size={18} className={activeTab === 'premium' ? 'text-yellow-400' : 'text-gray-300'} />
                         <span className="font-josefin font-semibold text-[15px]">Premium</span>
-                        <span className="ml-auto bg-[#333] group-hover:bg-white group-hover:text-black text-gray-300 transition-colors text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest">Pro</span>
+                        <span className={`ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest transition-colors ${activeTab === 'premium' ? 'bg-yellow-400 text-black' : 'bg-[#333] group-hover:bg-white group-hover:text-black text-gray-300'}`}>Pro</span>
                      </button>
                      
                      <button onClick={() => { setActiveTab('analytics'); setIsSidebarOpen(false); }} className={`w-full flex items-center gap-3 px-3 py-3.5 rounded-xl transition-colors mb-1 cursor-pointer ${activeTab === 'analytics' ? 'bg-[#252525] text-white border border-white/5' : 'text-gray-300 hover:text-white hover:bg-[#252525]'}`}>
@@ -994,7 +993,7 @@ function EditPage({ onBack, onSignOut, onHome, data, onChange, userEmail, userId
                 <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6 flex flex-col items-center justify-center min-h-[300px] gap-4">
                    <BarChart2 size={48} className="text-gray-600" />
                    <p className="text-gray-400 text-center max-w-[250px]">Detailed analytics will be available in the upcoming Pro tier.</p>
-                   <button onClick={() => alert('Premium plan coming soon')} className="mt-4 bg-[#252525] hover:bg-[#333] text-white py-2 px-6 rounded-full font-medium transition-colors border border-white/5">
+                   <button onClick={() => setActiveTab('premium')} className="mt-4 bg-[#252525] hover:bg-[#333] text-white py-2 px-6 rounded-full font-medium transition-colors border border-white/5 cursor-pointer">
                      Upgrade to Pro
                    </button>
                 </div>
@@ -1094,6 +1093,107 @@ function EditPage({ onBack, onSignOut, onHome, data, onChange, userEmail, userId
                 </div>
              </div>
           )}
+          {activeTab === 'premium' && (
+             <div className="space-y-6 animate-fadeIn">
+                <div className="mb-8">
+                  <h1 className="text-[28px] font-josefin font-bold tracking-tight">Pro Membership</h1>
+                  <p className="text-gray-400 mt-2 text-sm">Elevate your digital presence on Nads.io with ultimate customization</p>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                   <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6 flex flex-col justify-between relative overflow-hidden shadow-xl">
+                      <div className="absolute top-0 right-0 bg-[#ffd700] text-black text-[9px] font-bold px-3 py-1 rounded-bl-xl uppercase tracking-widest font-sans">Popular</div>
+                      <div>
+                         <span className="text-gray-400 font-mono text-xs uppercase tracking-wider font-semibold">Individual</span>
+                         <h3 className="text-2xl font-josefin font-bold text-white mt-1">Creator Pro</h3>
+                         <p className="text-gray-400 text-xs mt-2 leading-relaxed">Perfect for creators who want fully customized, cinema-grade landing views and soundscapes.</p>
+                         
+                         <div className="flex items-baseline gap-1 mt-6">
+                            <span className="text-3xl font-josefin font-bold text-white">$4.99</span>
+                            <span className="text-gray-450 text-xs">/ month</span>
+                         </div>
+
+                         <div className="mt-6 space-y-3.5">
+                            <div className="flex items-center gap-2.5 text-sm text-gray-300">
+                               <Crown size={14} className="text-yellow-400 shrink-0" />
+                               <span>Cinematic Portrait Video Loops</span>
+                            </div>
+                            <div className="flex items-center gap-2.5 text-sm text-gray-300">
+                               <Crown size={14} className="text-yellow-400 shrink-0" />
+                               <span>Glow borders & avatar rings</span>
+                            </div>
+                            <div className="flex items-center gap-2.5 text-sm text-gray-300">
+                               <Crown size={14} className="text-yellow-400 shrink-0" />
+                               <span>Interactive Custom sound layers & player</span>
+                            </div>
+                            <div className="flex items-center gap-2.5 text-sm text-gray-300">
+                               <Crown size={14} className="text-yellow-400 shrink-0" />
+                               <span>Social Banners (15:6 format)</span>
+                            </div>
+                            <div className="flex items-center gap-2.5 text-sm text-gray-300">
+                               <Crown size={14} className="text-yellow-400 shrink-0" />
+                               <span>Detailed analytical reports & tracking</span>
+                            </div>
+                            <div className="flex items-center gap-2.5 text-sm text-gray-300">
+                               <Crown size={14} className="text-yellow-400 shrink-0" />
+                               <span>Unlimited general hyperlink pins</span>
+                            </div>
+                         </div>
+                      </div>
+
+                      <button onClick={() => alert('Creator Pro is already fully unlocked and active on your account!')} className="w-full bg-[#ffd700] hover:bg-[#ffeb55] text-black font-semibold text-sm py-3 rounded-full mt-8 transition-all active:scale-[0.98] shadow-lg shadow-yellow-500/10 cursor-pointer">
+                         Active Plan
+                      </button>
+                   </div>
+
+                   <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6 flex flex-col justify-between shadow-xl">
+                      <div>
+                         <span className="text-gray-400 font-mono text-xs uppercase tracking-wider font-semibold">Enterprise</span>
+                         <h3 className="text-2xl font-josefin font-bold text-white mt-1">Creator VIP</h3>
+                         <p className="text-gray-400 text-xs mt-2 leading-relaxed">For agencies, managers, and premium brands needing custom domains and 24/7 dedicated assistance.</p>
+                         
+                         <div className="flex items-baseline gap-1 mt-6">
+                            <span className="text-3xl font-josefin font-bold text-white">$12.99</span>
+                            <span className="text-gray-550 text-xs">/ month</span>
+                         </div>
+
+                         <div className="mt-6 space-y-3.5">
+                            <div className="flex items-center gap-2.5 text-sm text-gray-300">
+                               <Crown size={14} className="text-yellow-450 shrink-0" />
+                               <span>Everything in Creator Pro</span>
+                            </div>
+                            <div className="flex items-center gap-2.5 text-sm text-gray-300">
+                               <Crown size={14} className="text-yellow-450 shrink-0" />
+                               <span>Custom Root Domains (e.g. yourname.com)</span>
+                            </div>
+                            <div className="flex items-center gap-2.5 text-sm text-gray-300">
+                               <Crown size={14} className="text-yellow-450 shrink-0" />
+                               <span>Priority dedicated support manager</span>
+                            </div>
+                            <div className="flex items-center gap-2.5 text-sm text-gray-300">
+                               <Crown size={14} className="text-yellow-450 shrink-0" />
+                               <span>SEO enhancements & indexation control</span>
+                            </div>
+                         </div>
+                      </div>
+
+                      <button onClick={() => alert('VIP custom domains and agency manager panel setup has been initiated. Contact vip-support@nads.io to finalize routing.')} className="w-full bg-white hover:bg-gray-150 text-black font-semibold text-sm py-3 rounded-full mt-8 transition-all active:scale-[0.98] cursor-pointer">
+                         Upgrade to VIP
+                      </button>
+                   </div>
+                </div>
+
+                <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6">
+                   <h3 className="font-josefin font-bold text-white text-lg mb-2">Why Pro?</h3>
+                   <p className="text-gray-400 text-sm leading-relaxed mb-4">
+                      When thousands of visitors browse your social pages, details matter. Pro equips you with real tools – portrait loops, audio players, custom margins, glassmorphic layout, and comprehensive analytical graphs. 
+                   </p>
+                   <div className="flex items-center gap-2 text-xs text-yellow-400 font-mono font-bold tracking-widest uppercase">
+                      <Sparkles size={12} /> All Pro features are currently unlocked for testing!
+                   </div>
+                </div>
+             </div>
+          )}
           {activeTab === 'help' && (
              <div className="space-y-6">
                 <div className="mb-8">
@@ -1107,7 +1207,7 @@ function EditPage({ onBack, onSignOut, onHome, data, onChange, userEmail, userId
                    </div>
                    <div>
                       <h4 className="text-white font-josefin font-bold mb-1">How many links can I add?</h4>
-                      <p className="text-gray-400 text-sm leading-relaxed">Free users can add up to 5 links. Premium features are coming soon.</p>
+                      <p className="text-gray-400 text-sm leading-relaxed">Free users can add up to 5 links. Upgrade to Pro in the Premium tab to enjoy unlimited links, HD cinematic video backgrounds, custom audio player track uploads, and interactive styling options!</p>
                    </div>
                    <div>
                       <h4 className="text-white font-josefin font-bold mb-1">How can I contact support?</h4>
@@ -1176,13 +1276,15 @@ function EditPage({ onBack, onSignOut, onHome, data, onChange, userEmail, userId
              <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6">
                 <div className="flex items-center gap-2 mb-8 text-white font-josefin font-bold text-lg">
                    <Crown size={20} /> Premium features
-                   <button onClick={() => alert('Premium plan coming soon')} className="ml-auto bg-white text-black text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-widest hover:bg-gray-200 transition-colors shadow-sm cursor-pointer font-sans">Pro</button>
+                   <button onClick={() => setActiveTab('premium')} className="ml-auto bg-[#ffd700] text-black text-[10px] font-bold px-2.5 py-1.5 rounded-full uppercase tracking-[0.05em] hover:bg-[#ffeb55] transition-colors shadow-md cursor-pointer font-sans flex items-center gap-1 shrink-0">
+                      <Crown size={10} className="fill-black" /> Get Pro
+                   </button>
                 </div>
 
                 <div className="space-y-8">
                    <div className="text-center">
                       <label className="block text-[18px] font-josefin font-bold text-white mb-3 text-center tracking-tight">Custom banner</label>
-                      <div className="w-full aspect-[16/5] bg-[#141414] rounded-[1rem] relative overflow-hidden flex flex-col justify-between p-3 border border-white/5">
+                      <div className="w-full aspect-[15/6] bg-[#141414] rounded-[1rem] relative overflow-hidden flex flex-col justify-between p-3 border border-white/5">
                          {data.bannerUrl ? <img src={data.bannerUrl} className="w-full h-full object-cover absolute inset-0" /> : null}
                          <div className="flex justify-end relative z-10 w-full">
                            {data.bannerUrl && (
@@ -1236,37 +1338,6 @@ function EditPage({ onBack, onSignOut, onHome, data, onChange, userEmail, userId
 
                        {data.videoBackgroundEnabled && (
                          <div className="space-y-4">
-                           {/* Preset list */}
-                           <div className="text-left">
-                              <span className="text-[12px] font-bold text-gray-400 font-josefin tracking-wider uppercase mb-1.5 block">Aesthetic Loops Presets</span>
-                              <div className="grid grid-cols-3 gap-2 mt-2">
-                                 {VIDEO_PRESETS.map((preset) => {
-                                   const isSelected = data.videoBackgroundUrl === preset.url;
-                                   return (
-                                     <button 
-                                       key={preset.name}
-                                       type="button"
-                                       onClick={() => onChange({ ...data, videoBackgroundUrl: preset.url })}
-                                       className={`flex flex-col items-center gap-1 p-2.5 rounded-xl transition-all border ${
-                                         isSelected 
-                                           ? 'bg-white/10 border-white/30 text-white scale-[1.03]' 
-                                           : 'bg-[#1a1a1a] border-white/5 text-gray-400 hover:border-white/10 hover:text-white'
-                                       } cursor-pointer`}
-                                     >
-                                       <span className="text-xl mb-0.5">{preset.thumb}</span>
-                                       <span className="text-[9px] font-bold tracking-tight uppercase truncate w-full text-center">{preset.name}</span>
-                                     </button>
-                                   );
-                                 })}
-                              </div>
-                           </div>
-
-                           <div className="flex items-center gap-2 py-1">
-                              <div className="h-[1.5px] bg-white/5 flex-1" />
-                              <span className="text-[10px] font-bold text-gray-500 font-mono">OR</span>
-                              <div className="h-[1.5px] bg-white/5 flex-1" />
-                           </div>
-
                            {/* Upload Custom Video or Paste URL */}
                            <div className="text-left space-y-3">
                               <span className="text-[12px] font-bold text-gray-500 font-josefin tracking-wider uppercase block">Custom Video Source</span>
