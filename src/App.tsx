@@ -80,10 +80,10 @@ function Navbar({ onLoginClick, userEmail, onSignOut, onDashboardClick }: { onLo
     <nav className="fixed top-0 left-0 right-0 z-50 bg-[#f0f0f0]/90 backdrop-blur-md border-b border-[#e5e5e5]">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-josefin font-bold text-[15px]">
-            n
+          <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center text-white font-josefin font-bold text-[15px]">
+            N
           </div>
-          <span className="font-josefin font-bold text-[15px] tracking-tight text-black">nads.io</span>
+          <span className="font-josefin font-bold text-[15px] tracking-tight text-black">Nads.io</span>
         </div>
         <div className="flex items-center gap-4">
           {userEmail ? (
@@ -91,14 +91,14 @@ function Navbar({ onLoginClick, userEmail, onSignOut, onDashboardClick }: { onLo
               <button onClick={onDashboardClick} className="text-sm font-semibold text-gray-700 hover:text-black transition-colors cursor-pointer">
                 Editor
               </button>
-              <button onClick={onSignOut} className="font-josefin font-bold text-[15px] bg-black text-white px-4 py-2 rounded-full hover:bg-neutral-800 transition-colors cursor-pointer shadow-sm tracking-tight">
+              <button onClick={onSignOut} className="bg-[#18181b] hover:bg-[#27272a] py-2 px-4 rounded-[1.5rem] font-josefin font-bold text-[15px] transition-colors text-white shadow-md tracking-tight cursor-pointer">
                 Sign out
               </button>
             </>
           ) : (
             <>
               <button onClick={onLoginClick} className="font-josefin font-bold text-[15px] text-gray-700 hover:text-black transition-colors hidden sm:block cursor-pointer">Log in</button>
-              <button onClick={onLoginClick} className="font-josefin font-bold bg-white text-black px-5 py-2.5 rounded-full text-[15px] hover:bg-gray-200 transition-colors border border-gray-200 cursor-pointer shadow-sm tracking-tight">
+              <button onClick={onLoginClick} className="bg-[#18181b] hover:bg-[#27272a] py-2 px-4 rounded-[1.5rem] font-josefin font-bold text-[15px] transition-colors text-white shadow-md tracking-tight cursor-pointer">
                 Sign up
               </button>
             </>
@@ -182,8 +182,8 @@ function PhoneMockup() {
            </div>
            
            <div className="mt-10 font-josefin font-bold text-lg text-white/20 tracking-tight flex items-center gap-1">
-             <div className="w-4 h-4 rounded bg-white/20 flex items-center justify-center text-[10px] text-neutral-900 font-josefin font-bold">n</div>
-             nads.io
+             <div className="w-4 h-4 rounded bg-white/20 flex items-center justify-center text-[10px] text-neutral-900 font-josefin font-bold">N</div>
+             Nads.io
            </div>
         </div>
       </div>
@@ -210,7 +210,7 @@ function Hero({ onNavigate, onLoginClick }: { onNavigate: () => void, onLoginCli
            className="text-5xl md:text-6xl lg:text-7xl font-josefin font-bold tracking-tight text-black leading-[1.05]"
         >
           Your bio, <br className="hidden md:block" />
-          <span className="text-black bg-clip-text">one nads.io link.</span>
+          <span className="text-black bg-clip-text">one Nads.io link.</span>
         </motion.h1>
         <motion.p 
            initial={{ opacity: 0, y: 20 }}
@@ -327,12 +327,12 @@ function Footer() {
     <footer className="bg-[#e5e5e5] py-12 px-6 border-t border-[#d4d4d8]">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
         <div className="flex items-center gap-2">
-           <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-josefin font-bold text-[15px] shadow-sm">
-             n
+           <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center text-white font-josefin font-bold text-[15px] shadow-sm">
+             N
            </div>
-           <span className="font-josefin font-bold text-[15px] tracking-tight text-black">nads.io</span>
+           <span className="font-josefin font-bold text-[15px] tracking-tight text-black">Nads.io</span>
         </div>
-        <p className="text-gray-500 font-medium">© {new Date().getFullYear()} nads.io. All rights reserved.</p>
+        <p className="text-gray-500 font-medium">© {new Date().getFullYear()} Nads.io. All rights reserved.</p>
         <div className="flex gap-5 text-gray-400">
           <Twitter size={22} className="hover:text-indigo-400 cursor-pointer transition-colors" />
           <Github size={22} className="hover:text-indigo-400 cursor-pointer transition-colors" />
@@ -641,7 +641,7 @@ function EditPage({ onBack, onSignOut, onHome, data, onChange, userEmail, userId
                 <div className="flex items-center justify-between p-5 border-b border-white/5">
                    <div className="flex items-center gap-2 text-white">
                       <Sparkles size={18} />
-                      <span onClick={onHome} className="font-josefin font-bold text-[15px] hover:text-indigo-400 transition-colors cursor-pointer text-white">nads.io</span>
+                      <span onClick={onHome} className="font-josefin font-bold text-lg hover:text-indigo-400 transition-colors cursor-pointer text-white">Nads.io</span>
                    </div>
                    <button onClick={() => setIsSidebarOpen(false)} className="text-gray-400 hover:text-white transition-colors p-1">
                      <X size={20} />
@@ -708,17 +708,17 @@ function EditPage({ onBack, onSignOut, onHome, data, onChange, userEmail, userId
 
        {/* Top Navbar */}
        <header className="sticky top-0 z-50 bg-[#f0f0f0]/90 backdrop-blur-md p-4 md:px-8 flex items-center justify-between border-b border-[#e5e5e5]">
-          <button onClick={() => setIsSidebarOpen(true)} className="bg-[#18181b] hover:bg-[#27272a] py-2 px-4 rounded-[1.5rem] flex items-center gap-2 transition-colors text-white shadow-md">
+          <button onClick={() => setIsSidebarOpen(true)} className="bg-[#18181b] hover:bg-[#27272a] h-9 px-4 rounded-full flex items-center gap-2 transition-colors text-white shadow-md">
              <Menu size={16} className="text-white" strokeWidth={2.5} />
-             <span className="font-josefin font-bold text-[15px] tracking-tight text-white">nads.io</span>
+             <span className="font-josefin font-bold text-[15px] tracking-tight text-white mb-[1px]">Nads.io</span>
           </button>
           
           <div className="flex items-center gap-2">
-            <button className="bg-[#18181b] hover:bg-[#27272a] w-[36px] h-[36px] rounded-full flex items-center justify-center transition-colors text-white shadow-md">
+            <button className="bg-[#18181b] hover:bg-[#27272a] w-9 h-9 rounded-full flex items-center justify-center transition-colors text-white shadow-md">
                <Sun size={16} strokeWidth={2.5} className="text-white" />
             </button>
-            <button onClick={onSignOut} className="bg-[#18181b] hover:bg-[#27272a] py-2 px-4 rounded-[1.5rem] font-josefin font-bold text-[15px] transition-colors text-white shadow-md tracking-tight">
-               Sign out
+            <button onClick={onSignOut} className="bg-[#18181b] hover:bg-[#27272a] h-9 px-4 rounded-full font-josefin font-bold text-[15px] flex items-center justify-center transition-colors text-white shadow-md tracking-tight cursor-pointer">
+               <span className="mb-[1px]">Sign out</span>
             </button>
           </div>
        </header>
@@ -1115,12 +1115,12 @@ export default function App() {
             setProfileData(profile);
           } else if (name) {
             const username = name.split('@')[0].replace(/[^a-zA-Z0-9_]/g, '');
-            setProfileData(prev => prev.username === 'che' ? { ...prev, username: username, displayName: username, bio: '' } : prev);
+            setProfileData(prev => prev.username === '' ? { ...prev, username: username, displayName: username, bio: '' } : prev);
           }
         });
       } else if (!uid && name) {
         const username = name.split('@')[0].replace(/[^a-zA-Z0-9_]/g, '');
-        setProfileData(prev => prev.username === 'che' ? { ...prev, username: username, displayName: username, bio: '' } : prev);
+        setProfileData(prev => prev.username === '' ? { ...prev, username: username, displayName: username, bio: '' } : prev);
       }
     };
 
@@ -1136,7 +1136,7 @@ export default function App() {
   }, []);
   
   const [profileData, setProfileData] = useState<ProfileData>({
-    username: 'che',
+    username: '',
     displayName: '',
     bio: '',
     isGlowing: true,

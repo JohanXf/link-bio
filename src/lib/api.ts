@@ -140,9 +140,38 @@ export async function uploadFile(
   const fileName = `${userId}-${Date.now()}.${fileExt}`;
   const filePath = `${userId}/${fileName}`;
 
-  const { error: uploadError } = await supabase.storage
+  let { error: uploadError } = await supabase.storage
     .from(bucket)
     .upload(filePath, file, { upsert: true });
+
+  if (uploadError) {
+    const errMsg = uploadError.message?.toLowerCase() || '';
+    if (
+      errMsg.includes('bucket not found') || 
+      errMsg.includes('does not exist') || 
+      errMsg.includes('bucket_not_found') ||
+      errMsg.includes('invalid bucket')
+    ) {
+      try {
+        // Attempt to programmatic create the bucket if it does not exist
+        const { error: createBucketError } = await supabase.storage.createBucket(bucket, {
+          public: true
+        });
+
+        if (!createBucketError) {
+          // Retry upload if bucket creation succeeded
+          const retryResult = await supabase.storage
+            .from(bucket)
+            .upload(filePath, file, { upsert: true });
+          uploadError = retryResult.error;
+        } else {
+          console.error('Failed to create bucket programmatically:', createBucketError);
+        }
+      } catch (err) {
+        console.error('Exception during bucket auto-creation:', err);
+      }
+    }
+  }
 
   if (uploadError) throw uploadError;
 
