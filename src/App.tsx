@@ -632,12 +632,7 @@ function UserPage({ onBack, onEdit, data }: { onBack: () => void, onEdit: () => 
            </div>
 
            <h1 className="text-2xl font-josefin font-bold text-white tracking-tight leading-tight">{data.displayName || 'No Name'}</h1>
-           {data.username && (
-             <p className="text-[13px] font-semibold text-gray-400 font-mono mt-1 hover:text-gray-300 transition-colors">
-               @{data.username.toLowerCase()}
-             </p>
-           )}
-           <p className="text-gray-500 text-[14px] font-light mt-2.5 mb-4 text-center leading-normal max-w-[280px]">
+           <p className="text-gray-500 text-[14px] font-light mt-1.5 mb-4 text-center leading-normal max-w-[280px]">
              {data.bio}
            </p>
 
