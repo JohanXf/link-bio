@@ -1,0 +1,30 @@
+{
+  "mappings": [
+    { "keyword": "github", "icon": "Github" },
+    { "keyword": "twitter", "icon": "Twitter" },
+    { "keyword": "x.com", "icon": "Twitter" },
+    { "keyword": "instagram", "icon": "Instagram" },
+    { "keyword": "youtube", "icon": "Youtube" },
+    { "keyword": "linkedin", "icon": "Linkedin" },
+    { "keyword": "facebook", "icon": "Facebook" },
+    { "keyword": "twitch", "icon": "Twitch" },
+    { "keyword": "spotify", "icon": "Music" },
+    { "keyword": "soundcloud", "icon": "Music" },
+    { "keyword": "discord", "icon": "MessageCircle" },
+    { "keyword": "telegram", "icon": "MessageCircle" },
+    { "keyword": "whatsapp", "icon": "MessageCircle" },
+    { "keyword": "portfolio", "icon": "Globe" },
+    { "keyword": "blog", "icon": "Globe" },
+    { "keyword": "website", "icon": "Globe" },
+    { "keyword": "resume", "icon": "FileText" },
+    { "keyword": "cv", "icon": "FileText" },
+    { "keyword": "pdf", "icon": "FileText" },
+    { "keyword": "job", "icon": "Briefcase" },
+    { "keyword": "work", "icon": "Briefcase" },
+    { "keyword": "career", "icon": "Briefcase" },
+    { "keyword": "book", "icon": "BookOpen" },
+    { "keyword": "read", "icon": "BookOpen" },
+    { "keyword": "medium.com", "icon": "BookOpen" }
+  ],
+  "defaultIcon": "Link"
+}

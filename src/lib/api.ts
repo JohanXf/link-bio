@@ -1,6 +1,29 @@
 import { supabase } from './supabase';
 import { ProfileData } from '../App';
 
+function decodeBio(packedBio: string) {
+  const norm = packedBio || '';
+  const match = norm.match(/(.*?)\s*\|\|video:([^|]*)\|\|enabled:([^|]*)$/);
+  if (match) {
+    return {
+      bio: match[1].trim(),
+      videoBackgroundUrl: match[2],
+      videoBackgroundEnabled: match[3] === 'true'
+    };
+  }
+  return {
+    bio: norm,
+    videoBackgroundUrl: '',
+    videoBackgroundEnabled: false
+  };
+}
+
+function encodeBio(rawBio: string, videoUrl: string, videoEnabled: boolean) {
+  const cleanBio = (rawBio || '').trim();
+  if (!videoUrl) return cleanBio;
+  return `${cleanBio} ||video:${videoUrl}||enabled:${videoEnabled}`;
+}
+
 export async function fetchProfile(userId: string): Promise<ProfileData | null> {
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
@@ -16,15 +39,19 @@ export async function fetchProfile(userId: string): Promise<ProfileData | null> 
     .eq('profile_id', userId)
     .order('order_index', { ascending: true });
 
+  const decoded = decodeBio(profile.bio);
+
   return {
     username: profile.username,
     displayName: profile.display_name || '',
-    bio: profile.bio || '',
+    bio: decoded.bio,
     isGlowing: profile.is_glowing,
     avatarUrl: profile.avatar_url || '',
     bannerUrl: profile.banner_url || '',
     audioUrl: profile.audio_url || '',
     audioTitle: profile.audio_title || '',
+    videoBackgroundUrl: decoded.videoBackgroundUrl,
+    videoBackgroundEnabled: decoded.videoBackgroundEnabled,
     links: (links || []).map(link => ({
       id: link.id,
       title: link.title,
@@ -62,15 +89,19 @@ export async function fetchProfileByUsername(username: string): Promise<ProfileD
     .eq('profile_id', profile.id)
     .order('order_index', { ascending: true });
 
+  const decoded = decodeBio(profile.bio);
+
   return {
     username: profile.username,
     displayName: profile.display_name || '',
-    bio: profile.bio || '',
+    bio: decoded.bio,
     isGlowing: profile.is_glowing,
     avatarUrl: profile.avatar_url || '',
     bannerUrl: profile.banner_url || '',
     audioUrl: profile.audio_url || '',
     audioTitle: profile.audio_title || '',
+    videoBackgroundUrl: decoded.videoBackgroundUrl,
+    videoBackgroundEnabled: decoded.videoBackgroundEnabled,
     links: (links || []).map(link => ({
       id: link.id,
       title: link.title,
@@ -80,6 +111,8 @@ export async function fetchProfileByUsername(username: string): Promise<ProfileD
 }
 
 export async function saveProfile(userId: string, data: ProfileData) {
+  const packedBio = encodeBio(data.bio, data.videoBackgroundUrl || '', data.videoBackgroundEnabled || false);
+
   // 1. Upsert Profile
   const { error: profileError } = await supabase
     .from('profiles')
@@ -87,7 +120,7 @@ export async function saveProfile(userId: string, data: ProfileData) {
       id: userId,
       username: data.username.toLowerCase(),
       display_name: data.displayName,
-      bio: data.bio,
+      bio: packedBio,
       is_glowing: data.isGlowing,
       avatar_url: data.avatarUrl,
       banner_url: data.bannerUrl,

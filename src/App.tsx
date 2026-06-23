@@ -3,11 +3,85 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { motion, AnimatePresence } from 'motion/react';
-import { Sparkles, ArrowRight, Music, BarChart2, Image as ImageIcon, Zap, Github, Twitter, Instagram, Play, ArrowLeft, Eye, Crown, Menu, Sun, Upload, ExternalLink, Trash2, Plus, X, Home, User, Settings, HelpCircle, LogOut, Globe, Mail, Youtube, Linkedin, Facebook, Twitch, Link as LinkIcon, MessageCircle, BookOpen, FileText, Briefcase , Trophy } from 'lucide-react';
+import { Sparkles, ArrowRight, Music, BarChart2, Image as ImageIcon, Zap, Github, Twitter, Instagram, Play, ArrowLeft, Eye, Crown, Menu, Sun, Upload, ExternalLink, Trash2, Plus, X, Home, User, Settings, HelpCircle, LogOut, Globe, Mail, Youtube, Linkedin, Facebook, Twitch, Link as LinkIcon, MessageCircle, BookOpen, FileText, Briefcase , Trophy, Video } from 'lucide-react';
 import React, { useState, useRef, useEffect } from 'react';
 
 import { AuthModal } from './components/AuthModal';
 import { supabase } from './lib/supabase';
+import iconsConfig from './icons.json';
+
+const VIDEO_PRESETS = [
+  {
+    name: 'Cosmic Sky',
+    url: 'https://assets.mixkit.co/videos/preview/mixkit-starry-night-sky-loop-4643-large.mp4',
+    thumb: '🌌'
+  },
+  {
+    name: 'Neon Wave',
+    url: 'https://assets.mixkit.co/videos/preview/mixkit-abstract-laser-lights-background-32128-large.mp4',
+    thumb: '🔮'
+  },
+  {
+    name: 'Cyber Grid',
+    url: 'https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-screens-and-numbers-31901-large.mp4',
+    thumb: '📟'
+  },
+  {
+    name: 'Ocean Waves',
+    url: 'https://assets.mixkit.co/videos/preview/mixkit-waves-in-the-ocean-near-a-cliff-43105-large.mp4',
+    thumb: '🌊'
+  },
+  {
+    name: 'Midnight Rain',
+    url: 'https://assets.mixkit.co/videos/preview/mixkit-raindrops-on-a-window-at-night-42352-large.mp4',
+    thumb: '🌧️'
+  },
+  {
+    name: 'Aura Gold',
+    url: 'https://assets.mixkit.co/videos/preview/mixkit-falling-golden-particles-on-a-dark-background-31145-large.mp4',
+    thumb: '✨'
+  }
+];
+
+const IconComponentMap: Record<string, React.ComponentType<any>> = {
+  Sparkles,
+  ArrowRight,
+  Music,
+  BarChart2,
+  Image: ImageIcon,
+  Zap,
+  Github,
+  Twitter,
+  Instagram,
+  Play,
+  ArrowLeft,
+  Eye,
+  Crown,
+  Menu,
+  Sun,
+  Upload,
+  ExternalLink,
+  Trash2,
+  Plus,
+  X,
+  Home,
+  User,
+  Settings,
+  HelpCircle,
+  LogOut,
+  Globe,
+  Mail,
+  Youtube,
+  Linkedin,
+  Facebook,
+  Twitch,
+  Link: LinkIcon,
+  MessageCircle,
+  BookOpen,
+  FileText,
+  Briefcase,
+  Trophy
+};
 
 function getLinkIcon(url: string, title?: string, iconSize: number = 18) {
   const normUrl = (url || '').toLowerCase();
@@ -70,6 +144,44 @@ function getLinkIcon(url: string, title?: string, iconSize: number = 18) {
   }
   if (normUrl.includes('book') || normUrl.includes('read') || normTitle.includes('book') || normTitle.includes('reading') || normTitle.includes('medium.com')) {
     return <BookOpen size={iconSize} />;
+  }
+
+  // JSON overrides config mapping lookup
+  if (iconsConfig && Array.isArray(iconsConfig.mappings)) {
+    for (const mapping of iconsConfig.mappings) {
+      if (normUrl.includes(mapping.keyword) || normTitle.includes(mapping.keyword)) {
+        const Comp = IconComponentMap[mapping.icon];
+        if (Comp) return <Comp size={iconSize} />;
+      }
+    }
+  }
+
+  // Dynamic high-res Favicon API lookup if no match
+  let domain = '';
+  try {
+    const cleanUrl = url.trim();
+    if (cleanUrl) {
+      const hasProtocol = cleanUrl.startsWith('http://') || cleanUrl.startsWith('https://');
+      const parsed = new URL(hasProtocol ? cleanUrl : `https://${cleanUrl}`);
+      domain = parsed.hostname.replace('www.', '');
+    }
+  } catch {
+    const match = normUrl.match(/^(?:https?:\/\/)?(?:www\.)?([^\/]+)/);
+    domain = match ? match[1] : '';
+  }
+
+  if (domain && domain.includes('.')) {
+    return (
+      <img
+        src={`https://www.google.com/s2/favicons?sz=64&domain=${domain}`}
+        alt=""
+        className="object-contain rounded-sm"
+        style={{ width: iconSize, height: iconSize }}
+        onError={(e) => {
+          e.currentTarget.style.display = 'none';
+        }}
+      />
+    );
   }
   
   return <LinkIcon size={iconSize} />;
@@ -343,7 +455,7 @@ function Footer() {
   );
 }
 
-function AudioPlayer({ audioTitle, audioUrl }: { audioTitle: string, audioUrl: string }) {
+function AudioPlayer({ audioTitle, audioUrl, isVideoBg }: { audioTitle: string, audioUrl: string, isVideoBg?: boolean }) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -383,7 +495,11 @@ function AudioPlayer({ audioTitle, audioUrl }: { audioTitle: string, audioUrl: s
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 }}
-      className="w-full max-w-[400px] mt-3 bg-[#141414] rounded-[1.25rem] p-4 shadow-2xl border border-white/5"
+      className={`w-full max-w-[400px] mt-3 rounded-[1.25rem] p-4 shadow-2xl transition-all duration-300 ${
+        isVideoBg 
+          ? 'bg-[#141414]/30 backdrop-blur-xl border border-white/10' 
+          : 'bg-[#141414] border border-white/5'
+      }`}
     >
        <audio
          ref={audioRef}
@@ -393,7 +509,7 @@ function AudioPlayer({ audioTitle, audioUrl }: { audioTitle: string, audioUrl: s
          onEnded={() => setIsPlaying(false)}
        />
        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-[#E5ECE5] flex items-center justify-center shrink-0">
+          <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shrink-0 shadow-sm">
              <Music size={20} className="text-black" />
           </div>
           <div className="flex-1 min-w-0 pr-1">
@@ -444,32 +560,53 @@ function AudioPlayer({ audioTitle, audioUrl }: { audioTitle: string, audioUrl: s
 }
 
 function UserPage({ onBack, onEdit, data }: { onBack: () => void, onEdit: () => void, data: ProfileData }) {
+  const isVideoBg = !!(data.videoBackgroundEnabled && data.videoBackgroundUrl);
+
   return (
-    <div className="min-h-screen bg-[#f0f0f0] flex flex-col items-center py-12 px-4 relative font-sans">
+    <div className={`min-h-screen flex flex-col items-center py-12 px-4 relative font-sans transition-colors duration-500 overflow-hidden ${isVideoBg ? 'bg-black text-white' : 'bg-[#f0f0f0] text-black'}`}>
+      
+      {isVideoBg && (
+        <>
+          <video 
+            src={data.videoBackgroundUrl} 
+            autoPlay 
+            loop 
+            muted 
+            playsInline 
+            className="absolute inset-0 w-full h-full object-cover z-0 opacity-70"
+          />
+          <div className="absolute inset-0 bg-black/45 backdrop-blur-[1.5px] z-[1]" />
+        </>
+      )}
       
       {/* Main Card */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-[400px] bg-[#141414] rounded-[1.5rem] p-3 pb-8 shadow-2xl border border-white/5 relative overflow-hidden"
+        className={`w-full max-w-[400px] rounded-[1.5rem] p-3 pb-8 shadow-2xl relative overflow-hidden transition-all duration-300 ${
+          isVideoBg 
+            ? 'bg-[#141414]/30 backdrop-blur-md border border-white/10 z-10' 
+            : 'bg-[#141414] border border-white/5'
+        }`}
       >
         {/* Views Counter (Mountain Structure) */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20 bg-black/40 backdrop-blur-md px-2.5 py-0.5 rounded-b-lg flex items-center gap-1.5">
           <Eye size={10} className="text-gray-300" />
           <span className="text-gray-100 font-medium text-[10px]">2</span>
-          <span className="text-gray-400 text-[10px]">views</span>
         </div>
         
         {/* 16:5 Banner with no separator border */}
-        <div className="absolute top-0 left-0 right-0 h-[125px]">
-          {data.bannerUrl && (
+        <div className="relative w-[calc(100%+24px)] aspect-[16/5] -mx-3 -mt-3 overflow-hidden select-none">
+          {data.bannerUrl ? (
             <img src={data.bannerUrl} className="w-full h-full object-cover" />
+          ) : (
+            <div className={`w-full h-full ${isVideoBg ? 'bg-white/5' : 'bg-[#1c1c20]'}`} />
           )}
         </div>
 
-        <div className="relative z-10 flex flex-col items-center flex-1 mt-[125px] px-4 w-full">
+        <div className="relative z-10 flex flex-col items-center flex-1 mt-0 px-4 w-full">
            {/* Avatar: positioned 50% in banner and 50% in the content container */}
-           <div className="relative mb-3 -mt-[51px] select-none">
+           <div className="relative mb-3 -mt-[48px] select-none">
               {/* Glow */}
               {data.isGlowing && (
                 <div className="absolute -inset-1 rounded-full blur-[12px] opacity-80" style={{ background: 'conic-gradient(from 0deg, #10b981, #0ea5e9, #8b5cf6, #d946ef, #f43f5e, #f59e0b, #10b981)' }}></div>
@@ -500,24 +637,50 @@ function UserPage({ onBack, onEdit, data }: { onBack: () => void, onEdit: () => 
              {data.bio}
            </p>
 
-           <div className="w-full flex flex-col gap-2 px-2 mt-0">
+           <div className="w-full flex flex-col gap-2.5 px-2 mt-0">
              {data.links.length > 0 && (
-               <div className="w-full flex flex-wrap justify-center gap-[10px]">
+               <div className={`w-full grid gap-2.5 ${
+                 data.links.length === 5 || data.links.length >= 4 ? 'grid-cols-4' : 
+                 data.links.length === 3 ? 'grid-cols-3 max-w-[280px] mx-auto' : 
+                 data.links.length === 2 ? 'grid-cols-2 max-w-[180px] mx-auto' : 
+                 'grid-cols-1 max-w-[90px] mx-auto'
+               }`}>
                  {data.links.slice(0, data.links.length === 5 ? 4 : data.links.length).map(link => (
-                   <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" title={link.title || 'Link'} className="bg-[#f0f0f0] hover:bg-[#e5e5e5] border border-transparent text-black rounded-[1.25rem] flex items-center justify-center transition-all shadow-sm hover:scale-[1.05] active:scale-[0.95] w-[64px] h-[54px] sm:w-[68px] sm:h-[58px] shrink-0">
-                     <div className="text-gray-800 flex items-center justify-center w-full h-full">
-                       {getLinkIcon(link.url, link.title, 20)}
+                   <a 
+                     key={link.id} 
+                     href={link.url} 
+                     target="_blank" 
+                     rel="noopener noreferrer" 
+                     title={link.title || 'Link'} 
+                     className={`border flex items-center justify-center transition-all hover:scale-[1.05] active:scale-[0.95] aspect-[1.15/1] w-full shrink-0 rounded-2xl ${
+                       isVideoBg 
+                         ? 'bg-white/15 hover:bg-white/25 border-white/20 hover:border-white/30 text-white backdrop-blur-md shadow-lg shadow-black/15' 
+                         : 'bg-[#f0f0f0] hover:bg-[#e5e5e5] border-transparent text-black shadow-sm'
+                     }`}
+                   >
+                     <div className={`flex items-center justify-center w-full h-full ${isVideoBg ? 'text-white' : 'text-gray-800'}`}>
+                       {getLinkIcon(link.url, link.title, 18)}
                      </div>
                    </a>
                  ))}
                </div>
              )}
              {data.links.length === 5 && data.links.slice(4).map(link => (
-               <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="w-full bg-[#f0f0f0] hover:bg-[#e5e5e5] border border-transparent text-black py-[10px] px-5 h-[58px] rounded-full font-bold transition-all text-[15px] flex items-center justify-between shadow-sm hover:scale-[1.01] active:scale-[0.99] mt-1">
-                 <div className="shrink-0 text-gray-800 flex items-center justify-center w-6 h-6">
+               <a 
+                 key={link.id} 
+                 href={link.url} 
+                 target="_blank" 
+                 rel="noopener noreferrer" 
+                 className={`w-full py-3 px-4 h-[52px] rounded-2xl font-bold transition-all text-[15px] flex items-center justify-between hover:scale-[1.01] active:scale-[0.99] mt-0.5 border ${
+                   isVideoBg 
+                     ? 'bg-white/15 hover:bg-white/25 border-white/20 hover:border-white/30 text-white backdrop-blur-md shadow-lg shadow-black/15' 
+                     : 'bg-[#f0f0f0] hover:bg-[#e5e5e5] border-transparent text-black shadow-sm'
+                 }`}
+               >
+                 <div className={`shrink-0 flex items-center justify-center w-6 h-6 ${isVideoBg ? 'text-white' : 'text-gray-800'}`}>
                    {getLinkIcon(link.url, link.title, 20)}
                  </div>
-                 <span className="flex-1 text-center truncate px-2">{link.title || 'Link'}</span>
+                 <span className="flex-1 text-center truncate px-2 font-josefin">{link.title || 'Link'}</span>
                  <div className="w-6 h-6 shrink-0" />
                </a>
              ))}
@@ -526,7 +689,11 @@ function UserPage({ onBack, onEdit, data }: { onBack: () => void, onEdit: () => 
       </motion.div>
 
       {/* Music Card */}
-      {data.audioUrl && <AudioPlayer audioTitle={data.audioTitle} audioUrl={data.audioUrl} />}
+      {data.audioUrl && (
+        <div className="w-full max-w-[400px] z-10 transition-transform">
+          <AudioPlayer audioTitle={data.audioTitle} audioUrl={data.audioUrl} isVideoBg={isVideoBg} />
+        </div>
+      )}
 
       {/* Back to Editor button sent below */}
       <button 
@@ -600,6 +767,40 @@ function EditPage({ onBack, onSignOut, onHome, data, onChange, userEmail, userId
         } catch (err) {
           console.error(`Failed to upload ${field}`, err);
           alert(`Failed to upload ${field}. Make sure your Supabase Storage buckets are public and have RLS disabled for inserts/updates (see supabase/schema.sql)`);
+        }
+      }
+    }
+  };
+
+  const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      // Optimistic visual update
+      reader.onloadend = () => {
+        onChange(curr => ({ 
+          ...curr, 
+          videoBackgroundUrl: reader.result as string, 
+          videoBackgroundEnabled: true 
+        }));
+      };
+      reader.readAsDataURL(file);
+
+      if (userId) {
+        try {
+          const api = await import('./lib/api');
+          const publicUrl = await api.uploadFile('banners', file, userId);
+          // Wait for state to catch up to not override other quick changes
+          setTimeout(() => {
+            onChange(currentData => ({ 
+              ...currentData, 
+              videoBackgroundUrl: publicUrl, 
+              videoBackgroundEnabled: true 
+            }));
+          }, 500);
+        } catch (err) {
+          console.error(`Failed to upload background video`, err);
+          alert(`Failed to upload video. Make sure your video is under 15MB.`);
         }
       }
     }
@@ -981,7 +1182,7 @@ function EditPage({ onBack, onSignOut, onHome, data, onChange, userEmail, userId
                 <div className="space-y-8">
                    <div className="text-center">
                       <label className="block text-[18px] font-josefin font-bold text-white mb-3 text-center tracking-tight">Custom banner</label>
-                      <div className="w-full h-32 bg-[#141414] rounded-[1rem] relative overflow-hidden flex flex-col justify-between p-3 border border-white/5">
+                      <div className="w-full aspect-[16/5] bg-[#141414] rounded-[1rem] relative overflow-hidden flex flex-col justify-between p-3 border border-white/5">
                          {data.bannerUrl ? <img src={data.bannerUrl} className="w-full h-full object-cover absolute inset-0" /> : null}
                          <div className="flex justify-end relative z-10 w-full">
                            {data.bannerUrl && (
@@ -1019,7 +1220,98 @@ function EditPage({ onBack, onSignOut, onHome, data, onChange, userEmail, userId
                         </div>
                       )}
                       <p className="text-[14px] text-[#888] mt-4 text-center leading-relaxed">MP3, WAV, or OGG · up to 8MB · plays on your public profile</p>
-                   </div>
+                    </div>
+
+                    <div className="text-center pt-6 border-t border-white/5">
+                       <label className="block text-[18px] font-josefin font-bold tracking-tight text-white mb-1">Portrait video background</label>
+                       <p className="text-[13px] text-gray-500 mb-4">Add a cinematic loops background video to your page</p>
+                       
+                       <div className="flex items-center justify-between bg-[#1a1a1a] border border-white/5 rounded-xl p-4 mb-4">
+                          <span className="text-[15px] font-semibold text-[#a1a1aa]">Video background active</span>
+                          {/* Toggle Switch */}
+                          <div onClick={() => onChange({...data, videoBackgroundEnabled: !data.videoBackgroundEnabled})} className={`w-12 h-6 rounded-full flex items-center p-0.5 cursor-pointer transition-colors ${data.videoBackgroundEnabled ? 'bg-white' : 'bg-[#333]'}`}>
+                             <div className={`w-5 h-5 bg-black rounded-full shadow-sm transition-transform ${data.videoBackgroundEnabled ? 'translate-x-[24px]' : 'translate-x-[0px]'}`}></div>
+                          </div>
+                       </div>
+
+                       {data.videoBackgroundEnabled && (
+                         <div className="space-y-4">
+                           {/* Preset list */}
+                           <div className="text-left">
+                              <span className="text-[12px] font-bold text-gray-400 font-josefin tracking-wider uppercase mb-1.5 block">Aesthetic Loops Presets</span>
+                              <div className="grid grid-cols-3 gap-2 mt-2">
+                                 {VIDEO_PRESETS.map((preset) => {
+                                   const isSelected = data.videoBackgroundUrl === preset.url;
+                                   return (
+                                     <button 
+                                       key={preset.name}
+                                       type="button"
+                                       onClick={() => onChange({ ...data, videoBackgroundUrl: preset.url })}
+                                       className={`flex flex-col items-center gap-1 p-2.5 rounded-xl transition-all border ${
+                                         isSelected 
+                                           ? 'bg-white/10 border-white/30 text-white scale-[1.03]' 
+                                           : 'bg-[#1a1a1a] border-white/5 text-gray-400 hover:border-white/10 hover:text-white'
+                                       } cursor-pointer`}
+                                     >
+                                       <span className="text-xl mb-0.5">{preset.thumb}</span>
+                                       <span className="text-[9px] font-bold tracking-tight uppercase truncate w-full text-center">{preset.name}</span>
+                                     </button>
+                                   );
+                                 })}
+                              </div>
+                           </div>
+
+                           <div className="flex items-center gap-2 py-1">
+                              <div className="h-[1.5px] bg-white/5 flex-1" />
+                              <span className="text-[10px] font-bold text-gray-500 font-mono">OR</span>
+                              <div className="h-[1.5px] bg-white/5 flex-1" />
+                           </div>
+
+                           {/* Upload Custom Video or Paste URL */}
+                           <div className="text-left space-y-3">
+                              <span className="text-[12px] font-bold text-gray-500 font-josefin tracking-wider uppercase block">Custom Video Source</span>
+                              
+                              <div className="flex items-center gap-2">
+                                 <input 
+                                   type="text" 
+                                   placeholder="Paste direct MP4 or WebM URL..." 
+                                   value={data.videoBackgroundUrl && !data.videoBackgroundUrl.startsWith('data:') && !data.videoBackgroundUrl.includes('supabase.co') ? data.videoBackgroundUrl : ''} 
+                                   onChange={(e) => onChange({ ...data, videoBackgroundUrl: e.target.value })} 
+                                   className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl px-4 py-3.5 text-white placeholder-gray-650 text-[14px] font-semibold outline-none focus:border-white/10 text-center"
+                                 />
+                              </div>
+
+                              <div className="relative">
+                                 <label className="w-full bg-[#1a1a1a] hover:bg-[#252525] border border-white/5 py-3.5 rounded-full flex items-center justify-center gap-2 text-[14px] font-semibold text-white transition-colors cursor-pointer shadow-sm">
+                                    <Video size={16} /> Upload custom MP4/WebM
+                                    <input type="file" accept="video/mp4,video/webm" className="hidden" onChange={handleVideoUpload} />
+                                 </label>
+                              </div>
+                              
+                              {data.videoBackgroundUrl && (
+                                 <div className="bg-[#1a1a1a] border border-white/5 rounded-xl p-3 flex items-center justify-between">
+                                    <div className="flex items-center gap-2 truncate text-gray-300 text-sm">
+                                       <span className="text-[13px] bg-white/10 p-1 rounded-md">🎥</span>
+                                       <span className="truncate text-xs font-mono text-gray-400">{
+                                         data.videoBackgroundUrl.startsWith('data:') 
+                                           ? 'Uploaded File (Optimistic Preview)' 
+                                           : data.videoBackgroundUrl.includes('supabase.co')
+                                             ? 'Uploaded Portrait Video (Cloud Saved)'
+                                             : data.videoBackgroundUrl
+                                       }</span>
+                                    </div>
+                                    <button 
+                                      onClick={() => onChange({ ...data, videoBackgroundUrl: '' })} 
+                                      className="text-[#ff4444] hover:text-red-400 p-1.5 bg-[#ff4444]/10 rounded-lg transition-colors cursor-pointer flex items-center justify-center shrink-0"
+                                    >
+                                      <Trash2 size={13} />
+                                    </button>
+                                 </div>
+                              )}
+                           </div>
+                         </div>
+                       )}
+                    </div>
 
                    <div className="text-center">
                       <label className="block text-[18px] font-josefin font-bold tracking-tight text-white mb-3 text-center">Avatar decoration</label>
@@ -1091,6 +1383,8 @@ export type ProfileData = {
   bannerUrl: string;
   audioUrl: string;
   audioTitle: string;
+  videoBackgroundUrl?: string;
+  videoBackgroundEnabled?: boolean;
   links: Array<{ id: number, title: string, url: string }>;
 };
 
@@ -1144,6 +1438,8 @@ export default function App() {
     bannerUrl: '',
     audioUrl: '',
     audioTitle: '',
+    videoBackgroundUrl: '',
+    videoBackgroundEnabled: false,
     links: []
   });
 
