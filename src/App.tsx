@@ -45,6 +45,66 @@ import {
 } from "lucide-react";
 import React, { useState, useRef, useEffect } from "react";
 
+function DebouncedInput({ value, onChange, delay = 150, ...props }: any) {
+  const [localValue, setLocalValue] = useState(value);
+  const timeoutRef = useRef<any>(null);
+
+  useEffect(() => {
+    setLocalValue(value);
+  }, [value]);
+
+  const handleChange = (e: any) => {
+    const newVal = e.target.value;
+    setLocalValue(newVal);
+    
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    
+    const syntheticEvent = { target: { value: newVal } };
+    
+    timeoutRef.current = setTimeout(() => {
+      onChange(syntheticEvent);
+    }, delay);
+  };
+
+  const handleBlur = (e: any) => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    onChange({ target: { value: localValue } });
+    if (props.onBlur) props.onBlur(e);
+  };
+
+  return <input value={localValue} onChange={handleChange} onBlur={handleBlur} {...props} />;
+}
+
+function DebouncedTextarea({ value, onChange, delay = 150, ...props }: any) {
+  const [localValue, setLocalValue] = useState(value);
+  const timeoutRef = useRef<any>(null);
+
+  useEffect(() => {
+    setLocalValue(value);
+  }, [value]);
+
+  const handleChange = (e: any) => {
+    const newVal = e.target.value;
+    setLocalValue(newVal);
+    
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    
+    const syntheticEvent = { target: { value: newVal } };
+    
+    timeoutRef.current = setTimeout(() => {
+      onChange(syntheticEvent);
+    }, delay);
+  };
+
+  const handleBlur = (e: any) => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    onChange({ target: { value: localValue } });
+    if (props.onBlur) props.onBlur(e);
+  };
+
+  return <textarea value={localValue} onChange={handleChange} onBlur={handleBlur} {...props} />;
+}
+
 import { AuthModal } from "./components/AuthModal";
 import { supabase } from "./lib/supabase";
 
@@ -681,9 +741,7 @@ function UserPage({
     activePlan === "pro"
   );
   const isGlassmorphicEnabled =
-    activePlan === "starter" || activePlan === "pro"
-      ? !!data.isGlassmorphic
-      : false;
+    activePlan === "pro" ? !!data.isGlassmorphic : false;
 
   return (
     <div
@@ -800,7 +858,7 @@ function UserPage({
                       className={`flex items-center justify-center transition-all hover:scale-[1.05] active:scale-[0.95] w-[64px] h-[64px] shrink-0 rounded-2xl border ${
                         isGlassmorphicEnabled
                           ? "bg-transparent hover:bg-white/5 border-white/20 hover:border-white/30 text-white backdrop-blur-[1px] shadow-lg shadow-black/15"
-                          : "bg-[#2a2a2a] hover:bg-[#333] border-transparent text-white shadow-md"
+                          : "bg-[#2d2d2d] hover:bg-[#3d3d3d] border border-white/5 text-white shadow-md"
                       }`}
                     >
                       <div className="flex items-center justify-center w-full h-full text-gray-200">
@@ -820,7 +878,7 @@ function UserPage({
                   className={`w-full py-3 px-4 h-[52px] rounded-2xl font-bold transition-all text-[15px] flex items-center justify-between hover:scale-[1.01] active:scale-[0.99] mt-0.5 border ${
                     isGlassmorphicEnabled
                       ? "bg-transparent hover:bg-white/5 border-white/20 hover:border-white/30 text-gray-200 backdrop-blur-[1px] shadow-lg shadow-black/15"
-                      : "bg-[#2a2a2a] hover:bg-[#333] border-transparent text-gray-200 shadow-md"
+                      : "bg-[#2d2d2d] hover:bg-[#3d3d3d] border border-white/5 text-gray-200 shadow-md"
                   }`}
                 >
                   <div className="shrink-0 flex items-center justify-center w-6 h-6 text-gray-200">
@@ -844,7 +902,7 @@ function UserPage({
             audioUrl={data.audioUrl}
             isVideoBg={isVideoBg}
             activePlan={activePlan}
-            isGlassmorphic={data.isGlassmorphic}
+            isGlassmorphic={isGlassmorphicEnabled}
           />
         </div>
       )}
@@ -3043,7 +3101,7 @@ function EditPage({
                     <div className="px-4 py-3.5 text-white border-r border-[#222] bg-[#171717] font-semibold text-[15px]">
                       nads.io/
                     </div>
-                    <input
+                    <DebouncedInput
                       type="text"
                       value={data.username.toLowerCase()}
                       onChange={(e) =>
@@ -3065,7 +3123,7 @@ function EditPage({
                   <label className="block text-[15px] font-josefin font-bold tracking-tight text-white mb-2">
                     Display name
                   </label>
-                  <input
+                  <DebouncedInput
                     type="text"
                     value={data.displayName}
                     onChange={(e) =>
@@ -3080,13 +3138,13 @@ function EditPage({
                   <label className="block text-[15px] font-josefin font-bold tracking-tight text-white mb-2">
                     Bio
                   </label>
-                  <textarea
+                  <DebouncedTextarea
                     rows={3}
                     value={data.bio}
                     onChange={(e) => onChange({ ...data, bio: e.target.value })}
                     placeholder="Tell visitors about yourself (interests, bio, links)..."
                     className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl px-4 py-3.5 text-white outline-none focus:border-white/20 transition-colors resize-none text-[15px] font-semibold text-center placeholder:text-white/25"
-                  ></textarea>
+                  />
                   <p className="text-[12px] text-[#555] mt-1.5 text-center font-mono">
                     {data.bio.length}/160
                   </p>
@@ -3226,7 +3284,7 @@ function EditPage({
                           </span>
 
                           <div className="flex items-center gap-2">
-                            <input
+                            <DebouncedInput
                               type="text"
                               placeholder="Paste direct MP4 or WebM URL..."
                               value={
@@ -3321,22 +3379,36 @@ function EditPage({
                         </label>
                         <div className="flex items-center justify-between bg-white/5 border border-white/10 backdrop-blur-md rounded-xl p-4 shadow-lg">
                           <span className="text-[15px] font-semibold text-white/85">
-                            {data.isGlassmorphic
-                              ? "Glassmorphic design is ON"
-                              : "Glassmorphic design is OFF"}
+                            {activePlan === "pro"
+                              ? data.isGlassmorphic
+                                ? "Glassmorphic design is ON"
+                                : "Glassmorphic design is OFF"
+                              : "Glassmorphic design (Requires Pro)"}
                           </span>
                           {/* Glassmorphic Toggle Switch */}
                           <div
-                            onClick={() =>
-                              onChange({
-                                ...data,
-                                isGlassmorphic: !data.isGlassmorphic,
-                              })
-                            }
-                            className={`w-12 h-6 rounded-full flex items-center p-0.5 cursor-pointer transition-all border ${data.isGlassmorphic ? "bg-white/20 border-white/35" : "bg-white/5 border-white/10"}`}
+                            onClick={() => {
+                              if (activePlan === "pro") {
+                                onChange({
+                                  ...data,
+                                  isGlassmorphic: !data.isGlassmorphic,
+                                });
+                              }
+                            }}
+                            className={`w-12 h-6 rounded-full flex items-center p-0.5 transition-all border ${
+                              activePlan === "pro"
+                                ? data.isGlassmorphic
+                                  ? "bg-white/20 border-white/35 cursor-pointer"
+                                  : "bg-white/5 border-white/10 cursor-pointer"
+                                : "bg-white/5 border-white/10 opacity-40 cursor-not-allowed"
+                            }`}
                           >
                             <div
-                              className={`w-4 h-4 rounded-full shadow-md transition-transform duration-200 ${data.isGlassmorphic ? "bg-white translate-x-[24px]" : "bg-white/40 translate-x-[2px]"}`}
+                              className={`w-4 h-4 rounded-full shadow-md transition-transform duration-200 ${
+                                activePlan === "pro" && data.isGlassmorphic
+                                  ? "bg-white translate-x-[24px]"
+                                  : "bg-white/40 translate-x-[2px]"
+                              }`}
                             ></div>
                           </div>
                         </div>
@@ -3367,7 +3439,7 @@ function EditPage({
                         exit={{ opacity: 0, height: 0 }}
                         className="flex items-center gap-3 relative w-full pt-1"
                       >
-                        <input
+                        <DebouncedInput
                           type="text"
                           value={link.title}
                           onChange={(e) =>
@@ -3376,7 +3448,7 @@ function EditPage({
                           placeholder="Label"
                           className="w-[120px] bg-transparent border border-white/10 rounded-full px-5 py-3.5 text-white text-[15px] font-semibold outline-none focus:border-white/20 transition-colors shrink-0 text-center"
                         />
-                        <input
+                        <DebouncedInput
                           type="url"
                           value={link.url}
                           onChange={(e) =>

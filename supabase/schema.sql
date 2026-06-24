@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   display_name TEXT,
   bio TEXT,
   is_glowing BOOLEAN DEFAULT true NOT NULL,
+  is_glassmorphic BOOLEAN DEFAULT true NOT NULL,
   avatar_url TEXT,
   banner_url TEXT,
   audio_url TEXT,
@@ -23,6 +24,12 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT now() NOT NULL
 );
+
+-- Ensure first-class columns exist even if the table already existed previously
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS is_glowing BOOLEAN DEFAULT true NOT NULL;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS is_glassmorphic BOOLEAN DEFAULT true NOT NULL;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS video_background_url TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS video_background_enabled BOOLEAN DEFAULT false NOT NULL;
 
 -- -------------------------------------------------------------------------
 -- 2. Create Links Table
@@ -42,37 +49,39 @@ CREATE TABLE IF NOT EXISTS public.links (
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.links ENABLE ROW LEVEL SECURITY;
 
--- Public read access to profiles
+-- --- Profiles Policies (Idempotent via DROP IF EXISTS) ---
+DROP POLICY IF EXISTS "Public profiles are viewable by everyone." ON public.profiles;
 CREATE POLICY "Public profiles are viewable by everyone." 
   ON public.profiles FOR SELECT 
   USING (true);
 
--- User can insert their own profile
+DROP POLICY IF EXISTS "Users can create their own profile." ON public.profiles;
 CREATE POLICY "Users can create their own profile." 
   ON public.profiles FOR INSERT 
   WITH CHECK (auth.uid() = id);
 
--- User can update their own profile
+DROP POLICY IF EXISTS "Users can update their own profile." ON public.profiles;
 CREATE POLICY "Users can update their own profile." 
   ON public.profiles FOR UPDATE 
   USING (auth.uid() = id);
 
--- Public read access to links
+-- --- Links Policies (Idempotent via DROP IF EXISTS) ---
+DROP POLICY IF EXISTS "Links are viewable by everyone." ON public.links;
 CREATE POLICY "Links are viewable by everyone." 
   ON public.links FOR SELECT 
   USING (true);
 
--- User can insert links to their profile
+DROP POLICY IF EXISTS "Users can create links for their profile." ON public.links;
 CREATE POLICY "Users can create links for their profile." 
   ON public.links FOR INSERT 
   WITH CHECK (auth.uid() = profile_id);
 
--- User can update their own links
+DROP POLICY IF EXISTS "Users can update their own links." ON public.links;
 CREATE POLICY "Users can update their own links." 
   ON public.links FOR UPDATE 
   USING (auth.uid() = profile_id);
 
--- User can delete their own links
+DROP POLICY IF EXISTS "Users can delete their own links." ON public.links;
 CREATE POLICY "Users can delete their own links." 
   ON public.links FOR DELETE 
   USING (auth.uid() = profile_id);
@@ -119,6 +128,7 @@ BEGIN
     username,
     display_name,
     is_glowing,
+    is_glassmorphic,
     avatar_url,
     banner_url,
     audio_url,
@@ -130,6 +140,7 @@ BEGIN
     new.id,
     temp_username,
     COALESCE(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', SPLIT_PART(new.email, '@', 1)),
+    true,
     true,
     COALESCE(new.raw_user_meta_data->>'avatar_url', ''),
     '',
@@ -167,52 +178,73 @@ VALUES ('audio', 'audio', true)
 ON CONFLICT (id) DO NOTHING;
 
 -- Avatars Storage policies
+DROP POLICY IF EXISTS "Avatar images are publicly accessible." ON storage.objects;
 CREATE POLICY "Avatar images are publicly accessible." 
   ON storage.objects FOR SELECT 
   USING ( bucket_id = 'avatars' );
 
-CREATE POLICY "Anyone can upload an avatar." 
+DROP POLICY IF EXISTS "Anyone can upload an avatar." ON storage.objects;
+DROP POLICY IF EXISTS "Users can upload their own avatar." ON storage.objects;
+CREATE POLICY "Users can upload their own avatar." 
   ON storage.objects FOR INSERT 
-  WITH CHECK ( bucket_id = 'avatars' AND auth.role() = 'authenticated' );
+  WITH CHECK ( bucket_id = 'avatars' AND auth.role() = 'authenticated' AND (storage.foldername(name))[1] = auth.uid()::text );
 
-CREATE POLICY "Anyone can update their avatar."
+DROP POLICY IF EXISTS "Anyone can update their avatar." ON storage.objects;
+DROP POLICY IF EXISTS "Users can update their own avatar." ON storage.objects;
+CREATE POLICY "Users can update their own avatar."
   ON storage.objects FOR UPDATE
-  USING ( bucket_id = 'avatars' AND auth.role() = 'authenticated' );
+  USING ( bucket_id = 'avatars' AND auth.role() = 'authenticated' AND (storage.foldername(name))[1] = auth.uid()::text );
 
-CREATE POLICY "Anyone can delete their avatar."
+DROP POLICY IF EXISTS "Anyone can delete their avatar." ON storage.objects;
+DROP POLICY IF EXISTS "Users can delete their own avatar." ON storage.objects;
+CREATE POLICY "Users can delete their own avatar."
   ON storage.objects FOR DELETE
-  USING ( bucket_id = 'avatars' AND auth.role() = 'authenticated' );
+  USING ( bucket_id = 'avatars' AND auth.role() = 'authenticated' AND (storage.foldername(name))[1] = auth.uid()::text );
 
 -- Banners Storage policies
+DROP POLICY IF EXISTS "Banner images are publicly accessible." ON storage.objects;
 CREATE POLICY "Banner images are publicly accessible." 
   ON storage.objects FOR SELECT 
   USING ( bucket_id = 'banners' );
 
-CREATE POLICY "Anyone can upload a banner." 
+DROP POLICY IF EXISTS "Anyone can upload a banner." ON storage.objects;
+DROP POLICY IF EXISTS "Users can upload their own banner." ON storage.objects;
+CREATE POLICY "Users can upload their own banner." 
   ON storage.objects FOR INSERT 
-  WITH CHECK ( bucket_id = 'banners' AND auth.role() = 'authenticated' );
+  WITH CHECK ( bucket_id = 'banners' AND auth.role() = 'authenticated' AND (storage.foldername(name))[1] = auth.uid()::text );
 
-CREATE POLICY "Anyone can update their banner."
+DROP POLICY IF EXISTS "Anyone can update their banner." ON storage.objects;
+DROP POLICY IF EXISTS "Users can update their own banner." ON storage.objects;
+CREATE POLICY "Users can update their own banner."
   ON storage.objects FOR UPDATE
-  USING ( bucket_id = 'banners' AND auth.role() = 'authenticated' );
+  USING ( bucket_id = 'banners' AND auth.role() = 'authenticated' AND (storage.foldername(name))[1] = auth.uid()::text );
 
-CREATE POLICY "Anyone can delete their banner."
+DROP POLICY IF EXISTS "Anyone can delete their banner." ON storage.objects;
+DROP POLICY IF EXISTS "Users can delete their own banner." ON storage.objects;
+CREATE POLICY "Users can delete their own banner."
   ON storage.objects FOR DELETE
-  USING ( bucket_id = 'banners' AND auth.role() = 'authenticated' );
+  USING ( bucket_id = 'banners' AND auth.role() = 'authenticated' AND (storage.foldername(name))[1] = auth.uid()::text );
 
 -- Audio Storage policies
+DROP POLICY IF EXISTS "Audio files are publicly accessible." ON storage.objects;
 CREATE POLICY "Audio files are publicly accessible." 
   ON storage.objects FOR SELECT 
   USING ( bucket_id = 'audio' );
 
-CREATE POLICY "Anyone can upload audio." 
+DROP POLICY IF EXISTS "Anyone can upload audio." ON storage.objects;
+DROP POLICY IF EXISTS "Users can upload their own audio." ON storage.objects;
+CREATE POLICY "Users can upload their own audio." 
   ON storage.objects FOR INSERT 
-  WITH CHECK ( bucket_id = 'audio' AND auth.role() = 'authenticated' );
+  WITH CHECK ( bucket_id = 'audio' AND auth.role() = 'authenticated' AND (storage.foldername(name))[1] = auth.uid()::text );
 
-CREATE POLICY "Anyone can update their audio."
+DROP POLICY IF EXISTS "Anyone can update their audio." ON storage.objects;
+DROP POLICY IF EXISTS "Users can update their own audio." ON storage.objects;
+CREATE POLICY "Users can update their own audio."
   ON storage.objects FOR UPDATE
-  USING ( bucket_id = 'audio' AND auth.role() = 'authenticated' );
+  USING ( bucket_id = 'audio' AND auth.role() = 'authenticated' AND (storage.foldername(name))[1] = auth.uid()::text );
 
-CREATE POLICY "Anyone can delete their audio."
+DROP POLICY IF EXISTS "Anyone can delete their audio." ON storage.objects;
+DROP POLICY IF EXISTS "Users can delete their own audio." ON storage.objects;
+CREATE POLICY "Users can delete their own audio."
   ON storage.objects FOR DELETE
-  USING ( bucket_id = 'audio' AND auth.role() = 'authenticated' );
+  USING ( bucket_id = 'audio' AND auth.role() = 'authenticated' AND (storage.foldername(name))[1] = auth.uid()::text );
