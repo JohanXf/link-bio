@@ -18,6 +18,8 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   banner_url TEXT,
   audio_url TEXT,
   audio_title TEXT,
+  video_background_url TEXT,
+  video_background_enabled BOOLEAN DEFAULT false NOT NULL,
   created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT now() NOT NULL
 );
@@ -120,7 +122,9 @@ BEGIN
     avatar_url,
     banner_url,
     audio_url,
-    audio_title
+    audio_title,
+    video_background_url,
+    video_background_enabled
   )
   VALUES (
     new.id,
@@ -130,7 +134,9 @@ BEGIN
     COALESCE(new.raw_user_meta_data->>'avatar_url', ''),
     '',
     '',
-    ''
+    '',
+    '',
+    false
   );
   RETURN new;
 END;

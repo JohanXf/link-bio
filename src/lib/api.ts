@@ -3,25 +3,36 @@ import { ProfileData } from '../App';
 
 function decodeBio(packedBio: string) {
   const norm = packedBio || '';
+  const glassMatch = norm.match(/(.*?)\s*\|\|video:([^|]*)\|\|enabled:([^|]*)\|\|glassmorphic:([^|]*)$/);
+  if (glassMatch) {
+    return {
+      bio: glassMatch[1].trim(),
+      videoBackgroundUrl: glassMatch[2],
+      videoBackgroundEnabled: glassMatch[3] === 'true',
+      isGlassmorphic: glassMatch[4] === 'true'
+    };
+  }
+
   const match = norm.match(/(.*?)\s*\|\|video:([^|]*)\|\|enabled:([^|]*)$/);
   if (match) {
     return {
       bio: match[1].trim(),
       videoBackgroundUrl: match[2],
-      videoBackgroundEnabled: match[3] === 'true'
+      videoBackgroundEnabled: match[3] === 'true',
+      isGlassmorphic: true
     };
   }
   return {
     bio: norm,
     videoBackgroundUrl: '',
-    videoBackgroundEnabled: false
+    videoBackgroundEnabled: false,
+    isGlassmorphic: true
   };
 }
 
-function encodeBio(rawBio: string, videoUrl: string, videoEnabled: boolean) {
+function encodeBio(rawBio: string, videoUrl: string, videoEnabled: boolean, isGlassmorphic: boolean) {
   const cleanBio = (rawBio || '').trim();
-  if (!videoUrl) return cleanBio;
-  return `${cleanBio} ||video:${videoUrl}||enabled:${videoEnabled}`;
+  return `${cleanBio} ||video:${videoUrl || ''}||enabled:${videoEnabled || false}||glassmorphic:${isGlassmorphic}`;
 }
 
 export async function fetchProfile(userId: string): Promise<ProfileData | null> {
@@ -46,12 +57,13 @@ export async function fetchProfile(userId: string): Promise<ProfileData | null> 
     displayName: profile.display_name || '',
     bio: decoded.bio,
     isGlowing: profile.is_glowing,
+    isGlassmorphic: decoded.isGlassmorphic,
     avatarUrl: profile.avatar_url || '',
     bannerUrl: profile.banner_url || '',
     audioUrl: profile.audio_url || '',
     audioTitle: profile.audio_title || '',
-    videoBackgroundUrl: decoded.videoBackgroundUrl,
-    videoBackgroundEnabled: decoded.videoBackgroundEnabled,
+    videoBackgroundUrl: profile.video_background_url !== undefined && profile.video_background_url !== null ? profile.video_background_url : decoded.videoBackgroundUrl,
+    videoBackgroundEnabled: profile.video_background_enabled !== undefined && profile.video_background_enabled !== null ? !!profile.video_background_enabled : decoded.videoBackgroundEnabled,
     links: (links || []).map(link => ({
       id: link.id,
       title: link.title,
@@ -96,12 +108,13 @@ export async function fetchProfileByUsername(username: string): Promise<ProfileD
     displayName: profile.display_name || '',
     bio: decoded.bio,
     isGlowing: profile.is_glowing,
+    isGlassmorphic: decoded.isGlassmorphic,
     avatarUrl: profile.avatar_url || '',
     bannerUrl: profile.banner_url || '',
     audioUrl: profile.audio_url || '',
     audioTitle: profile.audio_title || '',
-    videoBackgroundUrl: decoded.videoBackgroundUrl,
-    videoBackgroundEnabled: decoded.videoBackgroundEnabled,
+    videoBackgroundUrl: profile.video_background_url !== undefined && profile.video_background_url !== null ? profile.video_background_url : decoded.videoBackgroundUrl,
+    videoBackgroundEnabled: profile.video_background_enabled !== undefined && profile.video_background_enabled !== null ? !!profile.video_background_enabled : decoded.videoBackgroundEnabled,
     links: (links || []).map(link => ({
       id: link.id,
       title: link.title,
@@ -111,7 +124,7 @@ export async function fetchProfileByUsername(username: string): Promise<ProfileD
 }
 
 export async function saveProfile(userId: string, data: ProfileData) {
-  const packedBio = encodeBio(data.bio, data.videoBackgroundUrl || '', data.videoBackgroundEnabled || false);
+  const packedBio = encodeBio(data.bio, data.videoBackgroundUrl || '', data.videoBackgroundEnabled || false, data.isGlassmorphic !== false);
 
   // 1. Upsert Profile
   const { error: profileError } = await supabase
@@ -121,6 +134,8 @@ export async function saveProfile(userId: string, data: ProfileData) {
       username: data.username.toLowerCase(),
       display_name: data.displayName,
       bio: packedBio,
+      video_background_url: data.videoBackgroundUrl || '',
+      video_background_enabled: data.videoBackgroundEnabled || false,
       is_glowing: data.isGlowing,
       avatar_url: data.avatarUrl,
       banner_url: data.bannerUrl,

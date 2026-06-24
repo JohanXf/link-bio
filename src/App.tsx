@@ -8,7 +8,6 @@ import React, { useState, useRef, useEffect } from 'react';
 
 import { AuthModal } from './components/AuthModal';
 import { supabase } from './lib/supabase';
-import iconsConfig from './icons.json';
 
 const VIDEO_PRESETS = [
   {
@@ -43,46 +42,6 @@ const VIDEO_PRESETS = [
   }
 ];
 
-const IconComponentMap: Record<string, React.ComponentType<any>> = {
-  Sparkles,
-  ArrowRight,
-  Music,
-  BarChart2,
-  Image: ImageIcon,
-  Zap,
-  Github,
-  Twitter,
-  Instagram,
-  Play,
-  ArrowLeft,
-  Eye,
-  Crown,
-  Menu,
-  Sun,
-  Upload,
-  ExternalLink,
-  Trash2,
-  Plus,
-  X,
-  Home,
-  User,
-  Settings,
-  HelpCircle,
-  LogOut,
-  Globe,
-  Mail,
-  Youtube,
-  Linkedin,
-  Facebook,
-  Twitch,
-  Link: LinkIcon,
-  MessageCircle,
-  BookOpen,
-  FileText,
-  Briefcase,
-  Trophy
-};
-
 function getLinkIcon(url: string, title?: string, iconSize: number = 18) {
   const normUrl = (url || '').toLowerCase();
   const normTitle = (title || '').toLowerCase();
@@ -90,10 +49,10 @@ function getLinkIcon(url: string, title?: string, iconSize: number = 18) {
   if (normUrl.includes('google.com') || normUrl.includes('google.') || normTitle.includes('google')) {
     return (
       <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="currentColor"/>
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="currentColor"/>
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="currentColor"/>
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="currentColor"/>
       </svg>
     );
   }
@@ -125,13 +84,13 @@ function getLinkIcon(url: string, title?: string, iconSize: number = 18) {
     return <Music size={iconSize} />;
   }
   if (normUrl.includes('discord') || normTitle.includes('discord')) {
-    return <MessageCircle size={iconSize} className="text-indigo-400" />;
+    return <MessageCircle size={iconSize} />;
   }
   if (normUrl.includes('telegram') || normUrl.includes('t.me') || normTitle.includes('telegram')) {
-    return <MessageCircle size={iconSize} className="text-sky-400" />;
+    return <MessageCircle size={iconSize} />;
   }
   if (normUrl.includes('whatsapp') || normTitle.includes('whatsapp') || normTitle.includes('wa.me')) {
-    return <MessageCircle size={iconSize} className="text-emerald-400" />;
+    return <MessageCircle size={iconSize} />;
   }
   if (normUrl.includes('portfolio') || normUrl.includes('blog') || normTitle.includes('portfolio') || normTitle.includes('blog') || normTitle.includes('website')) {
     return <Globe size={iconSize} />;
@@ -144,16 +103,6 @@ function getLinkIcon(url: string, title?: string, iconSize: number = 18) {
   }
   if (normUrl.includes('book') || normUrl.includes('read') || normTitle.includes('book') || normTitle.includes('reading') || normTitle.includes('medium.com')) {
     return <BookOpen size={iconSize} />;
-  }
-
-  // JSON overrides config mapping lookup
-  if (iconsConfig && Array.isArray(iconsConfig.mappings)) {
-    for (const mapping of iconsConfig.mappings) {
-      if (normUrl.includes(mapping.keyword) || normTitle.includes(mapping.keyword)) {
-        const Comp = IconComponentMap[mapping.icon];
-        if (Comp) return <Comp size={iconSize} />;
-      }
-    }
   }
 
   // Dynamic high-res Favicon API lookup if no match
@@ -175,7 +124,7 @@ function getLinkIcon(url: string, title?: string, iconSize: number = 18) {
       <img
         src={`https://www.google.com/s2/favicons?sz=64&domain=${domain}`}
         alt=""
-        className="object-contain rounded-sm"
+        className="object-contain rounded-sm grayscale brightness-200 contrast-50 opacity-80"
         style={{ width: iconSize, height: iconSize }}
         onError={(e) => {
           e.currentTarget.style.display = 'none';
@@ -221,92 +170,12 @@ function Navbar({ onLoginClick, userEmail, onSignOut, onDashboardClick }: { onLo
   );
 }
 
-function LinkCard({ title, icon, highlight }: { title: string, icon: React.ReactNode, highlight?: boolean }) {
+
+
+function Hero({ onNavigate, onLoginClick, data }: { onNavigate: () => void, onLoginClick: () => void, data: ProfileData }) {
   return (
-    <div className={`w-full relative overflow-hidden backdrop-blur-md rounded-2xl p-4 flex items-center justify-center cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98] ${highlight ? 'bg-indigo-500 text-white border border-indigo-400 shadow-lg shadow-indigo-500/20' : 'bg-white/10 text-white border border-white/10 hover:bg-white/15'}`}>
-      <div className="absolute left-4 opacity-80">
-        {icon}
-      </div>
-      <span className="text-sm font-semibold">{title}</span>
-    </div>
-  );
-}
-
-function MusicCard() {
-  return (
-    <div className="w-full bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl p-3 flex items-center gap-3 hover:bg-white/15 transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer group">
-      <div className="w-12 h-12 bg-indigo-500 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-lg shadow-indigo-500/30">
-        <Music size={20} className="text-white" />
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-white truncate group-hover:text-indigo-200 transition-colors">Lofi Beats to Code To</p>
-        <p className="text-xs text-indigo-200/70 truncate mt-0.5">Custom Audio Track</p>
-      </div>
-    </div>
-  );
-}
-
-function PhoneMockup() {
-  return (
-    <motion.div 
-      initial={{ opacity: 0, y: 40, rotateX: 10, rotateY: -10 }}
-      animate={{ opacity: 1, y: 0, rotateX: 0, rotateY: 0 }}
-      transition={{ duration: 1, delay: 0.2, type: "spring", stiffness: 50 }}
-      className="relative w-[320px] h-[650px] bg-black rounded-[3rem] border-[12px] border-black shadow-2xl overflow-hidden shadow-indigo-500/30"
-    >
-      <div className="absolute top-0 inset-x-0 h-7 flex justify-center z-20">
-        <div className="w-32 h-6 bg-black rounded-b-3xl"></div>
-      </div>
-
-      <div className="absolute inset-0 bg-neutral-900 text-white overflow-y-auto no-scrollbar pb-10">
-        <div className="relative h-40 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500">
-           <div className="absolute inset-0 bg-black/10 backdrop-blur-[2px]"></div>
-        </div>
-        
-        <div className="flex flex-col items-center px-6 -mt-12 relative z-10">
-           <div className="relative">
-             <motion.div 
-               animate={{ boxShadow: ['0px 0px 0px 0px rgba(99,102,241,0)', '0px 0px 30px 10px rgba(99,102,241,0.4)', '0px 0px 0px 0px rgba(99,102,241,0)'] }}
-               transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-               className="w-24 h-24 rounded-full absolute inset-0 z-0"
-             />
-             <div className="w-24 h-24 rounded-full border-4 border-neutral-900 bg-white overflow-hidden p-1 relative z-10 shadow-xl shadow-black/50">
-               <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Felix&backgroundColor=e6e6fa" alt="Avatar" className="w-full h-full rounded-full object-cover bg-indigo-50" />
-             </div>
-           </div>
-
-           <h2 className="mt-4 font-josefin font-bold text-xl drop-shadow-md">JohanXf</h2>
-           <p className="text-sm border flex items-center justify-center rounded-3xl px-2.5 py-1 w-full text-indigo-100/80 mt-2 text-center border-white/20 bg-white/5 backdrop-blur-md">
-             Builder. Writer. Creator of cool things.
-           </p>
-           
-           <div className="flex gap-4 mt-6">
-             <div className="p-2.5 rounded-full bg-white/5 text-white hover:bg-white/20 transition-colors shadow-sm ring-1 ring-white/10 cursor-pointer"><Twitter size={18} /></div>
-             <div className="p-2.5 rounded-full bg-white/5 text-white hover:bg-white/20 transition-colors shadow-sm ring-1 ring-white/10 cursor-pointer"><Github size={18} /></div>
-             <div className="p-2.5 rounded-full bg-white/5 text-white hover:bg-white/20 transition-colors shadow-sm ring-1 ring-white/10 cursor-pointer"><Instagram size={18} /></div>
-           </div>
-
-           <div className="w-full mt-8 space-y-3.5">
-             <LinkCard title="Read my latest essay" icon={<Zap size={18} />} />
-             <LinkCard title="Try my new SaaS" icon={<Sparkles size={18} />} highlight />
-             <MusicCard />
-             <LinkCard title="My Coding Setup 2026" icon={<ImageIcon size={18} />} />
-           </div>
-           
-           <div className="mt-10 font-josefin font-bold text-lg text-white/20 tracking-tight flex items-center gap-1">
-             <div className="w-4 h-4 rounded bg-white/20 flex items-center justify-center text-[10px] text-neutral-900 font-josefin font-bold">N</div>
-             Nads.io
-           </div>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
-function Hero({ onNavigate, onLoginClick }: { onNavigate: () => void, onLoginClick: () => void }) {
-  return (
-    <section className="pt-32 pb-16 px-6 max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16 lg:gap-8 min-h-[calc(100vh-4rem)]">
-      <div className="flex-1 text-center lg:text-left pt-10 lg:pt-0">
+    <section className="pt-32 pb-16 px-6 max-w-4xl mx-auto flex flex-col items-center justify-center gap-8 min-h-[calc(100vh-4rem)]">
+      <div className="w-full flex flex-col items-center text-center pt-10 lg:pt-0">
         <motion.div 
            initial={{ opacity: 0, y: 20 }}
            animate={{ opacity: 1, y: 0 }}
@@ -324,46 +193,41 @@ function Hero({ onNavigate, onLoginClick }: { onNavigate: () => void, onLoginCli
           Your bio, <br className="hidden md:block" />
           <span className="text-black bg-clip-text">one Nads.io link.</span>
         </motion.h1>
-        <motion.p 
-           initial={{ opacity: 0, y: 20 }}
-           animate={{ opacity: 1, y: 0 }}
-           transition={{ duration: 0.6, delay: 0.2 }}
-           className="mt-6 text-xl text-gray-500 max-w-2xl mx-auto lg:mx-0 leading-relaxed"
-        >
-          Sign in, pick your username, and share every link that matters from one beautifully simple page. Builder. Writer. Creator.
-        </motion.p>
-        <motion.div 
-           initial={{ opacity: 0, y: 20 }}
-           animate={{ opacity: 1, y: 0 }}
-           transition={{ duration: 0.6, delay: 0.3 }}
-           className="mt-10 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4"
-        >
-          <div className="flex items-center w-full max-w-md bg-[#141414] rounded-full p-2 border-2 border-white/10 shadow-sm focus-within:ring-4 focus-within:ring-indigo-500/20 focus-within:border-indigo-500/50 transition-all hover:border-white/20">
-            <span className="text-gray-500 pl-4 pr-1 font-semibold text-lg hidden sm:block">nads.io/</span>
-            <input 
-              type="text" 
-              placeholder="username" 
-              className="flex-1 bg-transparent px-2 py-3 outline-none text-white font-semibold text-lg placeholder-gray-500 w-full"
-            />
-            <button onClick={onLoginClick} className="bg-white text-black px-8 py-3 rounded-full font-semibold hover:bg-gray-200 transition-colors flex items-center gap-2 shrink-0 shadow-lg shadow-black/20 active:scale-95">
-              Claim Link <ArrowRight size={18} />
-            </button>
-          </div>
-        </motion.div>
-        <motion.p 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 0.6 }}
-            className="mt-5 text-sm font-medium text-gray-500"
-        >
-          It's free, forever. No credit card required.
-        </motion.p>
-      </div>
-
-      <div className="flex-1 flex justify-center lg:justify-end relative perspective-1000 w-full max-w-lg lg:max-w-none pb-12 lg:pb-0">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-to-br from-indigo-500/30 to-purple-500/30 blur-[100px] rounded-full pointer-events-none" />
-        <PhoneMockup />
-      </div>
+         <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="mt-6 text-xl text-gray-600 max-w-2xl leading-relaxed"
+         >
+           Sign in, pick your username, and share every link that matters from one beautifully simple page. Builder. Writer. Creator.
+         </motion.p>
+         <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 w-full"
+         >
+           <div className="flex items-center w-full max-w-md bg-[#141414] rounded-full p-2 border-2 border-white/10 shadow-sm focus-within:ring-4 focus-within:ring-indigo-500/20 focus-within:border-indigo-500/50 transition-all hover:border-white/20">
+             <span className="text-gray-550 pl-4 pr-1 font-semibold text-lg hidden sm:block">nads.io/</span>
+             <input 
+               type="text" 
+               placeholder="username" 
+               className="flex-1 bg-transparent px-2 py-3 outline-none text-white font-semibold text-lg placeholder:text-white/30 w-full"
+             />
+             <button onClick={onLoginClick} className="bg-white text-black px-8 py-3 rounded-full font-semibold hover:bg-gray-200 transition-colors flex items-center gap-2 shrink-0 shadow-lg shadow-black/20 active:scale-95">
+               Claim Link <ArrowRight size={18} />
+             </button>
+           </div>
+         </motion.div>
+         <motion.p 
+             initial={{ opacity: 0 }}
+             animate={{ opacity: 1 }}
+             transition={{ delay: 0.5, duration: 0.6 }}
+             className="mt-5 text-sm font-medium text-gray-550"
+         >
+           It's free, forever. No credit card required.
+         </motion.p>
+       </div>
     </section>
   );
 }
@@ -455,7 +319,7 @@ function Footer() {
   );
 }
 
-function AudioPlayer({ audioTitle, audioUrl, isVideoBg }: { audioTitle: string, audioUrl: string, isVideoBg?: boolean }) {
+function AudioPlayer({ audioTitle, audioUrl, isVideoBg, activePlan, isGlassmorphic }: { audioTitle: string, audioUrl: string, isVideoBg?: boolean, activePlan?: string, isGlassmorphic?: boolean }) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -496,9 +360,9 @@ function AudioPlayer({ audioTitle, audioUrl, isVideoBg }: { audioTitle: string, 
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 }}
       className={`w-full max-w-[400px] mt-3 rounded-[1.25rem] p-4 shadow-2xl transition-all duration-300 ${
-        isVideoBg 
-          ? 'bg-[#141414]/10 backdrop-blur-xl border border-white/10' 
-          : 'bg-[#141414] border border-white/5'
+        activePlan === 'pro' || isGlassmorphic
+          ? 'bg-black/25 backdrop-blur-md border border-white/10 text-white' 
+          : 'bg-[#141414] border border-white/5 text-white'
       }`}
     >
        <audio
@@ -559,8 +423,8 @@ function AudioPlayer({ audioTitle, audioUrl, isVideoBg }: { audioTitle: string, 
   );
 }
 
-function UserPage({ onBack, onEdit, data }: { onBack: () => void, onEdit: () => void, data: ProfileData }) {
-  const isVideoBg = !!(data.videoBackgroundEnabled && data.videoBackgroundUrl);
+function UserPage({ onBack, onEdit, data, activePlan = 'pro' }: { onBack: () => void, onEdit: () => void, data: ProfileData, activePlan?: 'free' | 'starter' | 'pro' }) {
+  const isVideoBg = !!(data.videoBackgroundEnabled && data.videoBackgroundUrl && activePlan === 'pro');
 
   return (
     <div className={`min-h-screen flex flex-col items-center py-12 px-4 relative font-sans transition-colors duration-500 overflow-hidden ${isVideoBg ? 'bg-black text-white' : 'bg-[#f0f0f0] text-black'}`}>
@@ -584,13 +448,13 @@ function UserPage({ onBack, onEdit, data }: { onBack: () => void, onEdit: () => 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className={`w-full max-w-[400px] rounded-[1.5rem] p-3 pb-8 shadow-2xl relative overflow-hidden transition-all duration-300 ${
-          isVideoBg 
-            ? 'bg-[#141414]/10 backdrop-blur-md border border-white/10 z-10' 
-            : 'bg-[#141414] border border-white/5'
+          activePlan === 'pro' || data.isGlassmorphic
+            ? 'bg-black/25 backdrop-blur-md border border-white/10 z-10 text-white' 
+            : 'bg-[#141414] border border-white/5 text-white'
         }`}
       >
         {/* Views Counter (Mountain Structure) */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20 bg-black/40 backdrop-blur-md px-2.5 py-0.5 rounded-b-lg flex items-center gap-1.5">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20 bg-black/25 backdrop-blur-md px-2.5 py-0.5 rounded-b-lg flex items-center gap-1.5">
           <Eye size={10} className="text-gray-300" />
           <span className="text-gray-100 font-medium text-[10px]">2</span>
         </div>
@@ -600,7 +464,7 @@ function UserPage({ onBack, onEdit, data }: { onBack: () => void, onEdit: () => 
           {data.bannerUrl ? (
             <img src={data.bannerUrl} className="w-full h-full object-cover" />
           ) : (
-            <div className={`w-full h-full ${isVideoBg ? 'bg-white/5' : 'bg-[#1c1c20]'}`} />
+            <div className="w-full h-full bg-transparent" />
           )}
         </div>
 
@@ -632,7 +496,7 @@ function UserPage({ onBack, onEdit, data }: { onBack: () => void, onEdit: () => 
            </div>
 
            <h1 className="text-2xl font-josefin font-bold text-white tracking-tight leading-tight">{data.displayName || 'No Name'}</h1>
-           <p className="text-gray-500 text-[14px] font-light mt-1.5 mb-4 text-center leading-normal max-w-[280px]">
+           <p className="text-white/95 text-[14px] font-semibold mt-1.5 mb-4 text-center leading-normal max-w-[280px]">
              {data.bio}
            </p>
 
@@ -647,12 +511,12 @@ function UserPage({ onBack, onEdit, data }: { onBack: () => void, onEdit: () => 
                      rel="noopener noreferrer" 
                      title={link.title || 'Link'} 
                      className={`flex items-center justify-center transition-all hover:scale-[1.05] active:scale-[0.95] w-[64px] h-[64px] shrink-0 rounded-2xl border ${
-                       isVideoBg 
-                         ? 'bg-white/15 hover:bg-white/25 border-white/20 hover:border-white/30 text-white backdrop-blur-md shadow-lg shadow-black/15' 
-                         : 'bg-[#f0f0f0] hover:bg-[#e5e5e5] border-transparent text-black shadow-sm'
+                       activePlan === 'pro' || data.isGlassmorphic
+                         ? 'bg-transparent hover:bg-white/5 border-white/20 hover:border-white/30 text-white backdrop-blur-[1px] shadow-lg shadow-black/15' 
+                         : 'bg-[#1a1a1a] hover:bg-[#222] border-white/10 text-white shadow-md'
                      }`}
                    >
-                     <div className={`flex items-center justify-center w-full h-full ${isVideoBg ? 'text-white' : 'text-gray-800'}`}>
+                     <div className="flex items-center justify-center w-full h-full text-gray-200">
                        {getLinkIcon(link.url, link.title, 20)}
                      </div>
                    </a>
@@ -666,12 +530,12 @@ function UserPage({ onBack, onEdit, data }: { onBack: () => void, onEdit: () => 
                  target="_blank" 
                  rel="noopener noreferrer" 
                  className={`w-full py-3 px-4 h-[52px] rounded-2xl font-bold transition-all text-[15px] flex items-center justify-between hover:scale-[1.01] active:scale-[0.99] mt-0.5 border ${
-                   isVideoBg 
-                     ? 'bg-white/15 hover:bg-white/25 border-white/20 hover:border-white/30 text-white backdrop-blur-md shadow-lg shadow-black/15' 
-                     : 'bg-[#f0f0f0] hover:bg-[#e5e5e5] border-transparent text-black shadow-sm'
+                   activePlan === 'pro' || data.isGlassmorphic
+                     ? 'bg-transparent hover:bg-white/5 border-white/20 hover:border-white/30 text-gray-200 backdrop-blur-[1px] shadow-lg shadow-black/15' 
+                     : 'bg-[#1a1a1a] hover:bg-[#222] border-white/10 text-gray-200 shadow-md'
                  }`}
                >
-                 <div className={`shrink-0 flex items-center justify-center w-6 h-6 ${isVideoBg ? 'text-white' : 'text-gray-800'}`}>
+                 <div className="shrink-0 flex items-center justify-center w-6 h-6 text-gray-200">
                    {getLinkIcon(link.url, link.title, 20)}
                  </div>
                  <span className="flex-1 text-center truncate px-2 font-josefin">{link.title || 'Link'}</span>
@@ -685,7 +549,7 @@ function UserPage({ onBack, onEdit, data }: { onBack: () => void, onEdit: () => 
       {/* Music Card */}
       {data.audioUrl && (
         <div className="w-full max-w-[400px] z-10 transition-transform">
-          <AudioPlayer audioTitle={data.audioTitle} audioUrl={data.audioUrl} isVideoBg={isVideoBg} />
+          <AudioPlayer audioTitle={data.audioTitle} audioUrl={data.audioUrl} isVideoBg={isVideoBg} activePlan={activePlan} isGlassmorphic={data.isGlassmorphic} />
         </div>
       )}
 
@@ -693,9 +557,9 @@ function UserPage({ onBack, onEdit, data }: { onBack: () => void, onEdit: () => 
       <button 
         onClick={onBack} 
         id="profile-back-button"
-        className="mt-8 flex items-center gap-2 px-5 py-2.5 bg-white text-gray-700 hover:text-black hover:bg-gray-50 border border-gray-200/80 rounded-full text-sm font-semibold transition-all shadow-sm hover:shadow active:scale-95 cursor-pointer z-30"
+        className="mt-8 flex items-center gap-2 px-5 py-2.5 bg-[#141414] text-gray-300 hover:text-white hover:bg-[#1c1c1c] border border-white/5 rounded-full text-sm font-semibold transition-all shadow-md active:scale-95 cursor-pointer z-30"
       >
-        <ArrowLeft size={16} className="text-gray-500" />
+        <ArrowLeft size={16} className="text-gray-400" />
         <span>Back to Editor</span>
       </button>
 
@@ -703,11 +567,14 @@ function UserPage({ onBack, onEdit, data }: { onBack: () => void, onEdit: () => 
   );
 }
 
-function EditPage({ onBack, onSignOut, onHome, data, onChange, userEmail, userId }: { onBack: () => void, onSignOut: () => void, onHome: () => void, data: ProfileData, onChange: React.Dispatch<React.SetStateAction<ProfileData>>, userEmail: string | null, userId: string | null }) {
+function EditPage({ onBack, onSignOut, onHome, data, onChange, userEmail, userId, activePlan = 'pro', setActivePlan }: { onBack: () => void, onSignOut: () => void, onHome: () => void, data: ProfileData, onChange: React.Dispatch<React.SetStateAction<ProfileData>>, userEmail: string | null, userId: string | null, activePlan?: 'free' | 'starter' | 'pro', setActivePlan: (plan: 'free' | 'starter' | 'pro') => void }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'home'|'edit'|'analytics'|'leaderboard'|'settings'|'help'|'premium'>('edit');
+  const [activeTab, setActiveTab] = useState<'home'|'edit'|'analytics'|'leaderboard'|'discord'|'settings'|'help'|'premium'>('edit');
   const [leaderboardPeriod, setLeaderboardPeriod] = useState<'Daily'|'Weekly'|'Monthly'|'All Time'>('All Time');
+  const [discordPeriod, setDiscordPeriod] = useState<'Daily'|'Weekly'|'Monthly'|'All Time'>('All Time');
   const [isSaving, setIsSaving] = useState(false);
+  const [hoveredDay, setHoveredDay] = useState<number | null>(null);
+  const [analyticsPeriod, setAnalyticsPeriod] = useState<'Daily' | 'Weekly' | 'Monthly' | 'All Time'>('Weekly');
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -758,9 +625,13 @@ function EditPage({ onBack, onSignOut, onHome, data, onChange, userEmail, userId
               }
             });
           }, 500);
-        } catch (err) {
+        } catch (err: any) {
           console.error(`Failed to upload ${field}`, err);
-          alert(`Failed to upload ${field}. Make sure your Supabase Storage buckets are public and have RLS disabled for inserts/updates (see supabase/schema.sql)`);
+          if (err.message === 'Failed to fetch') {
+             console.log(`Fallback to base64 for ${field} due to network error`);
+          } else {
+             alert(`Failed to upload ${field}. Make sure your Supabase Storage buckets are public and have RLS disabled for inserts/updates (see supabase/schema.sql)`);
+          }
         }
       }
     }
@@ -792,9 +663,13 @@ function EditPage({ onBack, onSignOut, onHome, data, onChange, userEmail, userId
               videoBackgroundEnabled: true 
             }));
           }, 500);
-        } catch (err) {
+        } catch (err: any) {
           console.error(`Failed to upload background video`, err);
-          alert(`Failed to upload video. Make sure your video is under 15MB.`);
+          if (err.message === 'Failed to fetch') {
+             console.log(`Fallback to base64 for video due to network error`);
+          } else {
+             alert(`Failed to upload video. Make sure your video is under 15MB.`);
+          }
         }
       }
     }
@@ -876,6 +751,11 @@ function EditPage({ onBack, onSignOut, onHome, data, onChange, userEmail, userId
                      <button onClick={() => { setActiveTab('leaderboard'); setIsSidebarOpen(false); }} className={`w-full flex items-center gap-3 px-3 py-3.5 rounded-xl transition-colors mb-1 cursor-pointer ${activeTab === 'leaderboard' ? 'bg-[#252525] text-white border border-white/5' : 'text-gray-300 hover:text-white hover:bg-[#252525]'}`}>
                         <Trophy size={18} />
                         <span className="font-josefin font-semibold text-[15px]">Leaderboard</span>
+                     </button>
+                     
+                     <button onClick={() => { setActiveTab('discord'); setIsSidebarOpen(false); }} className={`w-full flex items-center gap-3 px-3 py-3.5 rounded-xl transition-colors mb-1 cursor-pointer ${activeTab === 'discord' ? 'bg-[#252525] text-white border border-white/5' : 'text-gray-300 hover:text-white hover:bg-[#252525]'}`}>
+                        <MessageCircle size={18} className={activeTab === 'discord' ? 'text-white' : 'text-gray-300'} />
+                        <span className="font-josefin font-semibold text-[15px]">Discord</span>
                      </button>
                      
                      <button onClick={() => { setActiveTab('settings'); setIsSidebarOpen(false); }} className={`w-full flex items-center gap-3 px-3 py-3.5 rounded-xl transition-colors mb-1 cursor-pointer mt-2 ${activeTab === 'settings' ? 'bg-[#252525] text-white border border-white/5' : 'text-gray-300 hover:text-white hover:bg-[#252525]'}`}>
@@ -981,16 +861,313 @@ function EditPage({ onBack, onSignOut, onHome, data, onChange, userEmail, userId
           )}
           {activeTab === 'analytics' && (
              <div className="space-y-6">
-                <div className="mb-8">
-                  <h1 className="text-[28px] font-josefin font-bold tracking-tight">Analytics</h1>
-                  <p className="text-gray-400 mt-2 text-sm">Track your performance</p>
+                <div className="mb-4">
+                  <div>
+                    <h1 className="text-[28px] font-josefin font-bold tracking-tight">Analytics</h1>
+                    <p className="text-gray-400 mt-1 text-sm">Detailed performance stats for your profile</p>
+                  </div>
+                  
+                  {/* Timeframe selector */}
+                  <div className="flex items-center justify-between bg-[#141414] border border-white/5 p-2 rounded-full mb-6 w-full gap-1">
+                     {([
+                       { id: 'Daily', label: 'Daily' },
+                       { id: 'Weekly', label: 'Weekly' },
+                       { id: 'Monthly', label: 'Monthly' },
+                       { id: 'All Time', label: 'All Time' }
+                     ] as const).map(p => (
+                       <button 
+                         key={p.id} 
+                         onClick={() => setAnalyticsPeriod(p.id)} 
+                         className={`flex-1 py-3 px-2 rounded-full text-[15px] font-josefin font-bold tracking-tight whitespace-nowrap transition-all cursor-pointer ${p.id === analyticsPeriod ? 'bg-[#252525] text-white shadow-md' : 'text-gray-500 hover:text-gray-300 bg-transparent'}`}
+                       >
+                         {p.label}
+                       </button>
+                     ))}
+                  </div>
                 </div>
-                <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6 flex flex-col items-center justify-center min-h-[300px] gap-4">
-                   <BarChart2 size={48} className="text-gray-600" />
-                   <p className="text-gray-400 text-center max-w-[250px]">Detailed analytics will be available in the upcoming Pro tier.</p>
-                   <button onClick={() => setActiveTab('premium')} className="mt-4 bg-[#252525] hover:bg-[#333] text-white py-2 px-6 rounded-full font-medium transition-colors border border-white/5 cursor-pointer">
-                     Upgrade to Pro
-                   </button>
+
+                {/* KPI Bento Grid */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="bg-[#141414] border border-white/5 p-4 rounded-2xl flex flex-col justify-between">
+                    <div>
+                      <span className="text-gray-400 font-mono text-[10px] uppercase tracking-wider font-semibold">Page Views</span>
+                      <h3 className="text-2xl font-josefin font-bold text-white mt-1">
+                        {{
+                          'Daily': '492',
+                          'Weekly': '3,482',
+                          'Monthly': '14,842',
+                          'All Time': '142,482'
+                        }[analyticsPeriod]}
+                      </h3>
+                    </div>
+                    <div className="text-emerald-400 text-xs font-mono font-medium mt-3 flex items-center gap-1">
+                      <span>↑ {{'Daily': '+12.4%', 'Weekly': '+18.4%', 'Monthly': '+25.1%', 'All Time': '+100%'}[analyticsPeriod]}</span>
+                      <span className="text-gray-500 font-sans">
+                        {{'Daily': 'today', 'Weekly': 'this week', 'Monthly': 'this month', 'All Time': 'all time'}[analyticsPeriod]}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="bg-[#141414] border border-white/5 p-4 rounded-2xl flex flex-col justify-between">
+                    <div>
+                      <span className="text-gray-400 font-mono text-[10px] uppercase tracking-wider font-semibold">Link Clicks</span>
+                      <h3 className="text-2xl font-josefin font-bold text-white mt-1">
+                        {{
+                          'Daily': '182',
+                          'Weekly': '1,294',
+                          'Monthly': '5,194',
+                          'All Time': '54,294'
+                        }[analyticsPeriod]}
+                      </h3>
+                    </div>
+                    <div className="text-emerald-400 text-xs font-mono font-medium mt-3 flex items-center gap-1">
+                      <span>↑ {{'Daily': '+8.1%', 'Weekly': '+22.1%', 'Monthly': '+15.2%', 'All Time': '+100%'}[analyticsPeriod]}</span>
+                      <span className="text-gray-500 font-sans">
+                        {{'Daily': 'CTR: 37.0%', 'Weekly': 'CTR: 37.2%', 'Monthly': 'CTR: 35.0%', 'All Time': 'CTR: 38.1%'}[analyticsPeriod]}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="bg-[#141414] border border-white/5 p-4 rounded-2xl flex flex-col justify-between">
+                    <div>
+                      <span className="text-gray-400 font-mono text-[10px] uppercase tracking-wider font-semibold font-sans">Avg. Session</span>
+                      <h3 className="text-2xl font-josefin font-bold text-white mt-1">
+                        {{
+                          'Daily': '1m 24s',
+                          'Weekly': '1m 45s',
+                          'Monthly': '1m 32s',
+                          'All Time': '2m 15s'
+                        }[analyticsPeriod]}
+                      </h3>
+                    </div>
+                    <div className={`text-xs font-mono font-medium mt-3 flex items-center gap-1 ${analyticsPeriod === 'Monthly' ? 'text-red-400' : 'text-emerald-400'}`}>
+                      <span>{{'Daily': '↑ +4.2%', 'Weekly': '↑ +8.2%', 'Monthly': '↓ -1.5%', 'All Time': '↑ +15.2%'}[analyticsPeriod]}</span>
+                      <span className="text-gray-500 font-sans">
+                        {{'Daily': 'vs yesterday', 'Weekly': 'up from 1m 37s', 'Monthly': 'down from 1m 35s', 'All Time': 'avg overall'}[analyticsPeriod]}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="bg-[#141414] border border-white/5 p-4 rounded-2xl flex flex-col justify-between">
+                    <div>
+                      <span className="text-gray-400 font-mono text-[10px] uppercase tracking-wider font-semibold font-sans">Unique Visitors</span>
+                      <h3 className="text-2xl font-josefin font-bold text-white mt-1">
+                        {{
+                          'Daily': '298',
+                          'Weekly': '1,842',
+                          'Monthly': '8,482',
+                          'All Time': '98,842'
+                        }[analyticsPeriod]}
+                      </h3>
+                    </div>
+                    <div className="text-emerald-400 text-xs font-mono font-medium mt-3 flex items-center gap-1">
+                      <span>↑ {{'Daily': '+9.3%', 'Weekly': '+12.3%', 'Monthly': '+18.1%', 'All Time': '+100%'}[analyticsPeriod]}</span>
+                      <span className="text-gray-500 font-sans">
+                        {{'Daily': 'today', 'Weekly': 'this week', 'Monthly': 'this month', 'All Time': 'all time'}[analyticsPeriod]}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Main Interactive Graph Panel */}
+                <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-5">
+                   <div className="flex items-center justify-between mb-6">
+                      <h3 className="font-josefin font-bold text-white text-[17px]">Profile Views & Engagement Trend</h3>
+                      <div className="flex items-center gap-4 text-xs">
+                        <div className="flex items-center gap-1.5 text-gray-300">
+                          <span className="w-2.5 h-2.5 bg-yellow-400 rounded-full inline-block" />
+                          <span>Views</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-gray-300">
+                          <span className="w-2.5 h-2.5 bg-white rounded-full inline-block" />
+                          <span>Clicks</span>
+                        </div>
+                      </div>
+                   </div>
+
+                   {/* Custom Graphic Bar Chart */}
+                   <div className="relative h-[200px] flex items-end gap-3.5 md:gap-7 w-full pt-8 px-2">
+                     
+                     {/* Y-axis Guides */}
+                     <div className="absolute left-0 right-0 top-8 border-t border-white/5" />
+                     <div className="absolute left-0 right-0 top-24 border-t border-white/5" />
+                     <div className="absolute left-0 right-0 top-40 border-t border-white/5" />
+
+                     {({
+                        '7d': [
+                          { label: 'Mon', views: 240, clicks: 82, ctr: '34.1%' },
+                          { label: 'Tue', views: 310, clicks: 112, ctr: '36.1%' },
+                          { label: 'Wed', views: 480, clicks: 185, ctr: '38.5%' },
+                          { label: 'Thu', views: 390, clicks: 140, ctr: '35.8%' },
+                          { label: 'Fri', views: 520, clicks: 215, ctr: '41.3%' },
+                          { label: 'Sat', views: 680, clicks: 298, ctr: '43.8%' },
+                          { label: 'Sun', views: 862, clicks: 362, ctr: '42.0%' },
+                        ],
+                        '30d': [
+                          { label: 'Week 1', views: 2400, clicks: 820, ctr: '34.1%' },
+                          { label: 'Week 2', views: 3100, clicks: 1120, ctr: '36.1%' },
+                          { label: 'Week 3', views: 4800, clicks: 1850, ctr: '38.5%' },
+                          { label: 'Week 4', views: 2182, clicks: 504, ctr: '23.1%' },
+                        ],
+                        'all': [
+                          { label: 'Jan', views: 12400, clicks: 4820, ctr: '38.8%' },
+                          { label: 'Feb', views: 15100, clicks: 6120, ctr: '40.5%' },
+                          { label: 'Mar', views: 24800, clicks: 9850, ctr: '39.7%' },
+                          { label: 'Apr', views: 31000, clicks: 12400, ctr: '40.0%' },
+                          { label: 'May', views: 28500, clicks: 10210, ctr: '35.8%' },
+                          { label: 'Jun', views: 30682, clicks: 10894, ctr: '35.5%' },
+                        ]
+                     }[analyticsPeriod] || []).map((dataNode, index) => {
+                       const maxViews = { '7d': 900, '30d': 5000, 'all': 35000 }[analyticsPeriod] || 900;
+                       const barHeightPercent = Math.max(15, (dataNode.views / maxViews) * 100);
+                       const clickHeightPercent = Math.max(10, (dataNode.clicks / maxViews) * 100);
+
+                       return (
+                         <div 
+                           key={dataNode.label} 
+                           className="flex-1 flex flex-col items-center h-full relative group"
+                           onMouseEnter={() => setHoveredDay(index)}
+                           onMouseLeave={() => setHoveredDay(null)}
+                         >
+                           {/* Hover tooltip overlay */}
+                           {hoveredDay === index && (
+                             <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-white text-black px-2.5 py-1.5 rounded-lg shadow-2xl text-[11px] font-semibold flex flex-col gap-0.5 z-40 whitespace-nowrap">
+                               <div className="font-bold border-b border-gray-100 pb-0.5 mb-0.5 text-center">{dataNode.label} Summary</div>
+                               <div className="text-gray-700">👁 Views: <strong className="text-black font-extrabold">{dataNode.views}</strong></div>
+                               <div className="text-gray-700">🎯 Clicks: <strong className="text-black font-extrabold">{dataNode.clicks}</strong></div>
+                               <div className="text-gray-750">📈 CTR: <strong className="text-black font-extrabold">{dataNode.ctr}</strong></div>
+                             </div>
+                           )}
+
+                           {/* Interactive Bar */}
+                           <div className="w-full max-w-[28px] h-full flex items-end justify-center relative select-none cursor-pointer">
+                              {/* Views bar (back) */}
+                              <div 
+                                className={`w-full rounded-t-md transition-all duration-300 relative ${hoveredDay === index ? 'bg-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.25)]' : 'bg-[#2a2a30]'}`}
+                                style={{ height: `${barHeightPercent}%` }}
+                              />
+                              {/* Clicks bar (front) */}
+                              <div 
+                                className={`w-1/2 rounded-t-sm transition-all duration-300 absolute bottom-0 left-1/4 ${hoveredDay === index ? 'bg-white' : 'bg-gray-500'}`}
+                                style={{ height: `${clickHeightPercent}%` }}
+                              />
+                           </div>
+
+                           {/* Label */}
+                           <span className={`text-[11px] mt-2 font-mono font-bold transition-colors ${hoveredDay === index ? 'text-white' : 'text-gray-500'}`}>
+                             {dataNode.label}
+                           </span>
+                         </div>
+                       );
+                     })}
+                   </div>
+                </div>
+
+                {/* Secondary breakdown blocks */}
+                <div className="grid md:grid-cols-2 gap-6">
+                     {/* Referral Channels */}
+                  <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-5">
+                     <h3 className="font-josefin font-bold text-white text-[16px] mb-4">Traffic Referrals</h3>
+                     <div className="space-y-4">
+                       {({
+                          'Daily': [
+                            { source: 'Twitter / X', clicks: 82, pct: 50, color: 'bg-yellow-400' },
+                            { source: 'GitHub', clicks: 49, pct: 30, color: 'bg-white' },
+                            { source: 'LinkedIn', clicks: 24, pct: 15, color: 'bg-gray-400' },
+                            { source: 'Direct / Other', clicks: 8, pct: 5, color: 'bg-gray-600' },
+                          ],
+                          'Weekly': [
+                            { source: 'Twitter / X', clicks: 612, pct: 47, color: 'bg-yellow-400' },
+                            { source: 'GitHub', clicks: 365, pct: 28, color: 'bg-white' },
+                            { source: 'LinkedIn', clicks: 195, pct: 15, color: 'bg-gray-400' },
+                            { source: 'Direct / Other', clicks: 122, pct: 10, color: 'bg-gray-600' },
+                          ],
+                          'Monthly': [
+                            { source: 'Twitter / X', clicks: 1612, pct: 40, color: 'bg-yellow-400' },
+                            { source: 'GitHub', clicks: 1365, pct: 32, color: 'bg-white' },
+                            { source: 'LinkedIn', clicks: 895, pct: 18, color: 'bg-gray-400' },
+                            { source: 'Direct / Other', clicks: 422, pct: 10, color: 'bg-gray-600' },
+                          ],
+                          'All Time': [
+                            { source: 'Twitter / X', clicks: 21612, pct: 45, color: 'bg-yellow-400' },
+                            { source: 'GitHub', clicks: 18365, pct: 30, color: 'bg-white' },
+                            { source: 'LinkedIn', clicks: 9895, pct: 15, color: 'bg-gray-400' },
+                            { source: 'Direct / Other', clicks: 4422, pct: 10, color: 'bg-gray-600' },
+                          ]
+                       }[analyticsPeriod] || []).map(ref => (
+                         <div key={ref.source} className="space-y-1.5">
+                           <div className="flex items-center justify-between text-xs font-medium">
+                             <span className="text-gray-300">{ref.source}</span>
+                             <span className="text-gray-400 font-mono">{ref.clicks} clicks ({ref.pct}%)</span>
+                           </div>
+                           <div className="w-full bg-[#1e1e24] h-1.5 rounded-full overflow-hidden">
+                             <div className={`h-full ${ref.color} rounded-full`} style={{ width: `${ref.pct}%` }} />
+                           </div>
+                         </div>
+                       ))}
+                     </div>
+                  </div>
+
+                  {/* Device & Location Split */}
+                  <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-5">
+                     <h3 className="font-josefin font-bold text-white text-[16px] mb-4">Device & Top Geographies</h3>
+                     
+                     {/* Devices */}
+                     <div className="flex items-center gap-3 mb-5 p-3 rounded-xl bg-white/2">
+                       <span className="text-gray-400 text-xs font-sans">Devices:</span>
+                       <span className="px-2 py-0.5 rounded-md bg-[#252525] text-white text-[11px] font-mono font-bold">
+                         📱 Mobile ({{'7d': '68%', '30d': '71%', 'all': '65%'}[analyticsPeriod]})
+                       </span>
+                       <span className="px-2 py-0.5 rounded-md bg-[#252525] text-white text-[11px] font-mono font-bold">
+                         💻 Desktop ({{'7d': '27%', '30d': '24%', 'all': '30%'}[analyticsPeriod]})
+                       </span>
+                       <span className="px-2 py-0.5 rounded-md bg-[#252525] text-white text-[11px] font-mono font-bold">
+                         📟 Tablet ({{'7d': '5%', '30d': '5%', 'all': '5%'}[analyticsPeriod]})
+                       </span>
+                     </div>
+
+                     {/* Countries */}
+                     <div className="space-y-3">
+                       {({
+                          'Daily': [
+                            { country: '🇺🇸 United States', visitors: 120, pct: 48 },
+                            { country: '🇬🇧 United Kingdom', visitors: 42, pct: 17 },
+                            { country: '🇩🇪 Germany', visitors: 22, pct: 9 },
+                            { country: '🇯🇵 Japan', visitors: 15, pct: 6 },
+                            { country: '🇸🇬 Singapore', visitors: 12, pct: 5 }
+                          ],
+                          'Weekly': [
+                            { country: '🇺🇸 United States', visitors: 824, pct: 45 },
+                            { country: '🇬🇧 United Kingdom', visitors: 310, pct: 17 },
+                            { country: '🇩🇪 Germany', visitors: 164, pct: 9 },
+                            { country: '🇯🇵 Japan', visitors: 110, pct: 6 },
+                            { country: '🇸🇬 Singapore', visitors: 91, pct: 5 }
+                          ],
+                          'Monthly': [
+                            { country: '🇺🇸 United States', visitors: 2824, pct: 41 },
+                            { country: '🇬🇧 United Kingdom', visitors: 1310, pct: 21 },
+                            { country: '🇩🇪 Germany', visitors: 864, pct: 14 },
+                            { country: '🇯🇵 Japan', visitors: 510, pct: 8 },
+                            { country: '🇸🇬 Singapore', visitors: 291, pct: 5 }
+                          ],
+                          'All Time': [
+                            { country: '🇺🇸 United States', visitors: 42824, pct: 45 },
+                            { country: '🇬🇧 United Kingdom', visitors: 18310, pct: 19 },
+                            { country: '🇩🇪 Germany', visitors: 11864, pct: 12 },
+                            { country: '🇯🇵 Japan', visitors: 8510, pct: 9 },
+                            { country: '🇸🇬 Singapore', visitors: 4291, pct: 5 }
+                          ]
+                       }[analyticsPeriod] || []).map((geo, idx) => (
+                         <div key={geo.country} className="flex items-center justify-between text-xs">
+                           <div className="flex items-center gap-2">
+                             <span className="text-gray-400 font-medium font-mono">#{idx+1}</span>
+                             <span className="text-gray-300 font-medium">{geo.country}</span>
+                           </div>
+                           <span className="text-gray-400 font-mono font-semibold">{geo.visitors} visitors</span>
+                         </div>
+                       ))}
+                     </div>
+                  </div>
                 </div>
              </div>
           )}
@@ -1020,28 +1197,48 @@ function EditPage({ onBack, onSignOut, onHome, data, onChange, userEmail, userId
                          { name: 'Mike T.', handle: '@miket', views: '1.8K', rank: 2, img: 'https://i.pravatar.cc/100?img=12' },
                          { name: 'Alice Smith', handle: '@alice', views: '1.5K', rank: 3, img: 'https://i.pravatar.cc/100?img=1' },
                          { name: 'Eve', handle: '@eve_xyz', views: '1.2K', rank: 4, img: 'https://i.pravatar.cc/100?img=5' },
-                         { name: 'Bob Jones', handle: '@bobjones', views: '980', rank: 5, img: 'https://i.pravatar.cc/100?img=11' }
+                         { name: 'Bob Jones', handle: '@bobjones', views: '980', rank: 5, img: 'https://i.pravatar.cc/100?img=11' },
+                         { name: 'David K.', handle: '@david_k', views: '850', rank: 6, img: 'https://i.pravatar.cc/100?img=15' },
+                         { name: 'Clara M.', handle: '@claram', views: '790', rank: 7, img: 'https://i.pravatar.cc/100?img=20' },
+                         { name: 'James P.', handle: '@james_p', views: '640', rank: 8, img: 'https://i.pravatar.cc/100?img=32' },
+                         { name: 'Nina R.', handle: '@ninar', views: '520', rank: 9, img: 'https://i.pravatar.cc/100?img=28' },
+                         { name: 'Tom B.', handle: '@tomb', views: '450', rank: 10, img: 'https://i.pravatar.cc/100?img=33' }
                       ],
                       'Weekly': [
                          { name: 'Diana P.', handle: '@diana', views: '8.4K', rank: 1, img: 'https://i.pravatar.cc/100?img=44' },
                          { name: 'Alice Smith', handle: '@alice', views: '7.5K', rank: 2, img: 'https://i.pravatar.cc/100?img=1' },
                          { name: 'Charlie', handle: '@charlie_d', views: '6.1K', rank: 3, img: 'https://i.pravatar.cc/100?img=33' },
                          { name: 'Sarah L.', handle: '@sarah', views: '5.8K', rank: 4, img: 'https://i.pravatar.cc/100?img=9' },
-                         { name: 'Mike T.', handle: '@miket', views: '4.2K', rank: 5, img: 'https://i.pravatar.cc/100?img=12' }
+                         { name: 'Mike T.', handle: '@miket', views: '4.2K', rank: 5, img: 'https://i.pravatar.cc/100?img=12' },
+                         { name: 'Ryan G.', handle: '@ryan_g', views: '3.9K', rank: 6, img: 'https://i.pravatar.cc/100?img=47' },
+                         { name: 'Chloe W.', handle: '@chloe_w', views: '3.1K', rank: 7, img: 'https://i.pravatar.cc/100?img=49' },
+                         { name: 'Lucas N.', handle: '@lucas_n', views: '2.8K', rank: 8, img: 'https://i.pravatar.cc/100?img=52' },
+                         { name: 'Sophia V.', handle: '@sophia_v', views: '2.4K', rank: 9, img: 'https://i.pravatar.cc/100?img=54' },
+                         { name: 'Ethan S.', handle: '@ethan_s', views: '1.9K', rank: 10, img: 'https://i.pravatar.cc/100?img=58' }
                       ],
                       'Monthly': [
                          { name: 'Alice Smith', handle: '@alice', views: '24.5K', rank: 1, img: 'https://i.pravatar.cc/100?img=1' },
                          { name: 'Charlie', handle: '@charlie_d', views: '22.1K', rank: 2, img: 'https://i.pravatar.cc/100?img=33' },
                          { name: 'Bob Jones', handle: '@bobjones', views: '18.2K', rank: 3, img: 'https://i.pravatar.cc/100?img=11' },
                          { name: 'Diana P.', handle: '@diana', views: '12.4K', rank: 4, img: 'https://i.pravatar.cc/100?img=44' },
-                         { name: 'Eve', handle: '@eve_xyz', views: '9.8K', rank: 5, img: 'https://i.pravatar.cc/100?img=5' }
+                         { name: 'Eve', handle: '@eve_xyz', views: '9.8K', rank: 5, img: 'https://i.pravatar.cc/100?img=5' },
+                         { name: 'Oliver H.', handle: '@oliver_h', views: '8.7K', rank: 6, img: 'https://i.pravatar.cc/100?img=60' },
+                         { name: 'Lily B.', handle: '@lily_b', views: '7.9K', rank: 7, img: 'https://i.pravatar.cc/100?img=62' },
+                         { name: 'Marcus J.', handle: '@marcus_j', views: '6.5K', rank: 8, img: 'https://i.pravatar.cc/100?img=64' },
+                         { name: 'Amelia F.', handle: '@amelia_f', views: '5.8K', rank: 9, img: 'https://i.pravatar.cc/100?img=66' },
+                         { name: 'Henry T.', handle: '@henry_t', views: '4.9K', rank: 10, img: 'https://i.pravatar.cc/100?img=68' }
                       ],
                       'All Time': [
                          { name: 'Alice Smith', handle: '@alice', views: '145K', rank: 1, img: 'https://i.pravatar.cc/100?img=1' },
                          { name: 'Bob Jones', handle: '@bobjones', views: '112K', rank: 2, img: 'https://i.pravatar.cc/100?img=11' },
                          { name: 'Charlie', handle: '@charlie_d', views: '98K', rank: 3, img: 'https://i.pravatar.cc/100?img=33' },
                          { name: 'Diana P.', handle: '@diana', views: '76K', rank: 4, img: 'https://i.pravatar.cc/100?img=44' },
-                         { name: 'Eve', handle: '@eve_xyz', views: '54K', rank: 5, img: 'https://i.pravatar.cc/100?img=5' }
+                         { name: 'Eve', handle: '@eve_xyz', views: '54K', rank: 5, img: 'https://i.pravatar.cc/100?img=5' },
+                         { name: 'Sarah L.', handle: '@sarah', views: '49K', rank: 6, img: 'https://i.pravatar.cc/100?img=9' },
+                         { name: 'Mike T.', handle: '@miket', views: '42K', rank: 7, img: 'https://i.pravatar.cc/100?img=12' },
+                         { name: 'Leo V.', handle: '@leov', views: '38K', rank: 8, img: 'https://i.pravatar.cc/100?img=70' },
+                         { name: 'Grace E.', handle: '@grace_e', views: '31K', rank: 9, img: 'https://i.pravatar.cc/100?img=72' },
+                         { name: 'Arthur M.', handle: '@arthurm', views: '25K', rank: 10, img: 'https://i.pravatar.cc/100?img=74' }
                       ]
                    }[leaderboardPeriod]).map(user => (
                       <div key={user.rank} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors">
@@ -1054,6 +1251,92 @@ function EditPage({ onBack, onSignOut, onHome, data, onChange, userEmail, userId
                          <div className="text-right">
                             <div className="font-bold text-white text-[15px]">{user.views}</div>
                             <div className="text-gray-500 text-[11px] uppercase">Views</div>
+                         </div>
+                      </div>
+                   ))}
+                </div>
+             </div>
+          )}
+          {activeTab === 'discord' && (
+             <div className="space-y-6">
+                <div className="mb-4">
+                  <h1 className="text-[28px] font-josefin font-bold tracking-tight">Discord Leaderboard</h1>
+                  <p className="text-gray-400 mt-2 text-sm">Most active members on the official server.</p>
+                </div>
+                
+                <div className="flex items-center justify-between bg-[#141414] border border-white/5 p-2 rounded-full mb-6 w-full gap-1">
+                   {(['Daily', 'Weekly', 'Monthly', 'All Time'] as const).map(period => (
+                     <button 
+                       key={period} 
+                       onClick={() => setDiscordPeriod(period)} 
+                       className={`flex-1 py-3 px-2 rounded-full text-[15px] font-josefin font-bold tracking-tight whitespace-nowrap transition-all ${period === discordPeriod ? 'bg-[#252525] text-white shadow-md' : 'text-gray-500 hover:text-gray-300 bg-transparent'}`}
+                     >
+                       {period}
+                     </button>
+                   ))}
+                </div>
+
+                <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-4 space-y-2">
+                   {({
+                      'Daily': [
+                         { name: 'GamerPro', handle: '@gamerpro', activity: '1,240 msg', rank: 1, img: 'https://i.pravatar.cc/100?img=53' },
+                         { name: 'Nova_X', handle: '@novax', activity: '980 msg', rank: 2, img: 'https://i.pravatar.cc/100?img=54' },
+                         { name: 'Sven', handle: '@sven_d', activity: '850 msg', rank: 3, img: 'https://i.pravatar.cc/100?img=55' },
+                         { name: 'Kira_99', handle: '@kira99', activity: '790 msg', rank: 4, img: 'https://i.pravatar.cc/100?img=56' },
+                         { name: 'NeonPulse', handle: '@neonpulse', activity: '640 msg', rank: 5, img: 'https://i.pravatar.cc/100?img=57' },
+                         { name: 'Vortex', handle: '@vortex_v', activity: '520 msg', rank: 6, img: 'https://i.pravatar.cc/100?img=58' },
+                         { name: 'Specter', handle: '@specter_s', activity: '450 msg', rank: 7, img: 'https://i.pravatar.cc/100?img=59' },
+                         { name: 'Aero', handle: '@aero_f', activity: '410 msg', rank: 8, img: 'https://i.pravatar.cc/100?img=60' },
+                         { name: 'Blaze', handle: '@blaze_b', activity: '320 msg', rank: 9, img: 'https://i.pravatar.cc/100?img=61' },
+                         { name: 'Frost', handle: '@frost_f', activity: '250 msg', rank: 10, img: 'https://i.pravatar.cc/100?img=62' }
+                      ],
+                      'Weekly': [
+                         { name: 'Nova_X', handle: '@novax', activity: '5,400 msg', rank: 1, img: 'https://i.pravatar.cc/100?img=54' },
+                         { name: 'GamerPro', handle: '@gamerpro', activity: '4,820 msg', rank: 2, img: 'https://i.pravatar.cc/100?img=53' },
+                         { name: 'Kira_99', handle: '@kira99', activity: '4,210 msg', rank: 3, img: 'https://i.pravatar.cc/100?img=56' },
+                         { name: 'Sven', handle: '@sven_d', activity: '3,900 msg', rank: 4, img: 'https://i.pravatar.cc/100?img=55' },
+                         { name: 'NeonPulse', handle: '@neonpulse', activity: '2,980 msg', rank: 5, img: 'https://i.pravatar.cc/100?img=57' },
+                         { name: 'Specter', handle: '@specter_s', activity: '2,400 msg', rank: 6, img: 'https://i.pravatar.cc/100?img=59' },
+                         { name: 'Vortex', handle: '@vortex_v', activity: '1,980 msg', rank: 7, img: 'https://i.pravatar.cc/100?img=58' },
+                         { name: 'Aero', handle: '@aero_f', activity: '1,720 msg', rank: 8, img: 'https://i.pravatar.cc/100?img=60' },
+                         { name: 'Blaze', handle: '@blaze_b', activity: '1,450 msg', rank: 9, img: 'https://i.pravatar.cc/100?img=61' },
+                         { name: 'Frost', handle: '@frost_f', activity: '1,120 msg', rank: 10, img: 'https://i.pravatar.cc/100?img=62' }
+                      ],
+                      'Monthly': [
+                         { name: 'Kira_99', handle: '@kira99', activity: '22,410 msg', rank: 1, img: 'https://i.pravatar.cc/100?img=56' },
+                         { name: 'Nova_X', handle: '@novax', activity: '19,800 msg', rank: 2, img: 'https://i.pravatar.cc/100?img=54' },
+                         { name: 'GamerPro', handle: '@gamerpro', activity: '18,500 msg', rank: 3, img: 'https://i.pravatar.cc/100?img=53' },
+                         { name: 'Sven', handle: '@sven_d', activity: '14,210 msg', rank: 4, img: 'https://i.pravatar.cc/100?img=55' },
+                         { name: 'NeonPulse', handle: '@neonpulse', activity: '11,240 msg', rank: 5, img: 'https://i.pravatar.cc/100?img=57' },
+                         { name: 'Vortex', handle: '@vortex_v', activity: '9,820 msg', rank: 6, img: 'https://i.pravatar.cc/100?img=58' },
+                         { name: 'Specter', handle: '@specter_s', activity: '8,400 msg', rank: 7, img: 'https://i.pravatar.cc/100?img=59' },
+                         { name: 'Aero', handle: '@aero_f', activity: '7,110 msg', rank: 8, img: 'https://i.pravatar.cc/100?img=60' },
+                         { name: 'Blaze', handle: '@blaze_b', activity: '6,420 msg', rank: 9, img: 'https://i.pravatar.cc/100?img=61' },
+                         { name: 'Frost', handle: '@frost_f', activity: '5,100 msg', rank: 10, img: 'https://i.pravatar.cc/100?img=62' }
+                      ],
+                      'All Time': [
+                         { name: 'GamerPro', handle: '@gamerpro', activity: '145,200 msg', rank: 1, img: 'https://i.pravatar.cc/100?img=53' },
+                         { name: 'Nova_X', handle: '@novax', activity: '124,100 msg', rank: 2, img: 'https://i.pravatar.cc/100?img=54' },
+                         { name: 'Sven', handle: '@sven_d', activity: '112,400 msg', rank: 3, img: 'https://i.pravatar.cc/100?img=55' },
+                         { name: 'Kira_99', handle: '@kira99', activity: '98,200 msg', rank: 4, img: 'https://i.pravatar.cc/100?img=56' },
+                         { name: 'NeonPulse', handle: '@neonpulse', activity: '84,100 msg', rank: 5, img: 'https://i.pravatar.cc/100?img=57' },
+                         { name: 'Specter', handle: '@specter_s', activity: '76,300 msg', rank: 6, img: 'https://i.pravatar.cc/100?img=59' },
+                         { name: 'Vortex', handle: '@vortex_v', activity: '54,200 msg', rank: 7, img: 'https://i.pravatar.cc/100?img=58' },
+                         { name: 'Aero', handle: '@aero_f', activity: '49,100 msg', rank: 8, img: 'https://i.pravatar.cc/100?img=60' },
+                         { name: 'Blaze', handle: '@blaze_b', activity: '42,400 msg', rank: 9, img: 'https://i.pravatar.cc/100?img=61' },
+                         { name: 'Frost', handle: '@frost_f', activity: '31,200 msg', rank: 10, img: 'https://i.pravatar.cc/100?img=62' }
+                      ]
+                   }[discordPeriod]).map(user => (
+                      <div key={user.rank} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors">
+                         <div className="w-6 text-center font-bold text-gray-500 text-sm">{user.rank}</div>
+                         <img src={user.img} className="w-10 h-10 rounded-full object-cover border border-white/10" />
+                         <div className="flex-1 min-w-0">
+                            <div className="font-medium text-white truncate text-[15px]">{user.name}</div>
+                            <div className="text-gray-500 text-[13px] truncate">{user.handle}</div>
+                         </div>
+                         <div className="text-right">
+                            <div className="font-bold text-white text-[15px]">{user.activity}</div>
+                            <div className="text-gray-500 text-[11px] uppercase">Activity</div>
                          </div>
                       </div>
                    ))}
@@ -1091,89 +1374,158 @@ function EditPage({ onBack, onSignOut, onHome, data, onChange, userEmail, userId
           {activeTab === 'premium' && (
              <div className="space-y-6 animate-fadeIn">
                 <div className="mb-8">
-                  <h1 className="text-[28px] font-josefin font-bold tracking-tight">Pro Membership</h1>
-                  <p className="text-gray-400 mt-2 text-sm">Elevate your digital presence on Nads.io with ultimate customization</p>
+                  <h1 className="text-[28px] font-josefin font-bold tracking-tight">Subscription Plans</h1>
+                  <p className="text-gray-400 mt-2 text-sm">Select a plan to test custom features instantly in real-time</p>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-6">
-                   <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6 flex flex-col justify-between relative overflow-hidden shadow-xl">
-                      <div className="absolute top-0 right-0 bg-[#ffd700] text-black text-[9px] font-bold px-3 py-1 rounded-bl-xl uppercase tracking-widest font-sans">Popular</div>
+                <div className="grid lg:grid-cols-3 gap-6">
+                   {/* Free Tier */}
+                   <div className={`bg-[#141414] border rounded-[1.5rem] p-5 flex flex-col justify-between shadow-xl relative overflow-hidden transition-all ${activePlan === 'free' ? 'border-yellow-400' : 'border-white/5'}`}>
+                      {activePlan === 'free' && (
+                        <div className="absolute top-0 right-0 bg-yellow-400 text-black text-[9px] font-bold px-3 py-1 rounded-bl-xl uppercase tracking-widest font-sans">Active</div>
+                      )}
                       <div>
-                         <span className="text-gray-400 font-mono text-xs uppercase tracking-wider font-semibold">Individual</span>
-                         <h3 className="text-2xl font-josefin font-bold text-white mt-1">Creator Pro</h3>
-                         <p className="text-gray-400 text-xs mt-2 leading-relaxed">Perfect for creators who want fully customized, cinema-grade landing views and soundscapes.</p>
+                         <span className="text-gray-500 font-mono text-[10px] uppercase tracking-wider font-semibold">Starter Level</span>
+                         <h3 className="text-xl font-josefin font-bold text-white mt-1">Free Tier</h3>
+                         <p className="text-gray-400 text-xs mt-2 leading-relaxed">Perfect for standard profiles needing basic connection directories.</p>
                          
-                         <div className="flex items-baseline gap-1 mt-6">
-                            <span className="text-3xl font-josefin font-bold text-white">$4.99</span>
-                            <span className="text-gray-450 text-xs">/ month</span>
+                         <div className="flex items-baseline gap-1 mt-5 mb-5">
+                            <span className="text-2xl font-josefin font-bold text-white">$0</span>
+                            <span className="text-gray-500 text-xs">/ month</span>
                          </div>
 
-                         <div className="mt-6 space-y-3.5">
-                            <div className="flex items-center gap-2.5 text-sm text-gray-300">
-                               <Crown size={14} className="text-yellow-400 shrink-0" />
+                         <div className="space-y-3">
+                            <div className="flex items-center gap-2 text-xs text-gray-300">
+                               <span className="text-emerald-400">✓</span>
+                               <span>Up to 5 custom social link items</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-xs text-gray-300">
+                               <span className="text-emerald-400">✓</span>
+                               <span>Core bio details & configuration</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-xs text-gray-500">
+                               <span>✗</span>
+                               <span>Custom Audio Music Player</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-xs text-gray-500">
+                               <span>✗</span>
+                               <span>Conic Glow avatar rings</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-xs text-gray-500">
+                               <span>✗</span>
                                <span>Cinematic Portrait Video Loops</span>
-                            </div>
-                            <div className="flex items-center gap-2.5 text-sm text-gray-300">
-                               <Crown size={14} className="text-yellow-400 shrink-0" />
-                               <span>Glow borders & avatar rings</span>
-                            </div>
-                            <div className="flex items-center gap-2.5 text-sm text-gray-300">
-                               <Crown size={14} className="text-yellow-400 shrink-0" />
-                               <span>Interactive Custom sound layers & player</span>
-                            </div>
-                            <div className="flex items-center gap-2.5 text-sm text-gray-300">
-                               <Crown size={14} className="text-yellow-400 shrink-0" />
-                               <span>Social Banners (15:6 format)</span>
-                            </div>
-                            <div className="flex items-center gap-2.5 text-sm text-gray-300">
-                               <Crown size={14} className="text-yellow-400 shrink-0" />
-                               <span>Detailed analytical reports & tracking</span>
-                            </div>
-                            <div className="flex items-center gap-2.5 text-sm text-gray-300">
-                               <Crown size={14} className="text-yellow-400 shrink-0" />
-                               <span>Unlimited general hyperlink pins</span>
                             </div>
                          </div>
                       </div>
 
-                      <button onClick={() => alert('Creator Pro is already fully unlocked and active on your account!')} className="w-full bg-[#ffd700] hover:bg-[#ffeb55] text-black font-semibold text-sm py-3 rounded-full mt-8 transition-all active:scale-[0.98] shadow-lg shadow-yellow-500/10 cursor-pointer">
-                         Active Plan
+                      <button 
+                        onClick={() => {
+                          setActivePlan('free');
+                        }} 
+                        className={`w-full font-semibold text-xs py-2.5 rounded-full mt-6 transition-all active:scale-[0.98] cursor-pointer ${activePlan === 'free' ? 'bg-[#252525] text-white border border-white/5 cursor-default' : 'bg-white hover:bg-gray-100 text-black'}`}
+                        disabled={activePlan === 'free'}
+                      >
+                         {activePlan === 'free' ? 'Active Plan' : 'Select Free'}
                       </button>
                    </div>
 
-                   <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6 flex flex-col justify-between shadow-xl">
+                   {/* Starter Tier */}
+                   <div className={`bg-[#141414] border rounded-[1.5rem] p-5 flex flex-col justify-between shadow-xl relative overflow-hidden transition-all ${activePlan === 'starter' ? 'border-yellow-400' : 'border-white/5'}`}>
+                      {activePlan === 'starter' && (
+                        <div className="absolute top-0 right-0 bg-yellow-400 text-black text-[9px] font-bold px-3 py-1 rounded-bl-xl uppercase tracking-widest font-sans">Active</div>
+                      )}
                       <div>
-                         <span className="text-gray-400 font-mono text-xs uppercase tracking-wider font-semibold">Enterprise</span>
-                         <h3 className="text-2xl font-josefin font-bold text-white mt-1">Creator VIP</h3>
-                         <p className="text-gray-400 text-xs mt-2 leading-relaxed">For agencies, managers, and premium brands needing custom domains and 24/7 dedicated assistance.</p>
+                         <span className="text-gray-500 font-mono text-[10px] uppercase tracking-wider font-semibold">Popular</span>
+                         <h3 className="text-xl font-josefin font-bold text-white mt-1">Starter Plan</h3>
+                         <p className="text-gray-400 text-xs mt-2 leading-relaxed">Unlock awesome personalized music embeds and avatar glow frames.</p>
                          
-                         <div className="flex items-baseline gap-1 mt-6">
-                            <span className="text-3xl font-josefin font-bold text-white">$12.99</span>
-                            <span className="text-gray-550 text-xs">/ month</span>
+                         <div className="flex items-baseline gap-1 mt-5 mb-5">
+                            <span className="text-2xl font-josefin font-bold text-white">$1</span>
+                            <span className="text-gray-500 text-xs">/ month</span>
                          </div>
 
-                         <div className="mt-6 space-y-3.5">
-                            <div className="flex items-center gap-2.5 text-sm text-gray-300">
-                               <Crown size={14} className="text-yellow-450 shrink-0" />
-                               <span>Everything in Creator Pro</span>
+                         <div className="space-y-3">
+                            <div className="flex items-center gap-2 text-xs text-gray-300">
+                               <span className="text-emerald-400">✓</span>
+                               <span>Unlimited custom social links</span>
                             </div>
-                            <div className="flex items-center gap-2.5 text-sm text-gray-300">
-                               <Crown size={14} className="text-yellow-450 shrink-0" />
-                               <span>Custom Root Domains (e.g. yourname.com)</span>
+                            <div className="flex items-center gap-2 text-xs text-gray-300">
+                               <span className="text-emerald-400">✓</span>
+                               <span>Conic Glow avatar borders & rings</span>
                             </div>
-                            <div className="flex items-center gap-2.5 text-sm text-gray-300">
-                               <Crown size={14} className="text-yellow-450 shrink-0" />
-                               <span>Priority dedicated support manager</span>
+                            <div className="flex items-center gap-2 text-xs text-gray-300">
+                               <span className="text-emerald-400">✓</span>
+                               <span>Custom Audio Music embed & player</span>
                             </div>
-                            <div className="flex items-center gap-2.5 text-sm text-gray-300">
-                               <Crown size={14} className="text-yellow-450 shrink-0" />
-                               <span>SEO enhancements & indexation control</span>
+                            <div className="flex items-center gap-2 text-xs text-gray-300">
+                               <span className="text-emerald-400">✓</span>
+                               <span>Core analytical statistics reports</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-xs text-gray-500">
+                               <span>✗</span>
+                               <span>Cinematic Portrait Video Loops</span>
                             </div>
                          </div>
                       </div>
 
-                      <button onClick={() => alert('VIP custom domains and agency manager panel setup has been initiated. Contact vip-support@nads.io to finalize routing.')} className="w-full bg-white hover:bg-gray-150 text-black font-semibold text-sm py-3 rounded-full mt-8 transition-all active:scale-[0.98] cursor-pointer">
-                         Upgrade to VIP
+                      <button 
+                        onClick={() => {
+                          setActivePlan('starter');
+                        }} 
+                        className={`w-full font-semibold text-xs py-2.5 rounded-full mt-6 transition-all active:scale-[0.98] cursor-pointer ${activePlan === 'starter' ? 'bg-[#252525] text-white border border-white/5 cursor-default' : 'bg-yellow-400 hover:bg-yellow-350 text-black'}`}
+                        disabled={activePlan === 'starter'}
+                      >
+                         {activePlan === 'starter' ? 'Active Plan' : 'Upgrade to Starter ($1)'}
+                      </button>
+                   </div>
+
+                   {/* Pro Tier */}
+                   <div className={`bg-[#141414] border rounded-[1.5rem] p-5 flex flex-col justify-between shadow-xl relative overflow-hidden transition-all ${activePlan === 'pro' ? 'border-yellow-400' : 'border-white/5'}`}>
+                      {activePlan === 'pro' && (
+                        <div className="absolute top-0 right-0 bg-yellow-400 text-black text-[9px] font-bold px-3 py-1 rounded-bl-xl uppercase tracking-widest font-sans">Active</div>
+                      )}
+                      <div>
+                         <span className="text-gray-500 font-mono text-[10px] uppercase tracking-wider font-semibold font-sans">Power User</span>
+                         <h3 className="text-xl font-josefin font-bold text-white mt-1">Pro Plan</h3>
+                         <p className="text-gray-400 text-xs mt-2 leading-relaxed">The ultimate creator experience with cinematic landscape and portrait loop settings.</p>
+                         
+                         <div className="flex items-baseline gap-1 mt-5 mb-5">
+                            <span className="text-2xl font-josefin font-bold text-white">$2</span>
+                            <span className="text-gray-500 text-xs">/ month</span>
+                         </div>
+
+                         <div className="space-y-3">
+                            <div className="flex items-center gap-2 text-xs text-gray-300">
+                               <span className="text-emerald-400">✓</span>
+                               <span>Everything in Starter Plan</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-xs text-emerald-400 font-bold">
+                               <span>✓</span>
+                               <span>Cinematic Portrait Video background loops</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-xs text-gray-300">
+                               <span className="text-emerald-400">✓</span>
+                               <span>Priority dedicated support manager (24/7)</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-xs text-gray-300">
+                               <span className="text-emerald-400">✓</span>
+                               <span>Full analytical reports & CTR metrics</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-xs text-gray-300">
+                               <span className="text-emerald-400">✓</span>
+                               <span>SEO metadata custom configurations</span>
+                            </div>
+                         </div>
+                      </div>
+
+                      <button 
+                        onClick={() => {
+                          setActivePlan('pro');
+                        }} 
+                        className={`w-full font-semibold text-xs py-2.5 rounded-full mt-6 transition-all active:scale-[0.98] cursor-pointer ${activePlan === 'pro' ? 'bg-[#252525] text-white border border-white/5 cursor-default' : 'bg-yellow-400 hover:bg-yellow-350 text-black'}`}
+                        disabled={activePlan === 'pro'}
+                      >
+                         {activePlan === 'pro' ? 'Active Plan' : 'Upgrade to Pro ($2)'}
                       </button>
                    </div>
                 </div>
@@ -1181,10 +1533,10 @@ function EditPage({ onBack, onSignOut, onHome, data, onChange, userEmail, userId
                 <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6">
                    <h3 className="font-josefin font-bold text-white text-lg mb-2">Why Pro?</h3>
                    <p className="text-gray-400 text-sm leading-relaxed mb-4">
-                      When thousands of visitors browse your social pages, details matter. Pro equips you with real tools – portrait loops, audio players, custom margins, glassmorphic layout, and comprehensive analytical graphs. 
+                      When thousands of visitors browse your social pages, details matter. Pro equips you with real tools – cinematic portrait video background loops, premium glassmorphism layouts, full analytics tracking, and customizable glowing profiles.
                    </p>
                    <div className="flex items-center gap-2 text-xs text-yellow-400 font-mono font-bold tracking-widest uppercase">
-                      <Sparkles size={12} /> All Pro features are currently unlocked for testing!
+                      <Sparkles size={12} /> Test different plans above to see active features adapt in real-time!
                    </div>
                 </div>
              </div>
@@ -1249,20 +1601,20 @@ function EditPage({ onBack, onSignOut, onHome, data, onChange, userEmail, userId
                 <div>
                    <label className="block text-[15px] font-josefin font-bold tracking-tight text-white mb-2">Username</label>
                    <div className="flex items-center bg-[#1a1a1a] rounded-xl border border-white/5 overflow-hidden focus-within:border-white/20 transition-colors">
-                      <div className="px-4 py-3.5 text-white border-r border-white/5 bg-[#171717] font-semibold text-[15px]">nads.io/</div>
-                      <input type="text" value={data.username.toLowerCase()} onChange={e => onChange({ ...data, username: e.target.value.toLowerCase() })} className="bg-transparent flex-1 px-4 py-3 text-white outline-none w-full text-[15px] font-semibold text-center" />
+                      <div className="px-4 py-3.5 text-white border-r border-[#222] bg-[#171717] font-semibold text-[15px]">nads.io/</div>
+                      <input type="text" value={data.username.toLowerCase()} onChange={e => onChange({ ...data, username: e.target.value.toLowerCase() })} placeholder="yourname" className="bg-transparent flex-1 px-4 py-3 text-white outline-none w-full text-[15px] font-semibold text-center placeholder:text-white/25" />
                    </div>
-                   <p className="text-[13px] text-gray-500 mt-2 px-1 text-center">Username can only be changed once every 7 days.</p>
+                   <p className="text-[13px] text-gray-500 mt-2 px-1 text-center font-mono">Username can only be changed once every 7 days.</p>
                 </div>
 
                 <div>
                    <label className="block text-[15px] font-josefin font-bold tracking-tight text-white mb-2">Display name</label>
-                   <input type="text" value={data.displayName} onChange={e => onChange({ ...data, displayName: e.target.value })} className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl px-4 py-3.5 text-white outline-none focus:border-white/20 transition-colors text-[15px] font-semibold text-center" />
+                   <input type="text" value={data.displayName} onChange={e => onChange({ ...data, displayName: e.target.value })} placeholder="What should we call you?" className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl px-4 py-3.5 text-white outline-none focus:border-white/20 transition-colors text-[15px] font-semibold text-center placeholder:text-white/25" />
                 </div>
 
                 <div>
                    <label className="block text-[15px] font-josefin font-bold tracking-tight text-white mb-2">Bio</label>
-                   <textarea rows={3} value={data.bio} onChange={e => onChange({ ...data, bio: e.target.value })} className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl px-4 py-3.5 text-white outline-none focus:border-white/20 transition-colors resize-none text-[15px] font-semibold text-center"></textarea>
+                   <textarea rows={3} value={data.bio} onChange={e => onChange({ ...data, bio: e.target.value })} placeholder="Tell visitors about yourself (interests, bio, links)..." className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl px-4 py-3.5 text-white outline-none focus:border-white/20 transition-colors resize-none text-[15px] font-semibold text-center placeholder:text-white/25"></textarea>
                    <p className="text-[12px] text-[#555] mt-1.5 text-center font-mono">{data.bio.length}/160</p>
                 </div>
              </div>
@@ -1380,12 +1732,33 @@ function EditPage({ onBack, onSignOut, onHome, data, onChange, userEmail, userId
                     </div>
 
                    <div className="text-center">
-                      <label className="block text-[18px] font-josefin font-bold tracking-tight text-white mb-3 text-center">Avatar decoration</label>
-                      <div className="flex items-center justify-between bg-[#1a1a1a] border border-white/5 rounded-xl p-4">
-                         <span className="text-[15px] font-semibold text-[#a1a1aa]">{data.isGlowing ? 'Glowing ring is ON' : 'Glowing ring is OFF'}</span>
-                         {/* Toggle Switch */}
-                         <div onClick={() => onChange({...data, isGlowing: !data.isGlowing})} className={`w-12 h-6 rounded-full flex items-center p-0.5 cursor-pointer transition-colors ${data.isGlowing ? 'bg-white' : 'bg-[#333]'}`}>
-                            <div className={`w-5 h-5 bg-black rounded-full shadow-sm transition-transform ${data.isGlowing ? 'translate-x-6' : 'translate-x-0'}`}></div>
+                      <div className="space-y-6">
+                         <div>
+                            <label className="block text-[18px] font-josefin font-bold tracking-tight text-white mb-3 text-center">Avatar decoration</label>
+                            <div className="flex items-center justify-between bg-white/5 border border-white/10 backdrop-blur-md rounded-xl p-4 shadow-lg">
+                               <span className="text-[15px] font-semibold text-white/85">{data.isGlowing ? 'Glowing ring is ON' : 'Glowing ring is OFF'}</span>
+                               {/* Glassmorphic Toggle Switch */}
+                               <div 
+                                  onClick={() => onChange({...data, isGlowing: !data.isGlowing})} 
+                                  className={`w-12 h-6 rounded-full flex items-center p-0.5 cursor-pointer transition-all border ${data.isGlowing ? 'bg-white/20 border-white/35' : 'bg-white/5 border-white/10'}`}
+                               >
+                                  <div className={`w-4 h-4 rounded-full shadow-md transition-transform duration-200 ${data.isGlowing ? 'bg-white translate-x-[24px]' : 'bg-white/40 translate-x-[2px]'}`}></div>
+                                </div>
+                            </div>
+                         </div>
+
+                         <div className="pt-2">
+                            <label className="block text-[18px] font-josefin font-bold tracking-tight text-white mb-3 text-center">Glassmorphic Card</label>
+                            <div className="flex items-center justify-between bg-white/5 border border-white/10 backdrop-blur-md rounded-xl p-4 shadow-lg">
+                               <span className="text-[15px] font-semibold text-white/85">{data.isGlassmorphic ? 'Glassmorphic design is ON' : 'Glassmorphic design is OFF'}</span>
+                               {/* Glassmorphic Toggle Switch */}
+                               <div 
+                                  onClick={() => onChange({...data, isGlassmorphic: !data.isGlassmorphic})} 
+                                  className={`w-12 h-6 rounded-full flex items-center p-0.5 cursor-pointer transition-all border ${data.isGlassmorphic ? 'bg-white/20 border-white/35' : 'bg-white/5 border-white/10'}`}
+                               >
+                                  <div className={`w-4 h-4 rounded-full shadow-md transition-transform duration-200 ${data.isGlassmorphic ? 'bg-white translate-x-[24px]' : 'bg-white/40 translate-x-[2px]'}`}></div>
+                               </div>
+                            </div>
                          </div>
                       </div>
                    </div>
@@ -1445,6 +1818,7 @@ export type ProfileData = {
   displayName: string;
   bio: string;
   isGlowing: boolean;
+  isGlassmorphic: boolean;
   avatarUrl: string;
   bannerUrl: string;
   audioUrl: string;
@@ -1459,6 +1833,15 @@ export default function App() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+
+  const [activePlan, setActivePlan] = useState<'free' | 'starter' | 'pro'>(() => {
+    return (localStorage.getItem('nads_active_plan') as 'free' | 'starter' | 'pro') || 'pro';
+  });
+
+  const handleSetActivePlan = (plan: 'free' | 'starter' | 'pro') => {
+    setActivePlan(plan);
+    localStorage.setItem('nads_active_plan', plan);
+  };
 
   useEffect(() => {
     const handleSession = async (session: any) => {
@@ -1500,6 +1883,7 @@ export default function App() {
     displayName: '',
     bio: '',
     isGlowing: true,
+    isGlassmorphic: true,
     avatarUrl: '',
     bannerUrl: '',
     audioUrl: '',
@@ -1531,14 +1915,14 @@ export default function App() {
              onDashboardClick={() => setView('edit')}
            />
            <main className="relative z-10">
-              <Hero onNavigate={() => setView('profile')} onLoginClick={() => setIsAuthOpen(true)} />
+              <Hero onNavigate={() => setView('profile')} onLoginClick={() => setIsAuthOpen(true)} data={profileData} />
               <Features />
            </main>
            <Footer />
         </div>
       )}
-      {view === 'profile' && <UserPage data={profileData} onBack={() => setView('edit')} onEdit={() => setView('edit')} />}
-      {view === 'edit' && <EditPage data={profileData} onChange={setProfileData} onBack={() => setView('profile')} onSignOut={async () => { await supabase.auth.signOut(); setUserEmail(null); setUserId(null); setView('home'); }} onHome={() => setView('home')} userEmail={userEmail} userId={userId} />}
+      {view === 'profile' && <UserPage data={profileData} onBack={() => setView('edit')} onEdit={() => setView('edit')} activePlan={activePlan} />}
+      {view === 'edit' && <EditPage data={profileData} onChange={setProfileData} onBack={() => setView('profile')} onSignOut={async () => { await supabase.auth.signOut(); setUserEmail(null); setUserId(null); setView('home'); }} onHome={() => setView('home')} userEmail={userEmail} userId={userId} activePlan={activePlan} setActivePlan={handleSetActivePlan} />}
     </>
   );
 }
