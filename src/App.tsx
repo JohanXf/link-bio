@@ -625,12 +625,15 @@ function AudioPlayer({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 }}
-      className={`w-full max-w-[400px] mt-3 rounded-[1.25rem] p-4 shadow-2xl transition-all duration-300 ${
+      className={`w-full max-w-[400px] mt-3 rounded-[1.25rem] p-4 shadow-2xl relative overflow-hidden transition-all duration-300 z-10 ${
         isGlassmorphic
-          ? "bg-black/20 backdrop-blur-md border border-white/10 text-white"
+          ? "border border-white/10 text-white"
           : "bg-[#141414] border border-white/5 text-white"
       }`}
     >
+      {isGlassmorphic && (
+        <div className="absolute inset-0 bg-black/20 backdrop-blur-md -z-10" />
+      )}
       <audio
         ref={audioRef}
         src={audioUrl}
@@ -765,12 +768,15 @@ function UserPage({
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className={`w-full max-w-[400px] rounded-[1.5rem] p-3 pb-8 shadow-2xl relative overflow-hidden transition-all duration-300 ${
+        className={`w-full max-w-[400px] rounded-[1.5rem] p-3 pb-8 shadow-2xl relative overflow-hidden transition-all duration-300 z-10 ${
           isGlassmorphicEnabled
-            ? "bg-black/20 backdrop-blur-md border border-white/10 z-10 text-white"
+            ? "border border-white/10 text-white"
             : "bg-[#141414] border border-white/5 text-white"
         }`}
       >
+        {isGlassmorphicEnabled && (
+          <div className="absolute inset-0 bg-black/20 backdrop-blur-md -z-10" />
+        )}
         {/* Views Counter (Mountain Structure) */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20 bg-black/25 backdrop-blur-md px-2.5 py-0.5 rounded-b-lg flex items-center gap-1.5">
           <Eye size={10} className="text-gray-300" />
