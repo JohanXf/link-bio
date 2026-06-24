@@ -813,7 +813,7 @@ function UserPage({
                   : undefined
               }
             >
-              <div className="w-[96px] h-[96px] rounded-full bg-[#1b1b1f] flex items-center justify-center overflow-hidden border-2 border-[#141414]">
+              <div className="w-[96px] h-[96px] rounded-full bg-[#1b1b1f] flex items-center justify-center overflow-hidden">
                 {data.avatarUrl ? (
                   <img
                     src={data.avatarUrl}
@@ -825,15 +825,6 @@ function UserPage({
                   </div>
                 )}
               </div>
-            </div>
-
-            {/* Crown Pro Badge */}
-            <div className="absolute bottom-0 right-0 z-20 bg-white rounded-full w-[28px] h-[28px] flex items-center justify-center text-black shadow-xl border-[2.5px] border-[#141414]">
-              <Crown
-                size={12}
-                className="fill-black transform translate-y-[-0.5px]"
-                strokeWidth={1}
-              />
             </div>
           </div>
 
