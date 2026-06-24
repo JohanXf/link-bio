@@ -308,7 +308,7 @@ function getLinkIcon(url: string, title?: string, iconSize: number = 18) {
       <img
         src={`https://www.google.com/s2/favicons?sz=64&domain=${domain}`}
         alt=""
-        className="object-contain rounded-sm grayscale brightness-200 contrast-50 opacity-80"
+        className="object-contain rounded-sm grayscale brightness-0 opacity-80"
         style={{ width: iconSize, height: iconSize }}
         onError={(e) => {
           e.currentTarget.style.display = "none";
@@ -625,14 +625,14 @@ function AudioPlayer({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 }}
-      className={`w-full max-w-[400px] mt-3 rounded-[1.25rem] p-4 shadow-2xl relative overflow-hidden transition-all duration-300 z-10 ${
+      className={`w-full max-w-[400px] mt-3 rounded-[1.25rem] p-4 shadow-2xl relative transition-all duration-300 z-10 ${
         isGlassmorphic
           ? "border border-white/10 text-white"
           : "bg-[#141414] border border-white/5 text-white"
       }`}
     >
       {isGlassmorphic && (
-        <div className="absolute inset-0 bg-black/20 backdrop-blur-md -z-10" />
+        <div className="absolute inset-0 bg-black/20 backdrop-blur-md rounded-[1.25rem] -z-10" />
       )}
       <audio
         ref={audioRef}
@@ -768,14 +768,14 @@ function UserPage({
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className={`w-full max-w-[400px] rounded-[1.5rem] p-3 pb-8 shadow-2xl relative overflow-hidden transition-all duration-300 z-10 ${
+        className={`w-full max-w-[400px] rounded-[1.5rem] p-3 pb-8 shadow-2xl relative transition-all duration-300 z-10 ${
           isGlassmorphicEnabled
             ? "border border-white/10 text-white"
             : "bg-[#141414] border border-white/5 text-white"
         }`}
       >
         {isGlassmorphicEnabled && (
-          <div className="absolute inset-0 bg-black/20 backdrop-blur-md -z-10" />
+          <div className="absolute inset-0 bg-black/20 backdrop-blur-md rounded-[1.5rem] -z-10" />
         )}
         {/* Views Counter (Mountain Structure) */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20 bg-black/25 backdrop-blur-md px-2.5 py-0.5 rounded-b-lg flex items-center gap-1.5">
@@ -784,7 +784,7 @@ function UserPage({
         </div>
 
         {/* 15:6 Banner with no separator border */}
-        <div className="relative w-[calc(100%+24px)] aspect-[15/6] -mx-3 -mt-3 overflow-hidden select-none">
+        <div className="relative w-[calc(100%+24px)] aspect-[15/6] -mx-3 -mt-3 overflow-hidden select-none rounded-t-[calc(1.5rem-1px)]">
           {data.bannerUrl ? (
             <img src={data.bannerUrl} className="w-full h-full object-cover" />
           ) : (
@@ -861,13 +861,13 @@ function UserPage({
                       target="_blank"
                       rel="noopener noreferrer"
                       title={link.title || "Link"}
-                      className={`flex items-center justify-center transition-all hover:scale-[1.05] active:scale-[0.95] w-[64px] h-[64px] shrink-0 rounded-2xl border ${
+                      className={`flex items-center justify-center transition-all hover:scale-[1.05] active:scale-[0.95] w-[64px] h-[64px] shrink-0 rounded-2xl border-none ${
                         isGlassmorphicEnabled
-                          ? "bg-transparent hover:bg-white/5 border-white/20 hover:border-white/30 text-white backdrop-blur-[1px] shadow-lg shadow-black/15"
-                          : "bg-[#2d2d2d] hover:bg-[#3d3d3d] border border-white/5 text-white shadow-md"
+                          ? "bg-[#f0f0f0] hover:bg-[#e4e4e4] text-black backdrop-blur-md shadow-lg shadow-black/15"
+                          : "bg-[#f0f0f0] hover:bg-[#e4e4e4] text-black shadow-md"
                       }`}
                     >
-                      <div className="flex items-center justify-center w-full h-full text-gray-200">
+                      <div className="flex items-center justify-center w-full h-full text-black">
                         {getLinkIcon(link.url, link.title, 20)}
                       </div>
                     </a>
@@ -881,13 +881,13 @@ function UserPage({
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`w-full py-3 px-4 h-[52px] rounded-2xl font-bold transition-all text-[15px] flex items-center justify-between hover:scale-[1.01] active:scale-[0.99] mt-0.5 border ${
+                  className={`w-full py-3 px-4 h-[52px] rounded-2xl font-bold transition-all text-[15px] flex items-center justify-between hover:scale-[1.01] active:scale-[0.99] mt-0.5 border-none ${
                     isGlassmorphicEnabled
-                      ? "bg-transparent hover:bg-white/5 border-white/20 hover:border-white/30 text-gray-200 backdrop-blur-[1px] shadow-lg shadow-black/15"
-                      : "bg-[#2d2d2d] hover:bg-[#3d3d3d] border border-white/5 text-gray-200 shadow-md"
+                      ? "bg-[#f0f0f0] hover:bg-[#e4e4e4] text-black backdrop-blur-md shadow-lg shadow-black/15"
+                      : "bg-[#f0f0f0] hover:bg-[#e4e4e4] text-black shadow-md"
                   }`}
                 >
-                  <div className="shrink-0 flex items-center justify-center w-6 h-6 text-gray-200">
+                  <div className="shrink-0 flex items-center justify-center w-6 h-6 text-black">
                     {getLinkIcon(link.url, link.title, 20)}
                   </div>
                   <span className="flex-1 text-center truncate px-2 font-josefin">
