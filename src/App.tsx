@@ -632,7 +632,7 @@ function AudioPlayer({
       }`}
     >
       {isGlassmorphic && (
-        <div className="absolute inset-0 bg-black/20 backdrop-blur-md rounded-[1.25rem] -z-10" />
+        <div className="absolute inset-0 bg-transparent backdrop-blur-[10px] rounded-[1.25rem] -z-10" />
       )}
       <audio
         ref={audioRef}
@@ -758,9 +758,8 @@ function UserPage({
             loop
             muted
             playsInline
-            className="absolute inset-0 w-full h-full object-cover z-0 opacity-70"
+            className="absolute inset-0 w-full h-full object-cover z-0 opacity-100"
           />
-          <div className="absolute inset-0 bg-black/45 backdrop-blur-[1.5px] z-[1]" />
         </>
       )}
 
@@ -775,7 +774,7 @@ function UserPage({
         }`}
       >
         {isGlassmorphicEnabled && (
-          <div className="absolute inset-0 bg-black/20 backdrop-blur-md rounded-[1.5rem] -z-10" />
+          <div className="absolute inset-0 bg-transparent backdrop-blur-[10px] rounded-[1.5rem] -z-10" />
         )}
         {/* Views Counter (Mountain Structure) */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20 bg-black/25 backdrop-blur-md px-2.5 py-0.5 rounded-b-lg flex items-center gap-1.5">
