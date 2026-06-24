@@ -625,10 +625,8 @@ function AudioPlayer({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 }}
-      className={`w-full max-w-[400px] mt-3 rounded-[1.25rem] p-4 shadow-2xl relative transition-all duration-300 z-10 ${
-        isGlassmorphic
-          ? "border border-white/10 text-white"
-          : "bg-[#141414] border border-white/5 text-white"
+      className={`w-full max-w-[400px] mt-3 rounded-[1.25rem] p-4 shadow-2xl relative transition-all duration-300 z-10 text-white border ${
+        isGlassmorphic ? "border-black/10" : "border-white/10 bg-[#141414]"
       }`}
     >
       {isGlassmorphic && (
@@ -758,7 +756,7 @@ function UserPage({
             loop
             muted
             playsInline
-            className="absolute inset-0 w-full h-full object-cover z-0 opacity-100"
+            className="absolute inset-0 w-full h-full object-cover z-0 opacity-100 blur-[1px] scale-105"
           />
         </>
       )}
@@ -767,10 +765,8 @@ function UserPage({
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className={`w-full max-w-[400px] rounded-[1.5rem] p-3 pb-8 shadow-2xl relative transition-all duration-300 z-10 ${
-          isGlassmorphicEnabled
-            ? "border border-white/10 text-white"
-            : "bg-[#141414] border border-white/5 text-white"
+        className={`w-full max-w-[400px] rounded-[1.5rem] p-3 pb-8 shadow-2xl relative transition-all duration-300 z-10 text-white border ${
+          isGlassmorphicEnabled ? "border-black/10" : "border-white/10 bg-[#141414]"
         }`}
       >
         {isGlassmorphicEnabled && (
