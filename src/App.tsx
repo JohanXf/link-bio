@@ -332,51 +332,53 @@ function Navbar({
   onDashboardClick: () => void;
 }) {
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#f0f0f0]/90 backdrop-blur-md border-b border-[#e5e5e5]">
-      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center text-white font-josefin font-bold text-[15px]">
-            N
+    <div className="fixed top-0 left-0 right-0 z-50 pt-4 px-4 pointer-events-none">
+      <nav className="mx-auto max-w-5xl bg-[#f0f0f0]/90 backdrop-blur-md border border-[#e5e5e5] rounded-full shadow-sm pointer-events-auto">
+        <div className="px-6 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center text-white font-josefin font-bold text-[15px]">
+              N
+            </div>
+            <span className="font-josefin font-bold text-[15px] tracking-tight text-black">
+              Nads.io
+            </span>
           </div>
-          <span className="font-josefin font-bold text-[15px] tracking-tight text-black">
-            Nads.io
-          </span>
+          <div className="flex items-center gap-4">
+            {userEmail ? (
+              <>
+                <button
+                  onClick={onDashboardClick}
+                  className="text-sm font-semibold text-gray-700 hover:text-black transition-colors cursor-pointer"
+                >
+                  Editor
+                </button>
+                <button
+                  onClick={onSignOut}
+                  className="bg-[#18181b] hover:bg-[#27272a] py-1.5 px-4 rounded-[1.5rem] font-josefin font-bold text-[14px] transition-colors text-white shadow-md tracking-tight cursor-pointer"
+                >
+                  Sign out
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={onLoginClick}
+                  className="font-josefin font-bold text-[14px] text-gray-700 hover:text-black transition-colors hidden sm:block cursor-pointer"
+                >
+                  Log in
+                </button>
+                <button
+                  onClick={onLoginClick}
+                  className="bg-[#18181b] hover:bg-[#27272a] py-1.5 px-4 rounded-[1.5rem] font-josefin font-bold text-[14px] transition-colors text-white shadow-md tracking-tight cursor-pointer"
+                >
+                  Sign up
+                </button>
+              </>
+            )}
+          </div>
         </div>
-        <div className="flex items-center gap-4">
-          {userEmail ? (
-            <>
-              <button
-                onClick={onDashboardClick}
-                className="text-sm font-semibold text-gray-700 hover:text-black transition-colors cursor-pointer"
-              >
-                Editor
-              </button>
-              <button
-                onClick={onSignOut}
-                className="bg-[#18181b] hover:bg-[#27272a] py-2 px-4 rounded-[1.5rem] font-josefin font-bold text-[15px] transition-colors text-white shadow-md tracking-tight cursor-pointer"
-              >
-                Sign out
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                onClick={onLoginClick}
-                className="font-josefin font-bold text-[15px] text-gray-700 hover:text-black transition-colors hidden sm:block cursor-pointer"
-              >
-                Log in
-              </button>
-              <button
-                onClick={onLoginClick}
-                className="bg-[#18181b] hover:bg-[#27272a] py-2 px-4 rounded-[1.5rem] font-josefin font-bold text-[15px] transition-colors text-white shadow-md tracking-tight cursor-pointer"
-              >
-                Sign up
-              </button>
-            </>
-          )}
-        </div>
-      </div>
-    </nav>
+      </nav>
+    </div>
   );
 }
 
@@ -577,12 +579,16 @@ function AudioPlayer({
   isVideoBg,
   activePlan,
   isGlassmorphic,
+  glassmorphismOpacity,
+  glassmorphismBlur,
 }: {
   audioTitle: string;
   audioUrl: string;
   isVideoBg?: boolean;
   activePlan?: string;
   isGlassmorphic?: boolean;
+  glassmorphismOpacity?: number;
+  glassmorphismBlur?: number;
 }) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -625,13 +631,18 @@ function AudioPlayer({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 }}
-      className={`w-full max-w-[400px] mt-3 rounded-[1.25rem] p-4 shadow-2xl relative transition-all duration-300 z-10 text-white border ${
-        isGlassmorphic ? "border-black/10" : "border-white/10 bg-[#141414]"
-      }`}
+      className={`w-full max-w-[400px] mt-3 rounded-[1.25rem] p-4 shadow-2xl relative transition-all duration-300 z-10 text-white border border-white/10`}
     >
-      {isGlassmorphic && (
-        <div className="absolute inset-0 bg-transparent backdrop-blur-[10px] rounded-[1.25rem] -z-10" />
-      )}
+      <div 
+        className="absolute inset-0 rounded-[1.25rem] -z-10" 
+        style={isGlassmorphic ? { 
+          backgroundColor: `rgba(20, 20, 20, ${(glassmorphismOpacity ?? 10) / 100})`,
+          backdropFilter: `blur(${(glassmorphismBlur ?? 20) / 2}px)`,
+          WebkitBackdropFilter: `blur(${(glassmorphismBlur ?? 20) / 2}px)`
+        } : {
+          backgroundColor: '#141414'
+        }}
+      />
       <audio
         ref={audioRef}
         src={audioUrl}
@@ -672,7 +683,7 @@ function AudioPlayer({
                         }
                       : { duration: 0.2 }
                   }
-                  className="w-[3px] bg-[#a1a1aa] rounded-full shrink-0"
+                  className="w-[3px] bg-white/70 rounded-full shrink-0"
                 />
               );
             })}
@@ -695,7 +706,7 @@ function AudioPlayer({
 
       {/* Audio Progress */}
       <div className="mt-4 flex items-center gap-3">
-        <span className="text-[11px] text-[#888] font-mono">
+        <span className="text-[11px] text-white/70 font-mono">
           {formatTime(currentTime)}
         </span>
         <div
@@ -717,7 +728,7 @@ function AudioPlayer({
             style={{ left: `calc(${progress}% - 8px)` }}
           ></div>
         </div>
-        <span className="text-[11px] text-[#888] font-mono">
+        <span className="text-[11px] text-white/70 font-mono">
           {formatTime(duration)}
         </span>
       </div>
@@ -729,20 +740,20 @@ function UserPage({
   onBack,
   onEdit,
   data,
-  activePlan = "pro",
+  activePlan = "pro+",
 }: {
   onBack: () => void;
   onEdit: () => void;
   data: ProfileData;
-  activePlan?: "free" | "starter" | "pro";
+  activePlan?: "free" | "pro" | "pro+";
 }) {
   const isVideoBg = !!(
     data.videoBackgroundEnabled &&
     data.videoBackgroundUrl &&
-    activePlan === "pro"
+    activePlan === "pro+"
   );
   const isGlassmorphicEnabled =
-    activePlan === "pro" ? !!data.isGlassmorphic : false;
+    activePlan === "pro+" ? !!data.isGlassmorphic : false;
 
   return (
     <div
@@ -765,13 +776,18 @@ function UserPage({
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className={`w-full max-w-[400px] rounded-[1.5rem] p-3 pb-8 shadow-2xl relative transition-all duration-300 z-10 text-white border ${
-          isGlassmorphicEnabled ? "border-black/10" : "border-white/10 bg-[#141414]"
-        }`}
+        className={`w-full max-w-[400px] rounded-[1.5rem] p-3 pb-8 shadow-2xl relative transition-all duration-300 z-10 text-white border border-white/10`}
       >
-        {isGlassmorphicEnabled && (
-          <div className="absolute inset-0 bg-transparent backdrop-blur-[10px] rounded-[1.5rem] -z-10" />
-        )}
+        <div 
+          className="absolute inset-0 rounded-[1.5rem] -z-10" 
+          style={isGlassmorphicEnabled ? { 
+            backgroundColor: `rgba(20, 20, 20, ${(data.glassmorphismOpacity ?? 10) / 100})`,
+            backdropFilter: `blur(${(data.glassmorphismBlur ?? 20) / 2}px)`,
+            WebkitBackdropFilter: `blur(${(data.glassmorphismBlur ?? 20) / 2}px)`
+          } : {
+            backgroundColor: '#141414'
+          }}
+        />
         {/* Views Counter (Mountain Structure) */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20 bg-black/25 backdrop-blur-md px-2.5 py-0.5 rounded-b-lg flex items-center gap-1.5">
           <Eye size={10} className="text-gray-300" />
@@ -895,6 +911,8 @@ function UserPage({
             isVideoBg={isVideoBg}
             activePlan={activePlan}
             isGlassmorphic={isGlassmorphicEnabled}
+            glassmorphismOpacity={data.glassmorphismOpacity}
+            glassmorphismBlur={data.glassmorphismBlur}
           />
         </div>
       )}
@@ -920,7 +938,7 @@ function EditPage({
   onChange,
   userEmail,
   userId,
-  activePlan = "pro",
+  activePlan = "pro+",
   setActivePlan,
 }: {
   onBack: () => void;
@@ -930,8 +948,8 @@ function EditPage({
   onChange: React.Dispatch<React.SetStateAction<ProfileData>>;
   userEmail: string | null;
   userId: string | null;
-  activePlan?: "free" | "starter" | "pro";
-  setActivePlan: (plan: "free" | "starter" | "pro") => void;
+  activePlan?: "free" | "pro" | "pro+";
+  setActivePlan: (plan: "free" | "pro" | "pro+") => void;
 }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<
@@ -1138,15 +1156,6 @@ function EditPage({
               </div>
 
               <div className="flex-1 overflow-y-auto no-scrollbar">
-                <div className="p-5 border-b border-white/5 cursor-default group">
-                  <p className="text-[11px] text-gray-500 font-medium tracking-wider mb-2 uppercase group-hover:text-gray-400 transition-colors">
-                    Signed in
-                  </p>
-                  <p className="text-gray-200 text-[15px] truncate">
-                    {userEmail || "Not signed in"}
-                  </p>
-                </div>
-
                 <div className="p-3">
                   <p className="text-[11px] text-gray-500 font-medium tracking-wider mb-2 px-2 uppercase mt-2">
                     Menu
@@ -1276,15 +1285,31 @@ function EditPage({
               </div>
 
               <div className="p-5 border-t border-white/5 mt-auto">
-                <button
-                  onClick={onSignOut}
-                  className="w-full flex items-center gap-3 text-gray-300 hover:text-white hover:text-red-400 transition-colors p-2 -ml-2 rounded-xl hover:bg-white/5 cursor-pointer"
-                >
-                  <LogOut size={18} />
-                  <span className="font-josefin font-semibold text-[15px]">
-                    Sign out
-                  </span>
-                </button>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    {data.avatarUrl ? (
+                      <img src={data.avatarUrl} className="w-10 h-10 rounded-full object-cover border border-white/10" />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center font-bold text-white">
+                        {data.username?.charAt(0).toUpperCase() || "U"}
+                      </div>
+                    )}
+                    <div className="flex flex-col">
+                      <span className="font-semibold text-white text-sm">
+                        {data.displayName || data.username || "User"}
+                      </span>
+                      <span className="text-xs text-gray-400 max-w-[120px] truncate">
+                        {userEmail}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={onSignOut}
+                    className="text-gray-400 hover:text-red-400 transition-colors p-2 rounded-xl hover:bg-white/5 cursor-pointer"
+                  >
+                    <LogOut size={18} />
+                  </button>
+                </div>
               </div>
             </motion.div>
           </>
@@ -1292,31 +1317,36 @@ function EditPage({
       </AnimatePresence>
 
       {/* Top Navbar */}
-      <header className="sticky top-0 z-50 bg-[#f0f0f0]/90 backdrop-blur-md p-4 md:px-8 flex items-center justify-between border-b border-[#e5e5e5]">
-        <button
-          onClick={() => setIsSidebarOpen(true)}
-          className="bg-[#18181b] hover:bg-[#27272a] h-9 px-4 rounded-full flex items-center gap-2 transition-colors text-white shadow-md"
-        >
-          <Menu size={16} className="text-white" strokeWidth={2.5} />
-          <span className="font-josefin font-bold text-[15px] tracking-tight text-white mb-[1px]">
-            Nads.io
-          </span>
-        </button>
-
-        <div className="flex items-center gap-2">
-          <button className="bg-[#18181b] hover:bg-[#27272a] w-9 h-9 rounded-full flex items-center justify-center transition-colors text-white shadow-md">
-            <Sun size={16} strokeWidth={2.5} className="text-white" />
-          </button>
+      <div className="pt-4 px-4 md:px-8">
+        <header className="sticky top-4 z-50 bg-[#f0f0f0]/90 backdrop-blur-md p-3 md:px-6 flex items-center justify-between border border-[#e5e5e5] rounded-full shadow-sm max-w-5xl mx-auto">
           <button
-            onClick={onSignOut}
-            className="bg-[#18181b] hover:bg-[#27272a] h-9 px-4 rounded-full font-josefin font-bold text-[15px] flex items-center justify-center transition-colors text-white shadow-md tracking-tight cursor-pointer"
+            onClick={() => setIsSidebarOpen(true)}
+            className="bg-[#18181b] hover:bg-[#27272a] h-9 px-4 rounded-full flex items-center gap-2 transition-colors text-white shadow-md cursor-pointer"
           >
-            <span className="mb-[1px]">Sign out</span>
+            <Menu size={16} className="text-white" strokeWidth={2.5} />
+            <span className="font-josefin font-bold text-[15px] tracking-tight text-white mb-[1px]">
+              Nads.io
+            </span>
           </button>
-        </div>
-      </header>
 
-      <main className="flex-1 w-full max-w-[400px] mx-auto px-4 pt-8">
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => setActiveTab("edit")}
+              className="w-9 h-9 rounded-full overflow-hidden border border-gray-300 shadow-sm cursor-pointer hover:opacity-80 transition-opacity bg-white"
+            >
+              {data.avatarUrl ? (
+                <img src={data.avatarUrl} className="w-full h-full object-cover" alt="Profile" />
+              ) : (
+                <div className="w-full h-full bg-black flex items-center justify-center font-bold text-white text-xs">
+                  {data.username?.charAt(0).toUpperCase() || "U"}
+                </div>
+              )}
+            </button>
+          </div>
+        </header>
+      </div>
+
+      <main className="flex-1 w-full max-w-[400px] mx-auto px-4 pt-8 md:pt-12">
         {activeTab === "home" && (
           <div className="space-y-6 pb-12">
             <div className="mb-8">
@@ -1432,7 +1462,26 @@ function EditPage({
                   Detailed performance stats for your profile
                 </p>
               </div>
+            </div>
 
+            {activePlan === "free" ? (
+              <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-8 text-center flex flex-col items-center justify-center">
+                <div className="w-16 h-16 bg-yellow-500/10 rounded-full flex items-center justify-center mb-4">
+                  <BarChart2 size={32} className="text-yellow-500" />
+                </div>
+                <h3 className="text-xl font-josefin font-bold text-white mb-2">Pro Feature</h3>
+                <p className="text-gray-400 text-sm max-w-sm mb-6">
+                  Analytics is a premium feature. Upgrade to Pro to track your page views, clicks, and engagement over time.
+                </p>
+                <button
+                  onClick={() => setActiveTab("premium")}
+                  className="bg-white text-black px-6 py-3 rounded-full font-semibold transition-colors hover:bg-gray-200"
+                >
+                  Upgrade to Pro
+                </button>
+              </div>
+            ) : (
+              <>
               {/* Timeframe selector */}
               <div className="flex items-center justify-between bg-[#141414] border border-white/5 p-2 rounded-full mb-6 w-full gap-1">
                 {(
@@ -1452,7 +1501,6 @@ function EditPage({
                   </button>
                 ))}
               </div>
-            </div>
 
             {/* KPI Bento Grid */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -2031,6 +2079,8 @@ function EditPage({
                 </div>
               </div>
             </div>
+              </>
+            )}
           </div>
         )}
         {activeTab === "leaderboard" && (
@@ -2392,21 +2442,39 @@ function EditPage({
               </p>
             </div>
 
-            <div className="flex items-center justify-between bg-[#141414] border border-white/5 p-2 rounded-full mb-6 w-full gap-1">
-              {(["Daily", "Weekly", "Monthly", "All Time"] as const).map(
-                (period) => (
-                  <button
-                    key={period}
-                    onClick={() => setDiscordPeriod(period)}
-                    className={`flex-1 py-3 px-2 rounded-full text-[15px] font-josefin font-bold tracking-tight whitespace-nowrap transition-all ${period === discordPeriod ? "bg-[#252525] text-white shadow-md" : "text-gray-500 hover:text-gray-300 bg-transparent"}`}
-                  >
-                    {period}
-                  </button>
-                ),
-              )}
-            </div>
+            {!data.discordConnected ? (
+              <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-8 text-center flex flex-col items-center justify-center">
+                <div className="w-16 h-16 bg-[#5865F2]/10 rounded-full flex items-center justify-center mb-4">
+                  <MessageCircle size={32} className="text-[#5865F2]" />
+                </div>
+                <h3 className="text-xl font-josefin font-bold text-white mb-2">Connect Discord</h3>
+                <p className="text-gray-400 text-sm max-w-sm mb-6">
+                  You need to connect your Discord account to view the server leaderboard and your ranking.
+                </p>
+                <button
+                  onClick={() => setActiveTab("settings")}
+                  className="bg-[#5865F2] hover:bg-[#4752C4] text-white px-6 py-3 rounded-full font-semibold transition-colors"
+                >
+                  Go to Settings
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center justify-between bg-[#141414] border border-white/5 p-2 rounded-full mb-6 w-full gap-1">
+                  {(["Daily", "Weekly", "Monthly", "All Time"] as const).map(
+                    (period) => (
+                      <button
+                        key={period}
+                        onClick={() => setDiscordPeriod(period)}
+                        className={`flex-1 py-3 px-2 rounded-full text-[15px] font-josefin font-bold tracking-tight whitespace-nowrap transition-all ${period === discordPeriod ? "bg-[#252525] text-white shadow-md" : "text-gray-500 hover:text-gray-300 bg-transparent"}`}
+                      >
+                        {period}
+                      </button>
+                    ),
+                  )}
+                </div>
 
-            <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-4 space-y-2">
+                <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-4 space-y-2">
               {{
                 Daily: [
                   {
@@ -2727,6 +2795,8 @@ function EditPage({
                 </div>
               ))}
             </div>
+              </>
+            )}
           </div>
         )}
         {activeTab === "settings" && (
@@ -2739,26 +2809,48 @@ function EditPage({
                 Manage your account preferences
               </p>
             </div>
-            <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6 space-y-4">
-              <div className="flex justify-between items-center pb-4 border-b border-white/5">
+            <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6 space-y-2">
+              <div className="flex justify-between items-center py-2 pb-4 border-b border-white/5">
                 <div>
-                  <p className="text-white font-medium">Email Address</p>
-                  <p className="text-gray-400 text-sm">
-                    {userEmail || "Not signed in"}
-                  </p>
+                  <p className="text-white font-medium font-josefin text-lg">Email Address</p>
+                  {userEmail ? (
+                    <p className="text-gray-400 text-sm">{userEmail}</p>
+                  ) : (
+                    <p className="text-gray-400 text-sm">Not connected</p>
+                  )}
                 </div>
+                {!userEmail && (
+                  <button 
+                    className="px-4 py-2 rounded-full text-sm font-semibold transition-colors bg-white text-black hover:bg-gray-200 cursor-pointer"
+                  >
+                    Add Email
+                  </button>
+                )}
               </div>
-              <div className="flex justify-between items-center py-2">
+              <div className="flex justify-between items-center py-4 pb-4">
                 <div>
-                  <p className="text-white font-medium">Dark Mode</p>
-                  <p className="text-gray-400 text-sm">Default theme</p>
+                  <p className="text-white font-medium font-josefin text-lg">Discord Account</p>
+                  {data.discordConnected ? (
+                    <p className="text-gray-400 text-sm">
+                      {data.username ? `${data.username}` : "discorduser"}
+                    </p>
+                  ) : (
+                    <p className="text-gray-400 text-sm">
+                      Not connected
+                    </p>
+                  )}
                 </div>
-                <div className="w-12 h-6 bg-[#333] rounded-full relative cursor-pointer">
-                  <div className="w-4 h-4 bg-white rounded-full absolute top-1 right-1"></div>
-                </div>
+                {!data.discordConnected && (
+                  <button 
+                    onClick={() => onChange({ ...data, discordConnected: true })}
+                    className="px-4 py-2 rounded-full text-sm font-semibold transition-colors bg-[#5865F2] text-white hover:bg-[#4752C4] cursor-pointer"
+                  >
+                    Connect Discord
+                  </button>
+                )}
               </div>
               <div className="pt-4 border-t border-white/5">
-                <button className="text-red-500 font-medium text-sm hover:text-red-400 transition-colors">
+                <button className="text-red-500 font-medium text-sm hover:text-red-400 transition-colors cursor-pointer">
                   Delete Account
                 </button>
               </div>
@@ -2788,7 +2880,7 @@ function EditPage({
                 )}
                 <div>
                   <span className="text-gray-500 font-mono text-[10px] uppercase tracking-wider font-semibold">
-                    Starter Level
+                    Basic Level
                   </span>
                   <h3 className="text-xl font-josefin font-bold text-white mt-1">
                     Free Tier
@@ -2840,11 +2932,11 @@ function EditPage({
                 </button>
               </div>
 
-              {/* Starter Tier */}
+              {/* Pro Tier */}
               <div
-                className={`bg-[#141414] border rounded-[1.5rem] p-5 flex flex-col justify-between shadow-xl relative overflow-hidden transition-all ${activePlan === "starter" ? "border-yellow-400" : "border-white/5"}`}
+                className={`bg-[#141414] border rounded-[1.5rem] p-5 flex flex-col justify-between shadow-xl relative overflow-hidden transition-all ${activePlan === "pro" ? "border-yellow-400" : "border-white/5"}`}
               >
-                {activePlan === "starter" && (
+                {activePlan === "pro" && (
                   <div className="absolute top-0 right-0 bg-yellow-400 text-black text-[9px] font-bold px-3 py-1 rounded-bl-xl uppercase tracking-widest font-sans">
                     Active
                   </div>
@@ -2854,7 +2946,7 @@ function EditPage({
                     Popular
                   </span>
                   <h3 className="text-xl font-josefin font-bold text-white mt-1">
-                    Starter Plan
+                    Pro Plan
                   </h3>
                   <p className="text-gray-400 text-xs mt-2 leading-relaxed">
                     Unlock awesome personalized music embeds and avatar glow
@@ -2871,7 +2963,7 @@ function EditPage({
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 text-xs text-gray-300">
                       <span className="text-emerald-400">✓</span>
-                      <span>Unlimited custom social links</span>
+                      <span>Up to 5 custom social links</span>
                     </div>
                     <div className="flex items-center gap-2 text-xs text-gray-300">
                       <span className="text-emerald-400">✓</span>
@@ -2894,22 +2986,22 @@ function EditPage({
 
                 <button
                   onClick={() => {
-                    setActivePlan("starter");
+                    setActivePlan("pro");
                   }}
-                  className={`w-full font-semibold text-xs py-2.5 rounded-full mt-6 transition-all active:scale-[0.98] cursor-pointer ${activePlan === "starter" ? "bg-[#252525] text-white border border-white/5 cursor-default" : "bg-yellow-400 hover:bg-yellow-350 text-black"}`}
-                  disabled={activePlan === "starter"}
+                  className={`w-full font-semibold text-xs py-2.5 rounded-full mt-6 transition-all active:scale-[0.98] cursor-pointer ${activePlan === "pro" ? "bg-[#252525] text-white border border-white/5 cursor-default" : "bg-yellow-400 hover:bg-yellow-350 text-black"}`}
+                  disabled={activePlan === "pro"}
                 >
-                  {activePlan === "starter"
+                  {activePlan === "pro"
                     ? "Active Plan"
-                    : "Upgrade to Starter ($1)"}
+                    : "Upgrade to Pro ($1)"}
                 </button>
               </div>
 
-              {/* Pro Tier */}
+              {/* Pro+ Tier */}
               <div
-                className={`bg-[#141414] border rounded-[1.5rem] p-5 flex flex-col justify-between shadow-xl relative overflow-hidden transition-all ${activePlan === "pro" ? "border-yellow-400" : "border-white/5"}`}
+                className={`bg-[#141414] border rounded-[1.5rem] p-5 flex flex-col justify-between shadow-xl relative overflow-hidden transition-all ${activePlan === "pro+" ? "border-yellow-400" : "border-white/5"}`}
               >
-                {activePlan === "pro" && (
+                {activePlan === "pro+" && (
                   <div className="absolute top-0 right-0 bg-yellow-400 text-black text-[9px] font-bold px-3 py-1 rounded-bl-xl uppercase tracking-widest font-sans">
                     Active
                   </div>
@@ -2919,7 +3011,7 @@ function EditPage({
                     Power User
                   </span>
                   <h3 className="text-xl font-josefin font-bold text-white mt-1">
-                    Pro Plan
+                    Pro+ Plan
                   </h3>
                   <p className="text-gray-400 text-xs mt-2 leading-relaxed">
                     The ultimate creator experience with cinematic landscape and
@@ -2936,7 +3028,7 @@ function EditPage({
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 text-xs text-gray-300">
                       <span className="text-emerald-400">✓</span>
-                      <span>Everything in Starter Plan</span>
+                      <span>Everything in Pro Plan</span>
                     </div>
                     <div className="flex items-center gap-2 text-xs text-emerald-400 font-bold">
                       <span>✓</span>
@@ -2959,19 +3051,19 @@ function EditPage({
 
                 <button
                   onClick={() => {
-                    setActivePlan("pro");
+                    setActivePlan("pro+");
                   }}
-                  className={`w-full font-semibold text-xs py-2.5 rounded-full mt-6 transition-all active:scale-[0.98] cursor-pointer ${activePlan === "pro" ? "bg-[#252525] text-white border border-white/5 cursor-default" : "bg-yellow-400 hover:bg-yellow-350 text-black"}`}
-                  disabled={activePlan === "pro"}
+                  className={`w-full font-semibold text-xs py-2.5 rounded-full mt-6 transition-all active:scale-[0.98] cursor-pointer ${activePlan === "pro+" ? "bg-[#252525] text-white border border-white/5 cursor-default" : "bg-yellow-400 hover:bg-yellow-350 text-black"}`}
+                  disabled={activePlan === "pro+"}
                 >
-                  {activePlan === "pro" ? "Active Plan" : "Upgrade to Pro ($2)"}
+                  {activePlan === "pro+" ? "Active Plan" : "Upgrade to Pro+ ($2)"}
                 </button>
               </div>
             </div>
 
             <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6">
               <h3 className="font-josefin font-bold text-white text-lg mb-2">
-                Why Pro?
+                Why Premium?
               </h3>
               <p className="text-gray-400 text-sm leading-relaxed mb-4">
                 When thousands of visitors browse your social pages, details
@@ -3011,8 +3103,8 @@ function EditPage({
                   How many links can I add?
                 </h4>
                 <p className="text-gray-400 text-sm leading-relaxed">
-                  Free users can add up to 5 links. Upgrade to Pro in the
-                  Premium tab to enjoy unlimited links, HD cinematic video
+                  All users can add up to 5 links. Upgrade to Pro in the
+                  Premium tab to enjoy HD cinematic video
                   backgrounds, custom audio player track uploads, and
                   interactive styling options!
                 </p>
@@ -3371,16 +3463,16 @@ function EditPage({
                         </label>
                         <div className="flex items-center justify-between bg-white/5 border border-white/10 backdrop-blur-md rounded-xl p-4 shadow-lg">
                           <span className="text-[15px] font-semibold text-white/85">
-                            {activePlan === "pro"
+                            {activePlan === "pro+"
                               ? data.isGlassmorphic
                                 ? "Glassmorphic design is ON"
                                 : "Glassmorphic design is OFF"
-                              : "Glassmorphic design (Requires Pro)"}
+                              : "Glassmorphic design (Requires Pro+)"}
                           </span>
                           {/* Glassmorphic Toggle Switch */}
                           <div
                             onClick={() => {
-                              if (activePlan === "pro") {
+                              if (activePlan === "pro+") {
                                 onChange({
                                   ...data,
                                   isGlassmorphic: !data.isGlassmorphic,
@@ -3388,7 +3480,7 @@ function EditPage({
                               }
                             }}
                             className={`w-12 h-6 rounded-full flex items-center p-0.5 transition-all border ${
-                              activePlan === "pro"
+                              activePlan === "pro+"
                                 ? data.isGlassmorphic
                                   ? "bg-white/20 border-white/35 cursor-pointer"
                                   : "bg-white/5 border-white/10 cursor-pointer"
@@ -3397,13 +3489,56 @@ function EditPage({
                           >
                             <div
                               className={`w-4 h-4 rounded-full shadow-md transition-transform duration-200 ${
-                                activePlan === "pro" && data.isGlassmorphic
+                                activePlan === "pro+" && data.isGlassmorphic
                                   ? "bg-white translate-x-[24px]"
                                   : "bg-white/40 translate-x-[2px]"
                               }`}
                             ></div>
                           </div>
                         </div>
+                        {activePlan === "pro+" && data.isGlassmorphic && (
+                          <>
+                            <div className="pt-4">
+                              <label className="block text-[18px] font-josefin font-bold tracking-tight text-white mb-3 text-center">
+                                Background Opacity
+                              </label>
+                              <div className="bg-white/5 border border-white/10 backdrop-blur-md rounded-xl p-4 shadow-lg">
+                                <div className="flex justify-between items-center mb-2">
+                                  <span className="text-[14px] font-semibold text-white/85">Opacity Level</span>
+                                  <span className="text-[13px] text-gray-400 font-mono">{data.glassmorphismOpacity ?? 10}%</span>
+                                </div>
+                                <input
+                                  type="range"
+                                  min="0"
+                                  max="100"
+                                  value={data.glassmorphismOpacity ?? 10}
+                                  onChange={(e) => onChange({ ...data, glassmorphismOpacity: Number(e.target.value) })}
+                                  className="w-full accent-white cursor-pointer"
+                                />
+                              </div>
+                            </div>
+                            
+                            <div className="pt-4">
+                              <label className="block text-[18px] font-josefin font-bold tracking-tight text-white mb-3 text-center">
+                                Background Blur
+                              </label>
+                              <div className="bg-white/5 border border-white/10 backdrop-blur-md rounded-xl p-4 shadow-lg">
+                                <div className="flex justify-between items-center mb-2">
+                                  <span className="text-[14px] font-semibold text-white/85">Blur Radius</span>
+                                  <span className="text-[13px] text-gray-400 font-mono">{data.glassmorphismBlur ?? 20}%</span>
+                                </div>
+                                <input
+                                  type="range"
+                                  min="0"
+                                  max="100"
+                                  value={data.glassmorphismBlur ?? 20}
+                                  onChange={(e) => onChange({ ...data, glassmorphismBlur: Number(e.target.value) })}
+                                  className="w-full accent-white cursor-pointer"
+                                />
+                              </div>
+                            </div>
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -3496,6 +3631,8 @@ export type ProfileData = {
   bio: string;
   isGlowing: boolean;
   isGlassmorphic: boolean;
+  glassmorphismOpacity?: number;
+  glassmorphismBlur?: number;
   avatarUrl: string;
   bannerUrl: string;
   audioUrl: string;
@@ -3503,6 +3640,7 @@ export type ProfileData = {
   videoBackgroundUrl?: string;
   videoBackgroundEnabled?: boolean;
   links: Array<{ id: number; title: string; url: string }>;
+  discordConnected?: boolean;
 };
 
 export default function App() {
@@ -3511,18 +3649,18 @@ export default function App() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
 
-  const [activePlan, setActivePlan] = useState<"free" | "starter" | "pro">(
+  const [activePlan, setActivePlan] = useState<"free" | "pro" | "pro+">(
     () => {
       return (
         (localStorage.getItem("nads_active_plan") as
           | "free"
-          | "starter"
-          | "pro") || "pro"
+          | "pro"
+          | "pro+") || "pro+"
       );
     },
   );
 
-  const handleSetActivePlan = (plan: "free" | "starter" | "pro") => {
+  const handleSetActivePlan = (plan: "free" | "pro" | "pro+") => {
     setActivePlan(plan);
     localStorage.setItem("nads_active_plan", plan);
   };
@@ -3587,6 +3725,8 @@ export default function App() {
     bio: "",
     isGlowing: true,
     isGlassmorphic: true,
+    glassmorphismOpacity: 10,
+    glassmorphismBlur: 20,
     avatarUrl: "",
     bannerUrl: "",
     audioUrl: "",
@@ -3594,6 +3734,7 @@ export default function App() {
     videoBackgroundUrl: "",
     videoBackgroundEnabled: false,
     links: [],
+    discordConnected: false,
   });
 
   return (
