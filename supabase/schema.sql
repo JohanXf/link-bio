@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   audio_title TEXT,
   video_background_url TEXT,
   video_background_enabled BOOLEAN DEFAULT false NOT NULL,
+  active_plan TEXT DEFAULT 'free' NOT NULL,
   created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT now() NOT NULL
 );
@@ -30,6 +31,7 @@ ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS is_glowing BOOLEAN DEFAULT 
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS is_glassmorphic BOOLEAN DEFAULT true NOT NULL;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS video_background_url TEXT;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS video_background_enabled BOOLEAN DEFAULT false NOT NULL;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS active_plan TEXT DEFAULT 'free' NOT NULL;
 
 -- -------------------------------------------------------------------------
 -- 2. Create Links Table

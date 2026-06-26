@@ -64,6 +64,7 @@ export async function fetchProfile(userId: string): Promise<ProfileData | null> 
     audioTitle: profile.audio_title || '',
     videoBackgroundUrl: profile.video_background_url !== undefined && profile.video_background_url !== null ? profile.video_background_url : decoded.videoBackgroundUrl,
     videoBackgroundEnabled: profile.video_background_enabled !== undefined && profile.video_background_enabled !== null ? !!profile.video_background_enabled : decoded.videoBackgroundEnabled,
+    activePlan: profile.active_plan || 'free',
     links: (links || []).map(link => ({
       id: link.id,
       title: link.title,
@@ -115,6 +116,7 @@ export async function fetchProfileByUsername(username: string): Promise<ProfileD
     audioTitle: profile.audio_title || '',
     videoBackgroundUrl: profile.video_background_url !== undefined && profile.video_background_url !== null ? profile.video_background_url : decoded.videoBackgroundUrl,
     videoBackgroundEnabled: profile.video_background_enabled !== undefined && profile.video_background_enabled !== null ? !!profile.video_background_enabled : decoded.videoBackgroundEnabled,
+    activePlan: profile.active_plan || 'free',
     links: (links || []).map(link => ({
       id: link.id,
       title: link.title,
@@ -142,6 +144,7 @@ export async function saveProfile(userId: string, data: ProfileData) {
       banner_url: data.bannerUrl,
       audio_url: data.audioUrl,
       audio_title: data.audioTitle,
+      active_plan: data.activePlan || 'free',
       updated_at: new Date().toISOString()
     });
 

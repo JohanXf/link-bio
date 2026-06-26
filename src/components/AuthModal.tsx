@@ -35,7 +35,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: import.meta.env.APP_URL,
+          redirectTo: window.location.origin,
         }
       });
       if (error) throw error;

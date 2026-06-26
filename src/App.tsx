@@ -964,15 +964,11 @@ function EditPage({
     | "edit"
     | "analytics"
     | "leaderboard"
-    | "discord"
     | "settings"
     | "help"
     | "premium"
   >("edit");
   const [leaderboardPeriod, setLeaderboardPeriod] = useState<
-    "Daily" | "Weekly" | "Monthly" | "All Time"
-  >("All Time");
-  const [discordPeriod, setDiscordPeriod] = useState<
     "Daily" | "Weekly" | "Monthly" | "All Time"
   >("All Time");
   const [isSaving, setIsSaving] = useState(false);
@@ -1251,24 +1247,6 @@ function EditPage({
                     <Trophy size={18} />
                     <span className="font-josefin font-semibold text-[15px]">
                       Leaderboard
-                    </span>
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      setActiveTab("discord");
-                      setIsSidebarOpen(false);
-                    }}
-                    className={`w-full flex items-center gap-3 px-3 py-3.5 rounded-xl transition-colors mb-1 cursor-pointer ${activeTab === "discord" ? "bg-[#252525] text-white border border-white/5" : "text-gray-300 hover:text-white hover:bg-[#252525]"}`}
-                  >
-                    <MessageCircle
-                      size={18}
-                      className={
-                        activeTab === "discord" ? "text-white" : "text-gray-300"
-                      }
-                    />
-                    <span className="font-josefin font-semibold text-[15px]">
-                      Discord
                     </span>
                   </button>
 
@@ -2447,374 +2425,6 @@ function EditPage({
             </div>
           </div>
         )}
-        {activeTab === "discord" && (
-          <div className="space-y-6">
-            <div className="mb-4">
-              <h1 className="text-[28px] font-josefin font-bold tracking-tight">
-                Discord Leaderboard
-              </h1>
-              <p className="text-gray-400 mt-2 text-sm">
-                Most active members on the official server.
-              </p>
-            </div>
-
-            {!data.discordConnected ? (
-              <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-8 text-center flex flex-col items-center justify-center">
-                <div className="w-16 h-16 bg-[#5865F2]/10 rounded-full flex items-center justify-center mb-4">
-                  <MessageCircle size={32} className="text-[#5865F2]" />
-                </div>
-                <h3 className="text-xl font-josefin font-bold text-white mb-2">Connect Discord</h3>
-                <p className="text-gray-400 text-sm max-w-sm mb-6">
-                  You need to connect your Discord account to view the server leaderboard and your ranking.
-                </p>
-                <button
-                  onClick={() => setActiveTab("settings")}
-                  className="bg-[#5865F2] hover:bg-[#4752C4] text-white px-6 py-3 rounded-full font-semibold transition-colors"
-                >
-                  Go to Settings
-                </button>
-              </div>
-            ) : (
-              <>
-                <div className="flex items-center justify-between bg-[#141414] border border-white/5 p-2 rounded-full mb-6 w-full gap-1">
-                  {(["Daily", "Weekly", "Monthly", "All Time"] as const).map(
-                    (period) => (
-                      <button
-                        key={period}
-                        onClick={() => setDiscordPeriod(period)}
-                        className={`flex-1 py-3 px-2 rounded-full text-[15px] font-josefin font-bold tracking-tight whitespace-nowrap transition-all ${period === discordPeriod ? "bg-[#252525] text-white shadow-md" : "text-gray-500 hover:text-gray-300 bg-transparent"}`}
-                      >
-                        {period}
-                      </button>
-                    ),
-                  )}
-                </div>
-
-                <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-4 space-y-2">
-              {{
-                Daily: [
-                  {
-                    name: "GamerPro",
-                    handle: "@gamerpro",
-                    activity: "1,240 msg",
-                    rank: 1,
-                    img: "https://i.pravatar.cc/100?img=53",
-                  },
-                  {
-                    name: "Nova_X",
-                    handle: "@novax",
-                    activity: "980 msg",
-                    rank: 2,
-                    img: "https://i.pravatar.cc/100?img=54",
-                  },
-                  {
-                    name: "Sven",
-                    handle: "@sven_d",
-                    activity: "850 msg",
-                    rank: 3,
-                    img: "https://i.pravatar.cc/100?img=55",
-                  },
-                  {
-                    name: "Kira_99",
-                    handle: "@kira99",
-                    activity: "790 msg",
-                    rank: 4,
-                    img: "https://i.pravatar.cc/100?img=56",
-                  },
-                  {
-                    name: "NeonPulse",
-                    handle: "@neonpulse",
-                    activity: "640 msg",
-                    rank: 5,
-                    img: "https://i.pravatar.cc/100?img=57",
-                  },
-                  {
-                    name: "Vortex",
-                    handle: "@vortex_v",
-                    activity: "520 msg",
-                    rank: 6,
-                    img: "https://i.pravatar.cc/100?img=58",
-                  },
-                  {
-                    name: "Specter",
-                    handle: "@specter_s",
-                    activity: "450 msg",
-                    rank: 7,
-                    img: "https://i.pravatar.cc/100?img=59",
-                  },
-                  {
-                    name: "Aero",
-                    handle: "@aero_f",
-                    activity: "410 msg",
-                    rank: 8,
-                    img: "https://i.pravatar.cc/100?img=60",
-                  },
-                  {
-                    name: "Blaze",
-                    handle: "@blaze_b",
-                    activity: "320 msg",
-                    rank: 9,
-                    img: "https://i.pravatar.cc/100?img=61",
-                  },
-                  {
-                    name: "Frost",
-                    handle: "@frost_f",
-                    activity: "250 msg",
-                    rank: 10,
-                    img: "https://i.pravatar.cc/100?img=62",
-                  },
-                ],
-                Weekly: [
-                  {
-                    name: "Nova_X",
-                    handle: "@novax",
-                    activity: "5,400 msg",
-                    rank: 1,
-                    img: "https://i.pravatar.cc/100?img=54",
-                  },
-                  {
-                    name: "GamerPro",
-                    handle: "@gamerpro",
-                    activity: "4,820 msg",
-                    rank: 2,
-                    img: "https://i.pravatar.cc/100?img=53",
-                  },
-                  {
-                    name: "Kira_99",
-                    handle: "@kira99",
-                    activity: "4,210 msg",
-                    rank: 3,
-                    img: "https://i.pravatar.cc/100?img=56",
-                  },
-                  {
-                    name: "Sven",
-                    handle: "@sven_d",
-                    activity: "3,900 msg",
-                    rank: 4,
-                    img: "https://i.pravatar.cc/100?img=55",
-                  },
-                  {
-                    name: "NeonPulse",
-                    handle: "@neonpulse",
-                    activity: "2,980 msg",
-                    rank: 5,
-                    img: "https://i.pravatar.cc/100?img=57",
-                  },
-                  {
-                    name: "Specter",
-                    handle: "@specter_s",
-                    activity: "2,400 msg",
-                    rank: 6,
-                    img: "https://i.pravatar.cc/100?img=59",
-                  },
-                  {
-                    name: "Vortex",
-                    handle: "@vortex_v",
-                    activity: "1,980 msg",
-                    rank: 7,
-                    img: "https://i.pravatar.cc/100?img=58",
-                  },
-                  {
-                    name: "Aero",
-                    handle: "@aero_f",
-                    activity: "1,720 msg",
-                    rank: 8,
-                    img: "https://i.pravatar.cc/100?img=60",
-                  },
-                  {
-                    name: "Blaze",
-                    handle: "@blaze_b",
-                    activity: "1,450 msg",
-                    rank: 9,
-                    img: "https://i.pravatar.cc/100?img=61",
-                  },
-                  {
-                    name: "Frost",
-                    handle: "@frost_f",
-                    activity: "1,120 msg",
-                    rank: 10,
-                    img: "https://i.pravatar.cc/100?img=62",
-                  },
-                ],
-                Monthly: [
-                  {
-                    name: "Kira_99",
-                    handle: "@kira99",
-                    activity: "22,410 msg",
-                    rank: 1,
-                    img: "https://i.pravatar.cc/100?img=56",
-                  },
-                  {
-                    name: "Nova_X",
-                    handle: "@novax",
-                    activity: "19,800 msg",
-                    rank: 2,
-                    img: "https://i.pravatar.cc/100?img=54",
-                  },
-                  {
-                    name: "GamerPro",
-                    handle: "@gamerpro",
-                    activity: "18,500 msg",
-                    rank: 3,
-                    img: "https://i.pravatar.cc/100?img=53",
-                  },
-                  {
-                    name: "Sven",
-                    handle: "@sven_d",
-                    activity: "14,210 msg",
-                    rank: 4,
-                    img: "https://i.pravatar.cc/100?img=55",
-                  },
-                  {
-                    name: "NeonPulse",
-                    handle: "@neonpulse",
-                    activity: "11,240 msg",
-                    rank: 5,
-                    img: "https://i.pravatar.cc/100?img=57",
-                  },
-                  {
-                    name: "Vortex",
-                    handle: "@vortex_v",
-                    activity: "9,820 msg",
-                    rank: 6,
-                    img: "https://i.pravatar.cc/100?img=58",
-                  },
-                  {
-                    name: "Specter",
-                    handle: "@specter_s",
-                    activity: "8,400 msg",
-                    rank: 7,
-                    img: "https://i.pravatar.cc/100?img=59",
-                  },
-                  {
-                    name: "Aero",
-                    handle: "@aero_f",
-                    activity: "7,110 msg",
-                    rank: 8,
-                    img: "https://i.pravatar.cc/100?img=60",
-                  },
-                  {
-                    name: "Blaze",
-                    handle: "@blaze_b",
-                    activity: "6,420 msg",
-                    rank: 9,
-                    img: "https://i.pravatar.cc/100?img=61",
-                  },
-                  {
-                    name: "Frost",
-                    handle: "@frost_f",
-                    activity: "5,100 msg",
-                    rank: 10,
-                    img: "https://i.pravatar.cc/100?img=62",
-                  },
-                ],
-                "All Time": [
-                  {
-                    name: "GamerPro",
-                    handle: "@gamerpro",
-                    activity: "145,200 msg",
-                    rank: 1,
-                    img: "https://i.pravatar.cc/100?img=53",
-                  },
-                  {
-                    name: "Nova_X",
-                    handle: "@novax",
-                    activity: "124,100 msg",
-                    rank: 2,
-                    img: "https://i.pravatar.cc/100?img=54",
-                  },
-                  {
-                    name: "Sven",
-                    handle: "@sven_d",
-                    activity: "112,400 msg",
-                    rank: 3,
-                    img: "https://i.pravatar.cc/100?img=55",
-                  },
-                  {
-                    name: "Kira_99",
-                    handle: "@kira99",
-                    activity: "98,200 msg",
-                    rank: 4,
-                    img: "https://i.pravatar.cc/100?img=56",
-                  },
-                  {
-                    name: "NeonPulse",
-                    handle: "@neonpulse",
-                    activity: "84,100 msg",
-                    rank: 5,
-                    img: "https://i.pravatar.cc/100?img=57",
-                  },
-                  {
-                    name: "Specter",
-                    handle: "@specter_s",
-                    activity: "76,300 msg",
-                    rank: 6,
-                    img: "https://i.pravatar.cc/100?img=59",
-                  },
-                  {
-                    name: "Vortex",
-                    handle: "@vortex_v",
-                    activity: "54,200 msg",
-                    rank: 7,
-                    img: "https://i.pravatar.cc/100?img=58",
-                  },
-                  {
-                    name: "Aero",
-                    handle: "@aero_f",
-                    activity: "49,100 msg",
-                    rank: 8,
-                    img: "https://i.pravatar.cc/100?img=60",
-                  },
-                  {
-                    name: "Blaze",
-                    handle: "@blaze_b",
-                    activity: "42,400 msg",
-                    rank: 9,
-                    img: "https://i.pravatar.cc/100?img=61",
-                  },
-                  {
-                    name: "Frost",
-                    handle: "@frost_f",
-                    activity: "31,200 msg",
-                    rank: 10,
-                    img: "https://i.pravatar.cc/100?img=62",
-                  },
-                ],
-              }[discordPeriod].map((user) => (
-                <div
-                  key={user.rank}
-                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors"
-                >
-                  <div className="w-6 text-center font-bold text-gray-500 text-sm">
-                    {user.rank}
-                  </div>
-                  <img
-                    src={user.img}
-                    className="w-10 h-10 rounded-full object-cover border border-white/10"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium text-white truncate text-[15px]">
-                      {user.name}
-                    </div>
-                    <div className="text-gray-500 text-[13px] truncate">
-                      {user.handle}
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-bold text-white text-[15px]">
-                      {user.activity}
-                    </div>
-                    <div className="text-gray-500 text-[11px] uppercase">
-                      Activity
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-              </>
-            )}
-          </div>
-        )}
         {activeTab === "settings" && (
           <div className="space-y-6">
             <div className="mb-8">
@@ -2840,28 +2450,6 @@ function EditPage({
                     className="px-4 py-2 rounded-full text-sm font-semibold transition-colors bg-white text-black hover:bg-gray-200 cursor-pointer"
                   >
                     Add Email
-                  </button>
-                )}
-              </div>
-              <div className="flex justify-between items-center py-4 pb-4">
-                <div>
-                  <p className="text-white font-medium font-josefin text-lg">Discord Account</p>
-                  {data.discordConnected ? (
-                    <p className="text-gray-400 text-sm">
-                      {data.username ? `${data.username}` : "discorduser"}
-                    </p>
-                  ) : (
-                    <p className="text-gray-400 text-sm">
-                      Not connected
-                    </p>
-                  )}
-                </div>
-                {!data.discordConnected && (
-                  <button 
-                    onClick={() => onChange({ ...data, discordConnected: true })}
-                    className="px-4 py-2 rounded-full text-sm font-semibold transition-colors bg-[#5865F2] text-white hover:bg-[#4752C4] cursor-pointer"
-                  >
-                    Connect Discord
                   </button>
                 )}
               </div>
@@ -3649,8 +3237,8 @@ export type ProfileData = {
   videoBackgroundUrl?: string;
   videoBackgroundEnabled?: boolean;
   videoBackgroundBlur?: number;
+  activePlan?: 'free' | 'pro';
   links: Array<{ id: number; title: string; url: string }>;
-  discordConnected?: boolean;
 };
 
 export default function App() {
@@ -3671,6 +3259,7 @@ export default function App() {
 
   const handleSetActivePlan = (plan: "free" | "pro") => {
     setActivePlan(plan);
+    setProfileData((prev) => ({ ...prev, activePlan: plan }));
     localStorage.setItem("nads_active_plan", plan);
   };
 
@@ -3691,6 +3280,7 @@ export default function App() {
           const profile = await api.fetchProfile(uid);
           if (profile) {
             setProfileData(profile);
+            if (profile.activePlan) setActivePlan(profile.activePlan);
           } else if (name) {
             const username = name.split("@")[0].replace(/[^a-zA-Z0-9._]/g, "");
             setProfileData((prev) =>
@@ -3743,8 +3333,8 @@ export default function App() {
     videoBackgroundUrl: "",
     videoBackgroundEnabled: false,
     videoBackgroundBlur: 5,
+    activePlan: 'free',
     links: [],
-    discordConnected: false,
   });
 
   return (
