@@ -29,6 +29,7 @@ import {
   Settings,
   HelpCircle,
   LogOut,
+  Lock,
   Globe,
   Mail,
   Youtube,
@@ -646,9 +647,9 @@ function AudioPlayer({
       <audio
         ref={audioRef}
         src={audioUrl}
+        loop
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
-        onEnded={() => setIsPlaying(false)}
       />
       <div className="flex items-center gap-3">
         <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shrink-0 shadow-sm">
@@ -740,20 +741,21 @@ function UserPage({
   onBack,
   onEdit,
   data,
-  activePlan = "pro+",
+  activePlan = "pro",
 }: {
   onBack: () => void;
   onEdit: () => void;
   data: ProfileData;
-  activePlan?: "free" | "pro" | "pro+";
+  activePlan?: "free" | "pro";
 }) {
   const isVideoBg = !!(
     data.videoBackgroundEnabled &&
-    data.videoBackgroundUrl &&
-    activePlan === "pro+"
+    data.videoBackgroundUrl
   );
   const isGlassmorphicEnabled =
-    activePlan === "pro+" ? !!data.isGlassmorphic : false;
+    activePlan === "pro" ? !!data.isGlassmorphic : false;
+  const isGlowingEnabled =
+    activePlan === "pro" ? !!data.isGlowing : false;
 
   return (
     <div
@@ -767,7 +769,8 @@ function UserPage({
             loop
             muted
             playsInline
-            className="absolute inset-0 w-full h-full object-cover z-0 opacity-100 blur-[1px] scale-105"
+            className="absolute inset-0 w-full h-full object-cover z-0 opacity-100 scale-105"
+            style={{ filter: `blur(${data.videoBackgroundBlur ?? 5}px)` }}
           />
         </>
       )}
@@ -807,7 +810,7 @@ function UserPage({
           {/* Avatar: positioned 50% in banner and 50% in the content container */}
           <div className="relative mb-3 -mt-[48px] select-none">
             {/* Glow */}
-            {data.isGlowing && (
+            {isGlowingEnabled && (
               <div
                 className="absolute -inset-1 rounded-full blur-[12px] opacity-80"
                 style={{
@@ -819,9 +822,9 @@ function UserPage({
 
             {/* Ring Wrapper */}
             <div
-              className={`p-[3px] rounded-full relative z-10 ${data.isGlowing ? "" : "bg-white/10"}`}
+              className={`rounded-full relative z-10 ${isGlowingEnabled ? "p-[3px]" : "p-0"}`}
               style={
-                data.isGlowing
+                isGlowingEnabled
                   ? {
                       background:
                         "conic-gradient(from 0deg, #10b981, #0ea5e9, #8b5cf6, #d946ef, #f43f5e, #f59e0b, #10b981)",
@@ -904,17 +907,21 @@ function UserPage({
 
       {/* Music Card */}
       {data.audioUrl && (
-        <div className="w-full max-w-[400px] z-10 transition-transform">
-          <AudioPlayer
-            audioTitle={data.audioTitle}
-            audioUrl={data.audioUrl}
-            isVideoBg={isVideoBg}
-            activePlan={activePlan}
-            isGlassmorphic={isGlassmorphicEnabled}
-            glassmorphismOpacity={data.glassmorphismOpacity}
-            glassmorphismBlur={data.glassmorphismBlur}
-          />
-        </div>
+        activePlan === "free" ? (
+          <audio autoPlay loop src={data.audioUrl} />
+        ) : (
+          <div className="w-full max-w-[400px] z-10 transition-transform">
+            <AudioPlayer
+              audioTitle={data.audioTitle}
+              audioUrl={data.audioUrl}
+              isVideoBg={isVideoBg}
+              activePlan={activePlan}
+              isGlassmorphic={isGlassmorphicEnabled}
+              glassmorphismOpacity={data.glassmorphismOpacity}
+              glassmorphismBlur={data.glassmorphismBlur}
+            />
+          </div>
+        )
       )}
 
       {/* Back to Editor button sent below */}
@@ -938,7 +945,7 @@ function EditPage({
   onChange,
   userEmail,
   userId,
-  activePlan = "pro+",
+  activePlan = "pro",
   setActivePlan,
 }: {
   onBack: () => void;
@@ -948,8 +955,8 @@ function EditPage({
   onChange: React.Dispatch<React.SetStateAction<ProfileData>>;
   userEmail: string | null;
   userId: string | null;
-  activePlan?: "free" | "pro" | "pro+";
-  setActivePlan: (plan: "free" | "pro" | "pro+") => void;
+  activePlan?: "free" | "pro";
+  setActivePlan: (plan: "free" | "pro") => void;
 }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<
@@ -1059,6 +1066,15 @@ function EditPage({
   const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      const isPremium = activePlan === "pro";
+      const maxSizeMB = isPremium ? 50 : 10;
+      const maxSizeBytes = maxSizeMB * 1024 * 1024;
+      
+      if (file.size > maxSizeBytes) {
+        alert(`File is too large. ${isPremium ? "Premium" : "Free"} plan allows up to ${maxSizeMB}MB (${isPremium ? "4K" : "720p"}). Upgrade to Premium for larger file limits.`);
+        return;
+      }
+
       const reader = new FileReader();
       // Optimistic visual update
       reader.onloadend = () => {
@@ -1088,7 +1104,7 @@ function EditPage({
             console.log(`Fallback to base64 for video due to network error`);
           } else {
             alert(
-              `Failed to upload video. Make sure your video is under 15MB.`,
+              `Failed to upload video. Make sure your video is under ${maxSizeMB}MB.`,
             );
           }
         }
@@ -1471,13 +1487,13 @@ function EditPage({
                 </div>
                 <h3 className="text-xl font-josefin font-bold text-white mb-2">Pro Feature</h3>
                 <p className="text-gray-400 text-sm max-w-sm mb-6">
-                  Analytics is a premium feature. Upgrade to Pro to track your page views, clicks, and engagement over time.
+                  Analytics is a premium feature. Upgrade to Premium to track your page views, clicks, and engagement over time.
                 </p>
                 <button
                   onClick={() => setActiveTab("premium")}
-                  className="bg-white text-black px-6 py-3 rounded-full font-semibold transition-colors hover:bg-gray-200"
+                  className="bg-white text-black px-6 py-3 rounded-full font-semibold transition-colors hover:bg-gray-200 cursor-pointer"
                 >
-                  Upgrade to Pro
+                  Upgrade to Premium
                 </button>
               </div>
             ) : (
@@ -2868,7 +2884,7 @@ function EditPage({
               </p>
             </div>
 
-            <div className="grid lg:grid-cols-3 gap-6">
+            <div className="grid lg:grid-cols-2 gap-6">
               {/* Free Tier */}
               <div
                 className={`bg-[#141414] border rounded-[1.5rem] p-5 flex flex-col justify-between shadow-xl relative overflow-hidden transition-all ${activePlan === "free" ? "border-yellow-400" : "border-white/5"}`}
@@ -2916,7 +2932,7 @@ function EditPage({
                     </div>
                     <div className="flex items-center gap-2 text-xs text-gray-500">
                       <span>✗</span>
-                      <span>Cinematic Portrait Video Loops</span>
+                      <span>Glassmorphic Card & Effects</span>
                     </div>
                   </div>
                 </div>
@@ -2932,7 +2948,7 @@ function EditPage({
                 </button>
               </div>
 
-              {/* Pro Tier */}
+              {/* Premium Tier */}
               <div
                 className={`bg-[#141414] border rounded-[1.5rem] p-5 flex flex-col justify-between shadow-xl relative overflow-hidden transition-all ${activePlan === "pro" ? "border-yellow-400" : "border-white/5"}`}
               >
@@ -2946,11 +2962,11 @@ function EditPage({
                     Popular
                   </span>
                   <h3 className="text-xl font-josefin font-bold text-white mt-1">
-                    Pro Plan
+                    Premium Plan
                   </h3>
                   <p className="text-gray-400 text-xs mt-2 leading-relaxed">
-                    Unlock awesome personalized music embeds and avatar glow
-                    frames.
+                    The ultimate creator experience with cinematic backgrounds,
+                    glassmorphism, and analytics.
                   </p>
 
                   <div className="flex items-baseline gap-1 mt-5 mb-5">
@@ -2963,23 +2979,23 @@ function EditPage({
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 text-xs text-gray-300">
                       <span className="text-emerald-400">✓</span>
-                      <span>Up to 5 custom social links</span>
+                      <span>Everything in Free Plan</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-emerald-400 font-bold">
+                      <span>✓</span>
+                      <span>Cinematic 4K Video Backgrounds & Blur</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-emerald-400 font-bold">
+                      <span>✓</span>
+                      <span>Glassmorphic Cards & Effects</span>
                     </div>
                     <div className="flex items-center gap-2 text-xs text-gray-300">
                       <span className="text-emerald-400">✓</span>
-                      <span>Conic Glow avatar borders & rings</span>
+                      <span>Full analytical reports & CTR metrics</span>
                     </div>
                     <div className="flex items-center gap-2 text-xs text-gray-300">
                       <span className="text-emerald-400">✓</span>
-                      <span>Custom Audio Music embed & player</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-300">
-                      <span className="text-emerald-400">✓</span>
-                      <span>Core analytical statistics reports</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                      <span>✗</span>
-                      <span>Cinematic Portrait Video Loops</span>
+                      <span>Conic Glow avatar borders</span>
                     </div>
                   </div>
                 </div>
@@ -2993,70 +3009,7 @@ function EditPage({
                 >
                   {activePlan === "pro"
                     ? "Active Plan"
-                    : "Upgrade to Pro ($1)"}
-                </button>
-              </div>
-
-              {/* Pro+ Tier */}
-              <div
-                className={`bg-[#141414] border rounded-[1.5rem] p-5 flex flex-col justify-between shadow-xl relative overflow-hidden transition-all ${activePlan === "pro+" ? "border-yellow-400" : "border-white/5"}`}
-              >
-                {activePlan === "pro+" && (
-                  <div className="absolute top-0 right-0 bg-yellow-400 text-black text-[9px] font-bold px-3 py-1 rounded-bl-xl uppercase tracking-widest font-sans">
-                    Active
-                  </div>
-                )}
-                <div>
-                  <span className="text-gray-500 font-mono text-[10px] uppercase tracking-wider font-semibold font-sans">
-                    Power User
-                  </span>
-                  <h3 className="text-xl font-josefin font-bold text-white mt-1">
-                    Pro+ Plan
-                  </h3>
-                  <p className="text-gray-400 text-xs mt-2 leading-relaxed">
-                    The ultimate creator experience with cinematic landscape and
-                    portrait loop settings.
-                  </p>
-
-                  <div className="flex items-baseline gap-1 mt-5 mb-5">
-                    <span className="text-2xl font-josefin font-bold text-white">
-                      $2
-                    </span>
-                    <span className="text-gray-500 text-xs">/ month</span>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2 text-xs text-gray-300">
-                      <span className="text-emerald-400">✓</span>
-                      <span>Everything in Pro Plan</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-emerald-400 font-bold">
-                      <span>✓</span>
-                      <span>Cinematic Portrait Video background loops</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-300">
-                      <span className="text-emerald-400">✓</span>
-                      <span>Priority dedicated support manager (24/7)</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-300">
-                      <span className="text-emerald-400">✓</span>
-                      <span>Full analytical reports & CTR metrics</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-300">
-                      <span className="text-emerald-400">✓</span>
-                      <span>SEO metadata custom configurations</span>
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => {
-                    setActivePlan("pro+");
-                  }}
-                  className={`w-full font-semibold text-xs py-2.5 rounded-full mt-6 transition-all active:scale-[0.98] cursor-pointer ${activePlan === "pro+" ? "bg-[#252525] text-white border border-white/5 cursor-default" : "bg-yellow-400 hover:bg-yellow-350 text-black"}`}
-                  disabled={activePlan === "pro+"}
-                >
-                  {activePlan === "pro+" ? "Active Plan" : "Upgrade to Pro+ ($2)"}
+                    : "Upgrade to Premium ($1)"}
                 </button>
               </div>
             </div>
@@ -3067,7 +3020,7 @@ function EditPage({
               </h3>
               <p className="text-gray-400 text-sm leading-relaxed mb-4">
                 When thousands of visitors browse your social pages, details
-                matter. Pro equips you with real tools – cinematic portrait
+                matter. Premium equips you with real tools – cinematic portrait
                 video background loops, premium glassmorphism layouts, full
                 analytics tracking, and customizable glowing profiles.
               </p>
@@ -3103,9 +3056,9 @@ function EditPage({
                   How many links can I add?
                 </h4>
                 <p className="text-gray-400 text-sm leading-relaxed">
-                  All users can add up to 5 links. Upgrade to Pro in the
+                  All users can add up to 5 links. Upgrade to Premium in the
                   Premium tab to enjoy HD cinematic video
-                  backgrounds, custom audio player track uploads, and
+                  backgrounds, visual audio player, and
                   interactive styling options!
                 </p>
               </div>
@@ -3191,7 +3144,7 @@ function EditPage({
                       onChange={(e) =>
                         onChange({
                           ...data,
-                          username: e.target.value.toLowerCase(),
+                          username: e.target.value.toLowerCase().replace(/[^a-z0-9._]/g, ''),
                         })
                       }
                       placeholder="yourname"
@@ -3235,6 +3188,182 @@ function EditPage({
                 </div>
               </div>
 
+              {/* Profile Music Settings */}
+              <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6 text-center space-y-4">
+                <label className="block text-[18px] font-josefin font-bold tracking-tight text-white mb-3 text-center">
+                  Profile music
+                </label>
+                <div className="relative flex items-center mb-3">
+                  <label className="w-full bg-[#1a1a1a] hover:bg-[#252525] border border-white/5 py-3.5 rounded-full flex items-center justify-center gap-2 text-[15px] font-semibold text-white transition-colors cursor-pointer">
+                    <Music size={20} />{" "}
+                    {data.audioUrl ? "Replace track" : "Upload track"}
+                    <input
+                      type="file"
+                      accept="audio/*"
+                      className="hidden"
+                      onChange={(e) => handleFileUpload(e, "audioUrl")}
+                    />
+                  </label>
+                  {data.audioUrl && (
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        onChange({ ...data, audioUrl: "", audioTitle: "" });
+                      }}
+                      className="absolute right-2 w-8 h-8 flex items-center justify-center rounded-full bg-black/20 text-[#ff4444] hover:bg-[#ff4444]/10 transition-colors"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  )}
+                </div>
+                {data.audioUrl && (
+                  <div className="w-full bg-transparent border border-white/10 rounded-full px-5 py-3.5 text-gray-300 text-[15px] flex items-center justify-between">
+                    <span className="truncate w-full text-center text-[#ddd] font-semibold">
+                      {data.audioTitle || "No track selected"}
+                    </span>
+                  </div>
+                )}
+                <p className="text-[14px] text-[#888] text-center leading-relaxed mt-4">
+                  MP3, WAV, or OGG · up to 8MB · plays on your public profile
+                  <br />
+                  <span className="text-[12px] opacity-80">Free: Auto-playing background music • Premium: Visual audio player</span>
+                </p>
+              </div>
+
+              {/* Video Background Settings */}
+              <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6 text-center space-y-4">
+                <label className="block text-[18px] font-josefin font-bold tracking-tight text-white mb-1">
+                  Portrait video background
+                </label>
+                <p className="text-[13px] text-gray-500 mb-4">
+                  Add a cinematic loops background video to your page.
+                  <br />
+                  <span className="text-[12px] opacity-80">Free: 720p (up to 10MB) • Premium: 4K (up to 50MB)</span>
+                </p>
+
+                <div className="flex items-center justify-between bg-[#1a1a1a] border border-white/5 rounded-xl p-4 mb-4">
+                  <span className="text-[15px] font-semibold text-[#a1a1aa]">
+                    Video background active
+                  </span>
+                  {/* Toggle Switch */}
+                  <div
+                    onClick={() =>
+                      onChange({
+                        ...data,
+                        videoBackgroundEnabled:
+                          !data.videoBackgroundEnabled,
+                      })
+                    }
+                    className={`w-12 h-6 rounded-full flex items-center p-0.5 cursor-pointer transition-colors ${data.videoBackgroundEnabled ? "bg-white" : "bg-[#333]"}`}
+                  >
+                    <div
+                      className={`w-5 h-5 bg-black rounded-full shadow-sm transition-transform ${data.videoBackgroundEnabled ? "translate-x-[24px]" : "translate-x-[0px]"}`}
+                    ></div>
+                  </div>
+                </div>
+
+                {data.videoBackgroundEnabled && (
+                  <div className="space-y-4">
+                    {/* Upload Custom Video or Paste URL */}
+                    <div className="text-left space-y-3">
+                      <span className="text-[12px] font-bold text-gray-500 font-josefin tracking-wider uppercase block">
+                        Custom Video Source
+                      </span>
+
+                      <div className="flex items-center gap-2">
+                        <DebouncedInput
+                          type="text"
+                          placeholder="Paste direct MP4 or WebM URL..."
+                          value={
+                            data.videoBackgroundUrl &&
+                            !data.videoBackgroundUrl.startsWith("data:") &&
+                            !data.videoBackgroundUrl.includes("supabase.co")
+                              ? data.videoBackgroundUrl
+                              : ""
+                          }
+                          onChange={(e) =>
+                            onChange({
+                              ...data,
+                              videoBackgroundUrl: e.target.value,
+                            })
+                          }
+                          className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl px-4 py-3.5 text-white placeholder-gray-650 text-[14px] font-semibold outline-none focus:border-white/10 text-center"
+                        />
+                      </div>
+
+                      <div className="relative">
+                        <label className="w-full bg-[#1a1a1a] hover:bg-[#252525] border border-white/5 py-3.5 rounded-full flex items-center justify-center gap-2 text-[14px] font-semibold text-white transition-colors cursor-pointer shadow-sm">
+                          <Video size={16} /> Upload custom MP4/WebM
+                          <input
+                            type="file"
+                            accept="video/mp4,video/webm"
+                            className="hidden"
+                            onChange={handleVideoUpload}
+                          />
+                        </label>
+                      </div>
+
+                      {data.videoBackgroundUrl && (
+                        <div className="bg-[#1a1a1a] border border-white/5 rounded-xl p-3 flex items-center justify-between">
+                          <div className="flex items-center gap-2 truncate text-gray-300 text-sm">
+                            <span className="text-[13px] bg-white/10 p-1 rounded-md">
+                              🎥
+                            </span>
+                            <span className="truncate text-xs font-mono text-gray-400">
+                              {data.videoBackgroundUrl.startsWith("data:")
+                                ? "Uploaded File (Optimistic Preview)"
+                                : data.videoBackgroundUrl.includes(
+                                      "supabase.co",
+                                    )
+                                  ? "Uploaded Portrait Video (Cloud Saved)"
+                                  : data.videoBackgroundUrl}
+                            </span>
+                          </div>
+                          <button
+                            onClick={() =>
+                              onChange({ ...data, videoBackgroundUrl: "" })
+                            }
+                            className="text-[#ff4444] hover:text-red-400 p-1.5 bg-[#ff4444]/10 rounded-lg transition-colors cursor-pointer flex items-center justify-center shrink-0"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                      )}
+
+                      <div className="pt-2 border-t border-white/5 relative">
+                        {activePlan === "free" && (
+                          <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none mt-8">
+                            <div className="bg-black/80 px-4 py-2 rounded-full flex items-center gap-2 shadow-xl border border-white/10 backdrop-blur-md pointer-events-auto cursor-pointer" onClick={() => setActiveTab("premium")}>
+                              <Lock size={14} className="text-yellow-400" />
+                              <span className="text-white text-[12px] font-semibold">Premium Feature</span>
+                            </div>
+                          </div>
+                        )}
+                        <div className={`transition-all duration-300 ${activePlan === "free" ? "blur-[2px] opacity-60 pointer-events-none select-none" : ""}`}>
+                          <label className="block text-[14px] font-josefin font-bold tracking-tight text-white mb-3 text-center">
+                            Video Blur
+                          </label>
+                          <div className="bg-white/5 border border-white/10 backdrop-blur-md rounded-xl p-4 shadow-lg">
+                            <div className="flex justify-between items-center mb-2">
+                              <span className="text-[13px] font-semibold text-white/85">Blur Radius</span>
+                              <span className="text-[12px] text-gray-400 font-mono">{Math.round(((data.videoBackgroundBlur ?? 5) / 50) * 100)}%</span>
+                            </div>
+                            <input
+                              type="range"
+                              min="0"
+                              max="50"
+                              value={data.videoBackgroundBlur ?? 5}
+                              onChange={(e) => onChange({ ...data, videoBackgroundBlur: Number(e.target.value) })}
+                              className="w-full accent-white cursor-pointer"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Premium Features Card */}
               <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6">
                 <div className="flex items-center gap-2 mb-8 text-white font-josefin font-bold text-lg">
@@ -3243,12 +3372,28 @@ function EditPage({
                     onClick={() => setActiveTab("premium")}
                     className="ml-auto bg-[#ffd700] text-black text-[10px] font-bold px-2.5 py-1.5 rounded-full uppercase tracking-[0.05em] hover:bg-[#ffeb55] transition-colors shadow-md cursor-pointer font-sans flex items-center gap-1 shrink-0"
                   >
-                    <Crown size={10} className="fill-black" /> Get Pro
+                    <Crown size={10} className="fill-black" /> Get Premium
                   </button>
                 </div>
 
-                <div className="space-y-8">
-                  <div className="text-center">
+                <div className="relative">
+                  {activePlan === "free" && (
+                    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center pointer-events-none">
+                      <div 
+                        className="bg-black/80 p-6 rounded-3xl flex flex-col items-center shadow-2xl border border-white/10 backdrop-blur-md pointer-events-auto cursor-pointer hover:bg-black/90 transition-colors"
+                        onClick={() => setActiveTab("premium")}
+                      >
+                        <Lock size={32} className="text-yellow-400 mb-3" />
+                        <h4 className="text-white font-josefin font-bold text-lg mb-1">Premium Features</h4>
+                        <p className="text-gray-400 text-[13px] mb-4 text-center max-w-[200px]">Unlock custom banners, glowing rings, and glassmorphism.</p>
+                        <span className="bg-yellow-400 text-black text-[11px] font-bold px-4 py-2 rounded-full uppercase tracking-wider">
+                          Upgrade Now
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                  <div className={`space-y-8 transition-all duration-500 ${activePlan === "free" ? "blur-[3px] opacity-60 pointer-events-none select-none" : ""}`}>
+                    <div className="text-center">
                     <label className="block text-[18px] font-josefin font-bold text-white mb-3 text-center tracking-tight">
                       Custom banner
                     </label>
@@ -3290,147 +3435,6 @@ function EditPage({
                     </p>
                   </div>
 
-                  <div className="text-center w-full">
-                    <label className="block text-[18px] font-josefin font-bold tracking-tight text-white mb-3 text-center">
-                      Profile music
-                    </label>
-                    <div className="relative flex items-center mb-3">
-                      <label className="w-full bg-[#1a1a1a] hover:bg-[#252525] border border-white/5 py-3.5 rounded-full flex items-center justify-center gap-2 text-[15px] font-semibold text-white transition-colors cursor-pointer">
-                        <Music size={20} />{" "}
-                        {data.audioUrl ? "Replace track" : "Upload track"}
-                        <input
-                          type="file"
-                          accept="audio/*"
-                          className="hidden"
-                          onChange={(e) => handleFileUpload(e, "audioUrl")}
-                        />
-                      </label>
-                      {data.audioUrl && (
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            onChange({ ...data, audioUrl: "", audioTitle: "" });
-                          }}
-                          className="absolute right-2 w-8 h-8 flex items-center justify-center rounded-full bg-black/20 text-[#ff4444] hover:bg-[#ff4444]/10 transition-colors"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      )}
-                    </div>
-                    {data.audioUrl && (
-                      <div className="w-full bg-transparent border border-white/10 rounded-full px-5 py-3.5 text-gray-300 text-[15px] flex items-center justify-between">
-                        <span className="truncate w-full text-center text-[#ddd] font-semibold">
-                          {data.audioTitle || "No track selected"}
-                        </span>
-                      </div>
-                    )}
-                    <p className="text-[14px] text-[#888] mt-4 text-center leading-relaxed">
-                      MP3, WAV, or OGG · up to 8MB · plays on your public
-                      profile
-                    </p>
-                  </div>
-
-                  <div className="text-center pt-6 border-t border-white/5">
-                    <label className="block text-[18px] font-josefin font-bold tracking-tight text-white mb-1">
-                      Portrait video background
-                    </label>
-                    <p className="text-[13px] text-gray-500 mb-4">
-                      Add a cinematic loops background video to your page
-                    </p>
-
-                    <div className="flex items-center justify-between bg-[#1a1a1a] border border-white/5 rounded-xl p-4 mb-4">
-                      <span className="text-[15px] font-semibold text-[#a1a1aa]">
-                        Video background active
-                      </span>
-                      {/* Toggle Switch */}
-                      <div
-                        onClick={() =>
-                          onChange({
-                            ...data,
-                            videoBackgroundEnabled:
-                              !data.videoBackgroundEnabled,
-                          })
-                        }
-                        className={`w-12 h-6 rounded-full flex items-center p-0.5 cursor-pointer transition-colors ${data.videoBackgroundEnabled ? "bg-white" : "bg-[#333]"}`}
-                      >
-                        <div
-                          className={`w-5 h-5 bg-black rounded-full shadow-sm transition-transform ${data.videoBackgroundEnabled ? "translate-x-[24px]" : "translate-x-[0px]"}`}
-                        ></div>
-                      </div>
-                    </div>
-
-                    {data.videoBackgroundEnabled && (
-                      <div className="space-y-4">
-                        {/* Upload Custom Video or Paste URL */}
-                        <div className="text-left space-y-3">
-                          <span className="text-[12px] font-bold text-gray-500 font-josefin tracking-wider uppercase block">
-                            Custom Video Source
-                          </span>
-
-                          <div className="flex items-center gap-2">
-                            <DebouncedInput
-                              type="text"
-                              placeholder="Paste direct MP4 or WebM URL..."
-                              value={
-                                data.videoBackgroundUrl &&
-                                !data.videoBackgroundUrl.startsWith("data:") &&
-                                !data.videoBackgroundUrl.includes("supabase.co")
-                                  ? data.videoBackgroundUrl
-                                  : ""
-                              }
-                              onChange={(e) =>
-                                onChange({
-                                  ...data,
-                                  videoBackgroundUrl: e.target.value,
-                                })
-                              }
-                              className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl px-4 py-3.5 text-white placeholder-gray-650 text-[14px] font-semibold outline-none focus:border-white/10 text-center"
-                            />
-                          </div>
-
-                          <div className="relative">
-                            <label className="w-full bg-[#1a1a1a] hover:bg-[#252525] border border-white/5 py-3.5 rounded-full flex items-center justify-center gap-2 text-[14px] font-semibold text-white transition-colors cursor-pointer shadow-sm">
-                              <Video size={16} /> Upload custom MP4/WebM
-                              <input
-                                type="file"
-                                accept="video/mp4,video/webm"
-                                className="hidden"
-                                onChange={handleVideoUpload}
-                              />
-                            </label>
-                          </div>
-
-                          {data.videoBackgroundUrl && (
-                            <div className="bg-[#1a1a1a] border border-white/5 rounded-xl p-3 flex items-center justify-between">
-                              <div className="flex items-center gap-2 truncate text-gray-300 text-sm">
-                                <span className="text-[13px] bg-white/10 p-1 rounded-md">
-                                  🎥
-                                </span>
-                                <span className="truncate text-xs font-mono text-gray-400">
-                                  {data.videoBackgroundUrl.startsWith("data:")
-                                    ? "Uploaded File (Optimistic Preview)"
-                                    : data.videoBackgroundUrl.includes(
-                                          "supabase.co",
-                                        )
-                                      ? "Uploaded Portrait Video (Cloud Saved)"
-                                      : data.videoBackgroundUrl}
-                                </span>
-                              </div>
-                              <button
-                                onClick={() =>
-                                  onChange({ ...data, videoBackgroundUrl: "" })
-                                }
-                                className="text-[#ff4444] hover:text-red-400 p-1.5 bg-[#ff4444]/10 rounded-lg transition-colors cursor-pointer flex items-center justify-center shrink-0"
-                              >
-                                <Trash2 size={13} />
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
                   <div className="text-center">
                     <div className="space-y-6">
                       <div>
@@ -3439,19 +3443,23 @@ function EditPage({
                         </label>
                         <div className="flex items-center justify-between bg-white/5 border border-white/10 backdrop-blur-md rounded-xl p-4 shadow-lg">
                           <span className="text-[15px] font-semibold text-white/85">
-                            {data.isGlowing
-                              ? "Glowing ring is ON"
-                              : "Glowing ring is OFF"}
+                            {activePlan === "pro"
+                              ? data.isGlowing
+                                ? "Glowing ring is ON"
+                                : "Glowing ring is OFF"
+                              : "Glowing ring (Requires Premium)"}
                           </span>
                           {/* Glassmorphic Toggle Switch */}
                           <div
-                            onClick={() =>
-                              onChange({ ...data, isGlowing: !data.isGlowing })
-                            }
-                            className={`w-12 h-6 rounded-full flex items-center p-0.5 cursor-pointer transition-all border ${data.isGlowing ? "bg-white/20 border-white/35" : "bg-white/5 border-white/10"}`}
+                            onClick={() => {
+                              if (activePlan === "pro") {
+                                onChange({ ...data, isGlowing: !data.isGlowing })
+                              }
+                            }}
+                            className={`w-12 h-6 rounded-full flex items-center p-0.5 cursor-pointer transition-all border ${activePlan === "pro" && data.isGlowing ? "bg-white/20 border-white/35" : "bg-white/5 border-white/10"}`}
                           >
                             <div
-                              className={`w-4 h-4 rounded-full shadow-md transition-transform duration-200 ${data.isGlowing ? "bg-white translate-x-[24px]" : "bg-white/40 translate-x-[2px]"}`}
+                              className={`w-4 h-4 rounded-full shadow-md transition-transform duration-200 ${activePlan === "pro" && data.isGlowing ? "bg-white translate-x-[24px]" : "bg-white/40 translate-x-[2px]"}`}
                             ></div>
                           </div>
                         </div>
@@ -3463,16 +3471,16 @@ function EditPage({
                         </label>
                         <div className="flex items-center justify-between bg-white/5 border border-white/10 backdrop-blur-md rounded-xl p-4 shadow-lg">
                           <span className="text-[15px] font-semibold text-white/85">
-                            {activePlan === "pro+"
+                            {activePlan === "pro"
                               ? data.isGlassmorphic
                                 ? "Glassmorphic design is ON"
                                 : "Glassmorphic design is OFF"
-                              : "Glassmorphic design (Requires Pro+)"}
+                              : "Glassmorphic design (Requires Premium)"}
                           </span>
                           {/* Glassmorphic Toggle Switch */}
                           <div
                             onClick={() => {
-                              if (activePlan === "pro+") {
+                              if (activePlan === "pro") {
                                 onChange({
                                   ...data,
                                   isGlassmorphic: !data.isGlassmorphic,
@@ -3480,7 +3488,7 @@ function EditPage({
                               }
                             }}
                             className={`w-12 h-6 rounded-full flex items-center p-0.5 transition-all border ${
-                              activePlan === "pro+"
+                              activePlan === "pro"
                                 ? data.isGlassmorphic
                                   ? "bg-white/20 border-white/35 cursor-pointer"
                                   : "bg-white/5 border-white/10 cursor-pointer"
@@ -3489,14 +3497,14 @@ function EditPage({
                           >
                             <div
                               className={`w-4 h-4 rounded-full shadow-md transition-transform duration-200 ${
-                                activePlan === "pro+" && data.isGlassmorphic
+                                activePlan === "pro" && data.isGlassmorphic
                                   ? "bg-white translate-x-[24px]"
                                   : "bg-white/40 translate-x-[2px]"
                               }`}
                             ></div>
                           </div>
                         </div>
-                        {activePlan === "pro+" && data.isGlassmorphic && (
+                        {activePlan === "pro" && data.isGlassmorphic && (
                           <>
                             <div className="pt-4">
                               <label className="block text-[18px] font-josefin font-bold tracking-tight text-white mb-3 text-center">
@@ -3542,6 +3550,7 @@ function EditPage({
                       </div>
                     </div>
                   </div>
+                </div>
                 </div>
               </div>
 
@@ -3639,6 +3648,7 @@ export type ProfileData = {
   audioTitle: string;
   videoBackgroundUrl?: string;
   videoBackgroundEnabled?: boolean;
+  videoBackgroundBlur?: number;
   links: Array<{ id: number; title: string; url: string }>;
   discordConnected?: boolean;
 };
@@ -3649,18 +3659,17 @@ export default function App() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
 
-  const [activePlan, setActivePlan] = useState<"free" | "pro" | "pro+">(
+  const [activePlan, setActivePlan] = useState<"free" | "pro">(
     () => {
       return (
         (localStorage.getItem("nads_active_plan") as
           | "free"
-          | "pro"
-          | "pro+") || "pro+"
+          | "pro") || "pro"
       );
     },
   );
 
-  const handleSetActivePlan = (plan: "free" | "pro" | "pro+") => {
+  const handleSetActivePlan = (plan: "free" | "pro") => {
     setActivePlan(plan);
     localStorage.setItem("nads_active_plan", plan);
   };
@@ -3683,7 +3692,7 @@ export default function App() {
           if (profile) {
             setProfileData(profile);
           } else if (name) {
-            const username = name.split("@")[0].replace(/[^a-zA-Z0-9_]/g, "");
+            const username = name.split("@")[0].replace(/[^a-zA-Z0-9._]/g, "");
             setProfileData((prev) =>
               prev.username === ""
                 ? {
@@ -3697,7 +3706,7 @@ export default function App() {
           }
         });
       } else if (!uid && name) {
-        const username = name.split("@")[0].replace(/[^a-zA-Z0-9_]/g, "");
+        const username = name.split("@")[0].replace(/[^a-zA-Z0-9._]/g, "");
         setProfileData((prev) =>
           prev.username === ""
             ? { ...prev, username: username, displayName: username, bio: "" }
@@ -3733,6 +3742,7 @@ export default function App() {
     audioTitle: "",
     videoBackgroundUrl: "",
     videoBackgroundEnabled: false,
+    videoBackgroundBlur: 5,
     links: [],
     discordConnected: false,
   });
