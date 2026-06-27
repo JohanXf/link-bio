@@ -2956,12 +2956,6 @@ function EditPage({
               <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6">
                 <div className="flex items-center gap-2 mb-8 text-white font-josefin font-bold text-lg">
                   <Crown size={20} /> Premium features
-                  <button
-                    onClick={() => setActiveTab("premium")}
-                    className="ml-auto bg-[#ffd700] text-black text-[10px] font-bold px-2.5 py-1.5 rounded-full uppercase tracking-[0.05em] hover:bg-[#ffeb55] transition-colors shadow-md cursor-pointer font-sans flex items-center gap-1 shrink-0"
-                  >
-                    <Crown size={10} className="fill-black" /> Get Premium
-                  </button>
                 </div>
 
                 <div className="relative">
@@ -3249,18 +3243,26 @@ export default function App() {
 
   const [activePlan, setActivePlan] = useState<"free" | "pro">(
     () => {
-      return (
-        (localStorage.getItem("nads_active_plan") as
-          | "free"
-          | "pro") || "pro"
-      );
+      try {
+        return (
+          (localStorage.getItem("nads_active_plan") as
+            | "free"
+            | "pro") || "pro"
+        );
+      } catch (e) {
+        return "pro";
+      }
     },
   );
 
   const handleSetActivePlan = (plan: "free" | "pro") => {
     setActivePlan(plan);
     setProfileData((prev) => ({ ...prev, activePlan: plan }));
-    localStorage.setItem("nads_active_plan", plan);
+    try {
+      localStorage.setItem("nads_active_plan", plan);
+    } catch (e) {
+      console.warn("localStorage not available");
+    }
   };
 
   useEffect(() => {
