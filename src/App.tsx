@@ -2732,10 +2732,10 @@ function EditPage({
                           onChange({ ...data, isGlowing: !data.isGlowing });
                         }
                       }}
-                      className={`w-10 h-5 rounded-full flex items-center p-0.5 transition-all border ${data.isGlowing ? "bg-white/20 border-white/35 cursor-pointer" : "bg-white/5 border-white/10 cursor-pointer"}`}
+                      className={`w-12 h-6 rounded-full flex items-center p-0.5 transition-colors ${activePlan === "pro" ? "cursor-pointer" : "cursor-not-allowed opacity-50"} ${data.isGlowing ? "bg-white" : "bg-[#333]"}`}
                     >
                       <div
-                        className={`w-3.5 h-3.5 rounded-full shadow-md transition-transform duration-200 ${data.isGlowing ? "bg-white translate-x-[20px]" : "bg-white/40 translate-x-[2px]"}`}
+                        className={`w-5 h-5 rounded-full shadow-sm transition-transform duration-200 ${data.isGlowing ? "bg-black translate-x-[24px]" : "bg-white/70 translate-x-[0px]"}`}
                       ></div>
                     </div>
                   </div>
@@ -2814,8 +2814,8 @@ function EditPage({
               {/* Typography & Colors */}
               <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6 space-y-5 text-center">
                 <div>
-                  <label className="block text-[15px] font-josefin font-bold tracking-tight text-white mb-2 flex items-center justify-center gap-2">
-                    Display Name Font <span className="text-yellow-400 bg-yellow-400/10 px-2 py-0.5 rounded-full text-[10px] uppercase tracking-wider font-sans">Premium</span>
+                  <label className="block text-[18px] font-josefin font-bold tracking-tight text-white mb-3 text-center">
+                    Display Name Font
                   </label>
                   <div className="flex flex-wrap gap-2">
                     {["font-sans", "font-serif", "font-mono", "font-josefin", "font-playfair", "font-outfit"].map((font) => (
@@ -2846,8 +2846,8 @@ function EditPage({
                 </div>
                 
                 <div>
-                  <label className="block text-[15px] font-josefin font-bold tracking-tight text-white mb-2 flex items-center justify-center gap-2">
-                    Display Name Color <span className="text-yellow-400 bg-yellow-400/10 px-2 py-0.5 rounded-full text-[10px] uppercase tracking-wider font-sans">Premium</span>
+                  <label className="block text-[18px] font-josefin font-bold tracking-tight text-white mb-3 text-center">
+                    Display Name Color
                   </label>
                   <div className="flex gap-2 mt-2 flex-wrap justify-center">
                     {["#ffffff", "#fca5a5", "#fdba74", "#fcd34d", "#86efac", "#67e8f9", "#93c5fd", "#c4b5fd", "#f9a8d4", "#fda4af"].map((color) => (
@@ -2947,7 +2947,7 @@ function EditPage({
                     className={`w-12 h-6 rounded-full flex items-center p-0.5 cursor-pointer transition-colors ${data.videoBackgroundEnabled ? "bg-white" : "bg-[#333]"}`}
                   >
                     <div
-                      className={`w-5 h-5 bg-black rounded-full shadow-sm transition-transform ${data.videoBackgroundEnabled ? "translate-x-[24px]" : "translate-x-[0px]"}`}
+                      className={`w-5 h-5 rounded-full shadow-sm transition-transform duration-200 ${data.videoBackgroundEnabled ? "bg-black translate-x-[24px]" : "bg-white/70 translate-x-[0px]"}`}
                     ></div>
                   </div>
                 </div>
@@ -3021,7 +3021,7 @@ function EditPage({
                       )}
 
                       <div className="pt-2 border-t border-white/5 relative mt-4">
-                        <label className="block text-[14px] font-josefin font-bold tracking-tight text-white mb-3 text-center">
+                        <label className="block text-[18px] font-josefin font-bold tracking-tight text-white mb-3 text-center">
                           Video Blur
                         </label>
                         <div className="bg-white/5 border border-white/10 backdrop-blur-md rounded-xl p-4 shadow-lg relative overflow-hidden">
@@ -3117,11 +3117,9 @@ function EditPage({
                             </div>
                           )}
                           <span className="text-[15px] font-semibold text-white/85">
-                            {activePlan === "pro"
-                              ? data.isGlassmorphic
-                                ? "Glassmorphic design is ON"
-                                : "Glassmorphic design is OFF"
-                              : "Glassmorphic design (Requires Premium)"}
+                            {data.isGlassmorphic
+                              ? "Glassmorphic design is ON"
+                              : "Glassmorphic design is OFF"}
                           </span>
                           {/* Glassmorphic Toggle Switch */}
                           <div
@@ -3133,19 +3131,13 @@ function EditPage({
                                 });
                               }
                             }}
-                            className={`w-12 h-6 rounded-full flex items-center p-0.5 transition-all border ${
-                              activePlan === "pro"
-                                ? data.isGlassmorphic
-                                  ? "bg-white/20 border-white/35 cursor-pointer"
-                                  : "bg-white/5 border-white/10 cursor-pointer"
-                                : "bg-white/5 border-white/10 opacity-40 cursor-not-allowed"
-                            }`}
+                            className={`w-12 h-6 rounded-full flex items-center p-0.5 transition-colors ${activePlan === "pro" ? "cursor-pointer" : "cursor-not-allowed opacity-50"} ${data.isGlassmorphic ? "bg-white" : "bg-[#333]"}`}
                           >
                             <div
-                              className={`w-4 h-4 rounded-full shadow-md transition-transform duration-200 ${
-                                activePlan === "pro" && data.isGlassmorphic
-                                  ? "bg-white translate-x-[24px]"
-                                  : "bg-white/40 translate-x-[2px]"
+                              className={`w-5 h-5 rounded-full shadow-sm transition-transform duration-200 ${
+                                data.isGlassmorphic
+                                  ? "bg-black translate-x-[24px]"
+                                  : "bg-white/70 translate-x-[0px]"
                               }`}
                             ></div>
                           </div>
