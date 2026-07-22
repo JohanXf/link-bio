@@ -808,32 +808,34 @@ function UserPage({
 
         <div className="relative z-10 flex flex-col items-center flex-1 mt-0 px-4 w-full">
           {/* Avatar: positioned 50% in banner and 50% in the content container */}
-          <div className="relative mb-3 -mt-[48px] select-none">
-            {/* Avatar Decoration */}
-            {isGlowingEnabled && (
-              <img
-                src={data.discordDecorationUrl || "https://cdn.discordapp.com/avatar-decoration-presets/a_124119d6910a3013d3cc4ec85c15beaa.png?size=96&passthrough=false"}
-                alt="Avatar Decoration"
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[115px] h-[115px] z-20 pointer-events-none scale-110"
-              />
-            )}
+          {data.showAvatar !== false && (
+            <div className="relative mb-3 -mt-[60px] select-none">
+              {/* Avatar Decoration */}
+              {isGlowingEnabled && (
+                <img
+                  src={data.discordDecorationUrl || "https://cdn.discordapp.com/avatar-decoration-presets/a_124119d6910a3013d3cc4ec85c15beaa.png?size=256&passthrough=true"}
+                  alt="Avatar Decoration"
+                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[144px] h-[144px] z-20 pointer-events-none"
+                />
+              )}
 
-            {/* Avatar Wrapper */}
-            <div className="rounded-full relative z-10 p-0">
-              <div className="w-[96px] h-[96px] rounded-full bg-[#1b1b1f] flex items-center justify-center overflow-hidden">
-                {data.avatarUrl ? (
-                  <img
-                    src={data.avatarUrl}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-[#27272a] flex items-center justify-center">
-                    <User size={38} className="text-gray-400" />
-                  </div>
-                )}
+              {/* Avatar Wrapper */}
+              <div className="rounded-full relative z-10 p-0">
+                <div className="w-[120px] h-[120px] rounded-full bg-[#1b1b1f] flex items-center justify-center overflow-hidden">
+                  {data.avatarUrl ? (
+                    <img
+                      src={data.avatarUrl}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-[#27272a] flex items-center justify-center">
+                      <User size={48} className="text-gray-400" />
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           <h1 className={`text-2xl ${data.displayNameFont || "font-josefin"} font-bold text-white tracking-tight leading-tight`} style={{ color: data.displayNameColor || "#ffffff" }}>
             {data.displayName || "No Name"}
@@ -3368,7 +3370,7 @@ export default function App() {
                 });
                 const dUser = await res.json();
                 if (dUser?.avatar_decoration_data?.asset) {
-                  fetchedDecorationUrl = `https://cdn.discordapp.com/avatar-decoration-presets/${dUser.avatar_decoration_data.asset}.png?size=96&passthrough=false`;
+                  fetchedDecorationUrl = `https://cdn.discordapp.com/avatar-decoration-presets/${dUser.avatar_decoration_data.asset}.png?size=256&passthrough=true`;
                 }
               } catch (e) {
                 console.error("Failed to fetch discord decoration", e);
