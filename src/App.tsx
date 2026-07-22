@@ -334,14 +334,14 @@ function Navbar({
 }) {
   return (
     <div className="fixed top-0 left-0 right-0 z-50 pt-4 px-4 pointer-events-none">
-      <nav className="mx-auto max-w-5xl bg-[#f0f0f0]/90 backdrop-blur-md border border-[#e5e5e5] rounded-full shadow-sm pointer-events-auto">
+      <nav className="mx-auto max-w-5xl bg-texture/90 backdrop-blur-md border border-[#e5e5e5] rounded-full shadow-sm pointer-events-auto">
         <div className="px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center text-white font-josefin font-bold text-[15px]">
               N
             </div>
             <span className="font-josefin font-bold text-[15px] tracking-tight text-black">
-              Nads.io
+              Prophile
             </span>
           </div>
           <div className="flex items-center gap-4">
@@ -411,7 +411,7 @@ function Hero({
           className="text-5xl md:text-6xl lg:text-7xl font-josefin font-bold tracking-tight text-black leading-[1.05]"
         >
           Your bio, <br className="hidden md:block" />
-          <span className="text-black bg-clip-text">one Nads.io link.</span>
+          <span className="text-black bg-clip-text">one Prophile link.</span>
         </motion.h1>
         <motion.p
           initial={{ opacity: 0, y: 20 }}
@@ -430,7 +430,7 @@ function Hero({
         >
           <div className="flex items-center w-full max-w-md bg-[#141414] rounded-full p-2 border-2 border-white/10 shadow-sm focus-within:ring-4 focus-within:ring-indigo-500/20 focus-within:border-indigo-500/50 transition-all hover:border-white/20">
             <span className="text-gray-550 pl-4 pr-1 font-semibold text-lg hidden sm:block">
-              nads.io/
+              prophile.app/
             </span>
             <input
               type="text"
@@ -491,7 +491,7 @@ function Features() {
   ];
 
   return (
-    <section className="py-24 bg-[#f0f0f0] px-6 relative overflow-hidden">
+    <section className="py-24 bg-texture px-6 relative overflow-hidden">
       <div className="absolute top-0 right-0 w-[800px] h-[400px] bg-gradient-to-bl from-indigo-500/10 to-transparent rounded-bl-[100px] -z-10" />
       <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-gradient-to-tr from-purple-500/10 to-transparent rounded-tr-[100px] -z-10" />
 
@@ -549,11 +549,11 @@ function Footer() {
             N
           </div>
           <span className="font-josefin font-bold text-[15px] tracking-tight text-black">
-            Nads.io
+            Prophile
           </span>
         </div>
         <p className="text-gray-500 font-medium">
-          © {new Date().getFullYear()} Nads.io. All rights reserved.
+          © {new Date().getFullYear()} Prophile. All rights reserved.
         </p>
         <div className="flex gap-5 text-gray-400">
           <Twitter
@@ -847,7 +847,7 @@ function UserPage({
             </div>
           </div>
 
-          <h1 className="text-2xl font-josefin font-bold text-white tracking-tight leading-tight">
+          <h1 className={`text-2xl ${data.displayNameFont || "font-josefin"} font-bold text-white tracking-tight leading-tight`} style={{ color: data.displayNameColor || "#ffffff" }}>
             {data.displayName || "No Name"}
           </h1>
           <p className="text-white/95 text-[14px] font-semibold mt-1.5 mb-4 text-center leading-normal max-w-[280px]">
@@ -868,8 +868,8 @@ function UserPage({
                       title={link.title || "Link"}
                       className={`flex items-center justify-center transition-all hover:scale-[1.05] active:scale-[0.95] w-[64px] h-[64px] shrink-0 rounded-2xl border-none ${
                         isGlassmorphicEnabled
-                          ? "bg-[#f0f0f0] hover:bg-[#e4e4e4] text-black backdrop-blur-md shadow-lg shadow-black/15"
-                          : "bg-[#f0f0f0] hover:bg-[#e4e4e4] text-black shadow-md"
+                          ? "bg-texture hover:bg-[#e4e4e4] text-black backdrop-blur-md shadow-lg shadow-black/15"
+                          : "bg-texture hover:bg-[#e4e4e4] text-black shadow-md"
                       }`}
                     >
                       <div className="flex items-center justify-center w-full h-full text-black">
@@ -888,8 +888,8 @@ function UserPage({
                   rel="noopener noreferrer"
                   className={`w-full py-3 px-4 h-[52px] rounded-2xl font-bold transition-all text-[15px] flex items-center justify-between hover:scale-[1.01] active:scale-[0.99] mt-0.5 border-none ${
                     isGlassmorphicEnabled
-                      ? "bg-[#f0f0f0] hover:bg-[#e4e4e4] text-black backdrop-blur-md shadow-lg shadow-black/15"
-                      : "bg-[#f0f0f0] hover:bg-[#e4e4e4] text-black shadow-md"
+                      ? "bg-texture hover:bg-[#e4e4e4] text-black backdrop-blur-md shadow-lg shadow-black/15"
+                      : "bg-texture hover:bg-[#e4e4e4] text-black shadow-md"
                   }`}
                 >
                   <div className="shrink-0 flex items-center justify-center w-6 h-6 text-black">
@@ -985,7 +985,7 @@ function EditPage({
         await api.saveProfile(userId, data);
       } else {
         // Fallback for demo users
-        await new Promise((r) => setTimeout(r, 800));
+        await new Promise((r) => setTimeout(r, 100));
       }
       setIsSaving(false);
       onBack();
@@ -993,6 +993,46 @@ function EditPage({
       console.error("Failed to save", e);
       alert("Failed to save profile. Please check console for details.");
       setIsSaving(false);
+    }
+  };
+
+  const handleDiscordFetch = async () => {
+    const discordId = prompt("Enter your Discord ID to fetch your profile:");
+    if (!discordId) return;
+
+    try {
+      const res = await fetch(`https://dcdn.dstn.to/profile/${discordId}`);
+      if (!res.ok) throw new Error("Failed to fetch Discord profile.");
+      
+      const resData = await res.json();
+      const user = resData.user;
+      
+      if (user) {
+        let avatarUrl = "";
+        if (user.avatar) {
+          const isAnimated = user.avatar.startsWith("a_");
+          avatarUrl = `https://cdn.discordapp.com/avatars/${discordId}/${user.avatar}.${isAnimated ? 'gif' : 'png'}?size=512`;
+        }
+
+        let bannerUrl = "";
+        if (user.banner) {
+          const isAnimatedBanner = user.banner.startsWith("a_");
+          bannerUrl = `https://cdn.discordapp.com/banners/${discordId}/${user.banner}.${isAnimatedBanner ? 'gif' : 'png'}?size=1024`;
+        }
+
+        onChange((currentData) => ({
+          ...currentData,
+          displayName: user.global_name || user.username || currentData.displayName,
+          avatarUrl: avatarUrl || currentData.avatarUrl,
+          bannerUrl: bannerUrl || currentData.bannerUrl,
+          bio: user.bio || currentData.bio
+        }));
+      } else {
+         alert("User not found.");
+      }
+    } catch (e: any) {
+      console.error(e);
+      alert("Failed to fetch Discord profile: " + e.message);
     }
   };
 
@@ -1047,7 +1087,7 @@ function EditPage({
           }, 500);
         } catch (err: any) {
           console.error(`Failed to upload ${field}`, err);
-          if (err.message === "Failed to fetch") {
+          if (err.message?.includes("fetch")) {
             console.log(`Fallback to base64 for ${field} due to network error`);
           } else {
             alert(
@@ -1096,7 +1136,7 @@ function EditPage({
           }, 500);
         } catch (err: any) {
           console.error(`Failed to upload background video`, err);
-          if (err.message === "Failed to fetch") {
+          if (err.message?.includes("fetch")) {
             console.log(`Fallback to base64 for video due to network error`);
           } else {
             alert(
@@ -1130,7 +1170,7 @@ function EditPage({
   };
 
   return (
-    <div className="min-h-screen bg-[#f0f0f0] text-black flex flex-col font-sans pb-12 overflow-hidden">
+    <div className="min-h-screen bg-texture text-black flex flex-col font-sans pb-12 overflow-hidden">
       {/* Sidebar */}
       <AnimatePresence>
         {isSidebarOpen && (
@@ -1147,7 +1187,7 @@ function EditPage({
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-              className="fixed top-0 left-0 bottom-0 w-[85%] max-w-[320px] bg-[#1a1a1a] z-[70] shadow-2xl flex flex-col"
+              className="fixed top-0 left-0 bottom-0 w-[85%] max-w-[320px] bg-[#1a1a1a] z-[70] shadow-2xl flex flex-col rounded-r-[24px]"
             >
               <div className="flex items-center justify-between p-5 border-b border-white/5">
                 <div className="flex items-center gap-2 text-white">
@@ -1156,7 +1196,7 @@ function EditPage({
                     onClick={onHome}
                     className="font-josefin font-bold text-lg hover:text-indigo-400 transition-colors cursor-pointer text-white"
                   >
-                    Nads.io
+                    Prophile
                   </span>
                 </div>
                 <button
@@ -1312,14 +1352,14 @@ function EditPage({
 
       {/* Top Navbar */}
       <div className="pt-4 px-4 md:px-8">
-        <header className="sticky top-4 z-50 bg-[#f0f0f0]/90 backdrop-blur-md p-3 md:px-6 flex items-center justify-between border border-[#e5e5e5] rounded-full shadow-sm max-w-5xl mx-auto">
+        <header className="sticky top-4 z-50 bg-texture/90 backdrop-blur-md p-3 md:px-6 flex items-center justify-between border border-[#e5e5e5] rounded-[24px] shadow-sm max-w-5xl mx-auto">
           <button
             onClick={() => setIsSidebarOpen(true)}
-            className="bg-[#18181b] hover:bg-[#27272a] h-9 px-4 rounded-full flex items-center gap-2 transition-colors text-white shadow-md cursor-pointer"
+            className="bg-[#18181b] hover:bg-[#27272a] h-9 px-4 rounded-xl flex items-center gap-2 transition-colors text-white shadow-md cursor-pointer"
           >
             <Menu size={16} className="text-white" strokeWidth={2.5} />
             <span className="font-josefin font-bold text-[15px] tracking-tight text-white mb-[1px]">
-              Nads.io
+              Prophile
             </span>
           </button>
 
@@ -1345,7 +1385,7 @@ function EditPage({
           <div className="space-y-6 pb-12">
             <div className="mb-8">
               <h1 className="text-[28px] font-josefin font-bold tracking-tight">
-                Welcome to Nads!
+                Welcome to Prophile!
               </h1>
               <p className="text-gray-400 mt-2 text-sm leading-relaxed">
                 Your ultimate link-in-bio and personal landing page builder.
@@ -1423,7 +1463,7 @@ function EditPage({
                     </h4>
                     <p className="text-gray-400 text-[13px] mt-1">
                       See how your page performs compared to other top creators
-                      on Nads.
+                      on Prophile.
                     </p>
                   </div>
                 </div>
@@ -2447,6 +2487,12 @@ function EditPage({
                 </div>
                 {!userEmail && (
                   <button 
+                    onClick={() => {
+                      if (typeof window !== "undefined") {
+                        const event = new CustomEvent("open-auth");
+                        window.dispatchEvent(event);
+                      }
+                    }}
                     className="px-4 py-2 rounded-full text-sm font-semibold transition-colors bg-white text-black hover:bg-gray-200 cursor-pointer"
                   >
                     Add Email
@@ -2454,7 +2500,20 @@ function EditPage({
                 )}
               </div>
               <div className="pt-4 border-t border-white/5">
-                <button className="text-red-500 font-medium text-sm hover:text-red-400 transition-colors cursor-pointer">
+                <button 
+                  onClick={async () => {
+                    if (confirm("Are you sure you want to delete your account? This action is irreversible.")) {
+                      // In a real production app, this would call an API or Supabase Edge Function 
+                      // to delete the user object. For now we will delete their profile row.
+                      if (userId) {
+                        await supabase.from('profiles').delete().eq('id', userId);
+                      }
+                      await supabase.auth.signOut();
+                      window.location.reload();
+                    }
+                  }}
+                  className="text-red-500 font-medium text-sm hover:text-red-400 transition-colors cursor-pointer"
+                >
                   Delete Account
                 </button>
               </div>
@@ -2655,7 +2714,7 @@ function EditPage({
                   How can I contact support?
                 </h4>
                 <p className="text-gray-400 text-sm leading-relaxed">
-                  Email us at support@nads.io.
+                  Email us at support@prophile.app.
                 </p>
               </div>
             </div>
@@ -2675,7 +2734,7 @@ function EditPage({
                 }}
                 className="inline-flex items-center gap-1.5 text-gray-500 hover:text-gray-900 mt-2 text-sm transition-colors cursor-pointer"
               >
-                Live at nads.io/{data.username.toLowerCase()}{" "}
+                Live at prophile.app/{data.username.toLowerCase()}{" "}
                 <ExternalLink size={14} />
               </a>
             </div>
@@ -2706,13 +2765,22 @@ function EditPage({
                     </label>
                   </div>
                   <div>
-                    <h3 className="text-[20px] font-josefin font-bold text-white tracking-tight">
+                    <h3 className={`text-[20px] ${data.displayNameFont || "font-josefin"} font-bold text-white tracking-tight`} style={{ color: data.displayNameColor || "#ffffff" }}>
                       {data.displayName || "No Name"}
                     </h3>
                     <p className="text-[#a1a1aa] text-[15px] mt-0.5">
                       @{data.username.toLowerCase()}
                     </p>
                   </div>
+                  <button 
+                    onClick={handleDiscordFetch}
+                    className="flex items-center gap-2 mt-2 px-4 py-2 bg-[#5865F2] hover:bg-[#4752C4] text-white rounded-lg text-sm font-semibold transition-colors w-full justify-center"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 127.14 96.36" fill="currentColor">
+                      <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.31,60,73.31,53s5-12.74,11.43-12.74S96.18,46,96.06,53,91,65.69,84.69,65.69Z"/>
+                    </svg>
+                    Fetch from Discord
+                  </button>
                 </div>
               </div>
 
@@ -2724,7 +2792,7 @@ function EditPage({
                   </label>
                   <div className="flex items-center bg-[#1a1a1a] rounded-xl border border-white/5 overflow-hidden focus-within:border-white/20 transition-colors">
                     <div className="px-4 py-3.5 text-white border-r border-[#222] bg-[#171717] font-semibold text-[15px]">
-                      nads.io/
+                      prophile.app/
                     </div>
                     <DebouncedInput
                       type="text"
@@ -2773,6 +2841,62 @@ function EditPage({
                   <p className="text-[12px] text-[#555] mt-1.5 text-center font-mono">
                     {data.bio.length}/160
                   </p>
+                </div>
+              </div>
+
+              {/* Typography & Colors */}
+              <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6 space-y-5 text-center">
+                <div>
+                  <label className="block text-[15px] font-josefin font-bold tracking-tight text-white mb-2 flex items-center justify-center gap-2">
+                    Display Name Font
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {["font-sans", "font-serif", "font-mono", "font-josefin", "font-playfair", "font-outfit"].map((font) => (
+                      <button
+                        key={font}
+                        onClick={() => onChange({ ...data, displayNameFont: font })}
+                        className={`flex-1 min-w-[70px] py-2 rounded-lg border ${
+                          (data.displayNameFont || "font-josefin") === font
+                            ? "bg-white text-black border-white"
+                            : "bg-[#1a1a1a] text-white border-white/5 hover:border-white/20"
+                        } text-sm ${font} transition-colors capitalize`}
+                      >
+                        {font.replace("font-", "")}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-[15px] font-josefin font-bold tracking-tight text-white mb-2 flex items-center justify-center gap-2">
+                    Display Name Color <span className="text-yellow-400 bg-yellow-400/10 px-2 py-0.5 rounded-full text-[10px] uppercase tracking-wider font-sans">Premium</span>
+                  </label>
+                  <div className="flex gap-2 mt-2 flex-wrap justify-center">
+                    {["#ffffff", "#fca5a5", "#fdba74", "#fcd34d", "#86efac", "#67e8f9", "#93c5fd", "#c4b5fd", "#f9a8d4", "#fda4af"].map((color) => (
+                      <button
+                        key={color}
+                        onClick={() => {
+                          if (activePlan === 'pro' || color === '#ffffff') {
+                            onChange({ ...data, displayNameColor: color });
+                          } else {
+                            alert("Custom colors are a Premium feature!");
+                          }
+                        }}
+                        className={`w-8 h-8 rounded-full border-2 ${
+                          (data.displayNameColor || "#ffffff") === color
+                            ? "border-white scale-110"
+                            : "border-transparent hover:scale-105"
+                        } transition-all relative overflow-hidden shadow-sm`}
+                        style={{ backgroundColor: color }}
+                      >
+                        {activePlan !== 'pro' && color !== '#ffffff' && (
+                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                            <Lock size={12} className="text-white/80" />
+                          </div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
@@ -3219,6 +3343,8 @@ function EditPage({
 export type ProfileData = {
   username: string;
   displayName: string;
+  displayNameFont?: string;
+  displayNameColor?: string;
   bio: string;
   isGlowing: boolean;
   isGlassmorphic: boolean;
@@ -3245,7 +3371,7 @@ export default function App() {
     () => {
       try {
         return (
-          (localStorage.getItem("nads_active_plan") as
+          (localStorage.getItem("prophile_active_plan") as
             | "free"
             | "pro") || "pro"
         );
@@ -3259,7 +3385,7 @@ export default function App() {
     setActivePlan(plan);
     setProfileData((prev) => ({ ...prev, activePlan: plan }));
     try {
-      localStorage.setItem("nads_active_plan", plan);
+      localStorage.setItem("prophile_active_plan", plan);
     } catch (e) {
       console.warn("localStorage not available");
     }
@@ -3279,22 +3405,26 @@ export default function App() {
 
       if (uid) {
         import("./lib/api").then(async (api) => {
-          const profile = await api.fetchProfile(uid);
-          if (profile) {
-            setProfileData(profile);
-            if (profile.activePlan) setActivePlan(profile.activePlan);
-          } else if (name) {
-            const username = name.split("@")[0].replace(/[^a-zA-Z0-9._]/g, "");
-            setProfileData((prev) =>
-              prev.username === ""
-                ? {
-                    ...prev,
-                    username: username,
-                    displayName: username,
-                    bio: "",
-                  }
-                : prev,
-            );
+          try {
+            const profile = await api.fetchProfile(uid);
+            if (profile) {
+              setProfileData(profile);
+              if (profile.activePlan) setActivePlan(profile.activePlan);
+            } else if (name) {
+              const username = name.split("@")[0].replace(/[^a-zA-Z0-9._]/g, "");
+              setProfileData((prev) =>
+                prev.username === ""
+                  ? {
+                      ...prev,
+                      username: username,
+                      displayName: username,
+                      bio: "",
+                    }
+                  : prev,
+              );
+            }
+          } catch (e: any) {
+            console.error("fetchProfile failed:", e.message);
           }
         });
       } else if (!uid && name) {
@@ -3317,12 +3447,20 @@ export default function App() {
       handleSession(session);
     });
 
-    return () => subscription.unsubscribe();
+    const handleOpenAuth = () => setIsAuthOpen(true);
+    window.addEventListener("open-auth", handleOpenAuth);
+
+    return () => {
+      subscription.unsubscribe();
+      window.removeEventListener("open-auth", handleOpenAuth);
+    };
   }, []);
 
   const [profileData, setProfileData] = useState<ProfileData>({
     username: "",
     displayName: "",
+    displayNameFont: "font-josefin",
+    displayNameColor: "#ffffff",
     bio: "",
     isGlowing: true,
     isGlassmorphic: true,
@@ -3350,7 +3488,7 @@ export default function App() {
         }}
       />
       {view === "home" && (
-        <div className="min-h-screen bg-[#f0f0f0] text-black relative overflow-x-hidden selection:bg-indigo-500/30 selection:text-indigo-900">
+        <div className="min-h-screen bg-texture text-black relative overflow-x-hidden selection:bg-indigo-500/30 selection:text-indigo-900">
           <Navbar
             onLoginClick={() => setIsAuthOpen(true)}
             userEmail={userEmail}

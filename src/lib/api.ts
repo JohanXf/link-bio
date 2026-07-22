@@ -3,36 +3,41 @@ import { ProfileData } from '../App';
 
 function decodeBio(packedBio: string) {
   const norm = packedBio || '';
-  const glassMatch = norm.match(/(.*?)\s*\|\|video:([^|]*)\|\|enabled:([^|]*)\|\|glassmorphic:([^|]*)$/);
-  if (glassMatch) {
-    return {
-      bio: glassMatch[1].trim(),
-      videoBackgroundUrl: glassMatch[2],
-      videoBackgroundEnabled: glassMatch[3] === 'true',
-      isGlassmorphic: glassMatch[4] === 'true'
-    };
+  const firstSep = norm.indexOf('||video:');
+  
+  let bio = norm.trim();
+  let videoBackgroundUrl = '';
+  let videoBackgroundEnabled = false;
+  let isGlassmorphic = true;
+  let displayNameFont = 'font-josefin';
+  let displayNameColor = '#ffffff';
+  
+  if (firstSep !== -1) {
+    bio = norm.slice(0, firstSep).trim();
+    const rest = norm.slice(firstSep + 2); // 'video:...'
+    const parts = rest.split('||');
+    for (const part of parts) {
+      if (part.startsWith('video:')) videoBackgroundUrl = part.slice(6);
+      if (part.startsWith('enabled:')) videoBackgroundEnabled = part.slice(8) === 'true';
+      if (part.startsWith('glassmorphic:')) isGlassmorphic = part.slice(13) === 'true';
+      if (part.startsWith('font:')) displayNameFont = part.slice(5);
+      if (part.startsWith('color:')) displayNameColor = part.slice(6);
+    }
   }
 
-  const match = norm.match(/(.*?)\s*\|\|video:([^|]*)\|\|enabled:([^|]*)$/);
-  if (match) {
-    return {
-      bio: match[1].trim(),
-      videoBackgroundUrl: match[2],
-      videoBackgroundEnabled: match[3] === 'true',
-      isGlassmorphic: true
-    };
-  }
   return {
-    bio: norm,
-    videoBackgroundUrl: '',
-    videoBackgroundEnabled: false,
-    isGlassmorphic: true
+    bio,
+    videoBackgroundUrl,
+    videoBackgroundEnabled,
+    isGlassmorphic,
+    displayNameFont,
+    displayNameColor
   };
 }
 
-function encodeBio(rawBio: string, videoUrl: string, videoEnabled: boolean, isGlassmorphic: boolean) {
+function encodeBio(rawBio: string, videoUrl: string, videoEnabled: boolean, isGlassmorphic: boolean, font: string, color: string) {
   const cleanBio = (rawBio || '').trim();
-  return `${cleanBio} ||video:${videoUrl || ''}||enabled:${videoEnabled || false}||glassmorphic:${isGlassmorphic}`;
+  return `${cleanBio} ||video:${videoUrl || ''}||enabled:${videoEnabled || false}||glassmorphic:${isGlassmorphic}||font:${font || 'font-josefin'}||color:${color || '#ffffff'}`;
 }
 
 export async function fetchProfile(userId: string): Promise<ProfileData | null> {
@@ -55,6 +60,8 @@ export async function fetchProfile(userId: string): Promise<ProfileData | null> 
   return {
     username: profile.username,
     displayName: profile.display_name || '',
+    displayNameFont: decoded.displayNameFont || "font-josefin",
+    displayNameColor: decoded.displayNameColor || "#ffffff",
     bio: decoded.bio,
     isGlowing: profile.is_glowing,
     isGlassmorphic: profile.is_glassmorphic !== undefined && profile.is_glassmorphic !== null ? !!profile.is_glassmorphic : decoded.isGlassmorphic,
@@ -107,6 +114,8 @@ export async function fetchProfileByUsername(username: string): Promise<ProfileD
   return {
     username: profile.username,
     displayName: profile.display_name || '',
+    displayNameFont: decoded.displayNameFont || "font-josefin",
+    displayNameColor: decoded.displayNameColor || "#ffffff",
     bio: decoded.bio,
     isGlowing: profile.is_glowing,
     isGlassmorphic: profile.is_glassmorphic !== undefined && profile.is_glassmorphic !== null ? !!profile.is_glassmorphic : decoded.isGlassmorphic,
@@ -126,7 +135,7 @@ export async function fetchProfileByUsername(username: string): Promise<ProfileD
 }
 
 export async function saveProfile(userId: string, data: ProfileData) {
-  const packedBio = encodeBio(data.bio, data.videoBackgroundUrl || '', data.videoBackgroundEnabled || false, data.isGlassmorphic !== false);
+  const packedBio = encodeBio(data.bio, data.videoBackgroundUrl || '', data.videoBackgroundEnabled || false, data.isGlassmorphic !== false, data.displayNameFont || 'font-josefin', data.displayNameColor || '#ffffff');
 
   // 1. Upsert Profile
   const { error: profileError } = await supabase
