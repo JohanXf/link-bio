@@ -117,7 +117,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
             </div>
             
             <p className="text-gray-400 text-sm mb-6 text-center">
-              Welcome to nads.io. Choose a provider below to continue building your profile.
+              Welcome to prophile.app. Choose a provider below to continue building your profile.
             </p>
 
             <div className="space-y-3">

@@ -3412,12 +3412,15 @@ export default function App() {
               if (profile.activePlan) setActivePlan(profile.activePlan);
             } else if (name) {
               const username = name.split("@")[0].replace(/[^a-zA-Z0-9._]/g, "");
+              const avatarUrl = session?.user?.user_metadata?.avatar_url || "";
+              const discordName = session?.user?.user_metadata?.custom_claims?.global_name || session?.user?.user_metadata?.full_name || username;
               setProfileData((prev) =>
                 prev.username === ""
                   ? {
                       ...prev,
                       username: username,
-                      displayName: username,
+                      displayName: discordName,
+                      avatarUrl: avatarUrl,
                       bio: "",
                     }
                   : prev,
@@ -3429,9 +3432,11 @@ export default function App() {
         });
       } else if (!uid && name) {
         const username = name.split("@")[0].replace(/[^a-zA-Z0-9._]/g, "");
+        const avatarUrl = session?.user?.user_metadata?.avatar_url || "";
+        const discordName = session?.user?.user_metadata?.custom_claims?.global_name || session?.user?.user_metadata?.full_name || username;
         setProfileData((prev) =>
           prev.username === ""
-            ? { ...prev, username: username, displayName: username, bio: "" }
+            ? { ...prev, username: username, displayName: discordName, avatarUrl: avatarUrl, bio: "" }
             : prev,
         );
       }
