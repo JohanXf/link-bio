@@ -809,19 +809,19 @@ function UserPage({
         <div className="relative z-10 flex flex-col items-center flex-1 mt-0 px-4 w-full">
           {/* Avatar: positioned 50% in banner and 50% in the content container */}
           {data.showAvatar !== false && (
-            <div className="relative mb-3 -mt-[60px] select-none">
+            <div className="relative mb-3 -mt-[48px] select-none">
               {/* Avatar Decoration */}
-              {isGlowingEnabled && (
+              {isGlowingEnabled && data.discordDecorationUrl && (
                 <img
-                  src={data.discordDecorationUrl || "https://cdn.discordapp.com/avatar-decoration-presets/a_124119d6910a3013d3cc4ec85c15beaa.png?size=256&passthrough=true"}
+                  src={data.discordDecorationUrl}
                   alt="Avatar Decoration"
-                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[144px] h-[144px] z-20 pointer-events-none"
+                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[115px] h-[115px] z-20 pointer-events-none scale-110"
                 />
               )}
 
               {/* Avatar Wrapper */}
               <div className="rounded-full relative z-10 p-0">
-                <div className="w-[120px] h-[120px] rounded-full bg-[#1b1b1f] flex items-center justify-center overflow-hidden">
+                <div className="w-[96px] h-[96px] rounded-full bg-[#1b1b1f] flex items-center justify-center overflow-hidden">
                   {data.avatarUrl ? (
                     <img
                       src={data.avatarUrl}
@@ -829,7 +829,7 @@ function UserPage({
                     />
                   ) : (
                     <div className="w-full h-full bg-[#27272a] flex items-center justify-center">
-                      <User size={48} className="text-gray-400" />
+                      <User size={38} className="text-gray-400" />
                     </div>
                   )}
                 </div>
@@ -2715,6 +2715,31 @@ function EditPage({
                       />
                     </label>
                   </div>
+                  
+                  {/* Avatar Decoration Toggle */}
+                  <div className="flex items-center justify-between bg-white/5 border border-white/10 backdrop-blur-md rounded-xl p-3 shadow-lg w-full max-w-[280px] mx-auto mt-2 relative overflow-hidden">
+                    {activePlan === "free" && (
+                      <div className="absolute inset-0 bg-black/50 z-20 flex items-center justify-center cursor-pointer" onClick={() => setActiveTab("premium")}>
+                        <Lock size={16} className="text-white/80" />
+                      </div>
+                    )}
+                    <span className="text-[14px] font-semibold text-white/85">
+                      Avatar Decoration
+                    </span>
+                    <div
+                      onClick={() => {
+                        if (activePlan === "pro") {
+                          onChange({ ...data, isGlowing: !data.isGlowing });
+                        }
+                      }}
+                      className={`w-10 h-5 rounded-full flex items-center p-0.5 transition-all border ${data.isGlowing ? "bg-white/20 border-white/35 cursor-pointer" : "bg-white/5 border-white/10 cursor-pointer"}`}
+                    >
+                      <div
+                        className={`w-3.5 h-3.5 rounded-full shadow-md transition-transform duration-200 ${data.isGlowing ? "bg-white translate-x-[20px]" : "bg-white/40 translate-x-[2px]"}`}
+                      ></div>
+                    </div>
+                  </div>
+
                   <div>
                     <h3 className={`text-[20px] ${data.displayNameFont || "font-josefin"} font-bold text-white tracking-tight`} style={{ color: data.displayNameColor || "#ffffff" }}>
                       {data.displayName || "No Name"}
@@ -2995,25 +3020,21 @@ function EditPage({
                         </div>
                       )}
 
-                      <div className="pt-2 border-t border-white/5 relative">
-                        {activePlan === "free" && (
-                          <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none mt-8">
-                            <div className="bg-black/80 px-4 py-2 rounded-full flex items-center gap-2 shadow-xl border border-white/10 backdrop-blur-md pointer-events-auto cursor-pointer" onClick={() => setActiveTab("premium")}>
-                              <Lock size={14} className="text-yellow-400" />
-                              <span className="text-white text-[12px] font-semibold">Premium Feature</span>
+                      <div className="pt-2 border-t border-white/5 relative mt-4">
+                        <label className="block text-[14px] font-josefin font-bold tracking-tight text-white mb-3 text-center">
+                          Video Blur
+                        </label>
+                        <div className="bg-white/5 border border-white/10 backdrop-blur-md rounded-xl p-4 shadow-lg relative overflow-hidden">
+                          {activePlan === "free" && (
+                            <div className="absolute inset-0 bg-black/50 z-20 flex items-center justify-center cursor-pointer" onClick={() => setActiveTab("premium")}>
+                              <Lock size={16} className="text-white/80" />
                             </div>
+                          )}
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-[13px] font-semibold text-white/85">Blur Radius</span>
+                            <span className="text-[12px] text-gray-400 font-mono">{Math.round(((data.videoBackgroundBlur ?? 5) / 50) * 100)}%</span>
                           </div>
-                        )}
-                        <div className={`transition-all duration-300 ${activePlan === "free" ? "blur-[2px] opacity-60 pointer-events-none select-none" : ""}`}>
-                          <label className="block text-[14px] font-josefin font-bold tracking-tight text-white mb-3 text-center">
-                            Video Blur
-                          </label>
-                          <div className="bg-white/5 border border-white/10 backdrop-blur-md rounded-xl p-4 shadow-lg">
-                            <div className="flex justify-between items-center mb-2">
-                              <span className="text-[13px] font-semibold text-white/85">Blur Radius</span>
-                              <span className="text-[12px] text-gray-400 font-mono">{Math.round(((data.videoBackgroundBlur ?? 5) / 50) * 100)}%</span>
-                            </div>
-                            <input
+                          <input
                               type="range"
                               min="0"
                               max="50"
@@ -3022,7 +3043,6 @@ function EditPage({
                               className="w-full accent-white cursor-pointer"
                             />
                           </div>
-                        </div>
                       </div>
                     </div>
                   </div>
@@ -3036,27 +3056,17 @@ function EditPage({
                 </div>
 
                 <div className="relative">
-                  {activePlan === "free" && (
-                    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center pointer-events-none">
-                      <div 
-                        className="bg-black/80 p-6 rounded-3xl flex flex-col items-center shadow-2xl border border-white/10 backdrop-blur-md pointer-events-auto cursor-pointer hover:bg-black/90 transition-colors"
-                        onClick={() => setActiveTab("premium")}
-                      >
-                        <Lock size={32} className="text-yellow-400 mb-3" />
-                        <h4 className="text-white font-josefin font-bold text-lg mb-1">Premium Features</h4>
-                        <p className="text-gray-400 text-[13px] mb-4 text-center max-w-[200px]">Unlock custom banners and glassmorphism.</p>
-                        <span className="bg-yellow-400 text-black text-[11px] font-bold px-4 py-2 rounded-full uppercase tracking-wider">
-                          Upgrade Now
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                  <div className={`space-y-8 transition-all duration-500 ${activePlan === "free" ? "blur-[3px] opacity-60 pointer-events-none select-none" : ""}`}>
+                  <div className={`space-y-8 transition-all duration-500`}>
                     <div className="text-center">
                     <label className="block text-[18px] font-josefin font-bold text-white mb-3 text-center tracking-tight">
                       Custom banner
                     </label>
                     <div className="w-full aspect-[15/6] bg-[#141414] rounded-[1rem] relative overflow-hidden flex flex-col justify-between p-3 border border-white/5">
+                      {activePlan === "free" && (
+                        <div className="absolute inset-0 bg-black/50 z-20 flex items-center justify-center cursor-pointer" onClick={() => setActiveTab("premium")}>
+                          <Lock size={20} className="text-white/80" />
+                        </div>
+                      )}
                       {data.bannerUrl ? (
                         <img
                           src={data.bannerUrl}
@@ -3100,7 +3110,12 @@ function EditPage({
                         <label className="block text-[18px] font-josefin font-bold tracking-tight text-white mb-3 text-center">
                           Glassmorphic Card
                         </label>
-                        <div className="flex items-center justify-between bg-white/5 border border-white/10 backdrop-blur-md rounded-xl p-4 shadow-lg">
+                        <div className="flex items-center justify-between bg-white/5 border border-white/10 backdrop-blur-md rounded-xl p-4 shadow-lg relative overflow-hidden">
+                          {activePlan === "free" && (
+                            <div className="absolute inset-0 bg-black/50 z-20 flex items-center justify-center cursor-pointer" onClick={() => setActiveTab("premium")}>
+                              <Lock size={16} className="text-white/80" />
+                            </div>
+                          )}
                           <span className="text-[15px] font-semibold text-white/85">
                             {activePlan === "pro"
                               ? data.isGlassmorphic
@@ -3178,34 +3193,6 @@ function EditPage({
                             </div>
                           </>
                         )}
-                      </div>
-                      
-                      <div>
-                        <label className="block text-[18px] font-josefin font-bold tracking-tight text-white mb-3 text-center">
-                          Avatar decoration
-                        </label>
-                        <div className="flex items-center justify-between bg-white/5 border border-white/10 backdrop-blur-md rounded-xl p-4 shadow-lg">
-                          <span className="text-[15px] font-semibold text-white/85">
-                            {activePlan === "pro"
-                              ? data.isGlowing
-                                ? "Avatar decoration is ON"
-                                : "Avatar decoration is OFF"
-                              : "Avatar decoration (Requires Premium)"}
-                          </span>
-                          {/* Avatar Decoration Toggle Switch */}
-                          <div
-                            onClick={() => {
-                              if (activePlan === "pro") {
-                                onChange({ ...data, isGlowing: !data.isGlowing })
-                              }
-                            }}
-                            className={`w-12 h-6 rounded-full flex items-center p-0.5 transition-all border ${activePlan === "pro" ? (data.isGlowing ? "bg-white/20 border-white/35 cursor-pointer" : "bg-white/5 border-white/10 cursor-pointer") : "bg-white/5 border-white/10 opacity-40 cursor-not-allowed"}`}
-                          >
-                            <div
-                              className={`w-4 h-4 rounded-full shadow-md transition-transform duration-200 ${activePlan === "pro" && data.isGlowing ? "bg-white translate-x-[24px]" : "bg-white/40 translate-x-[2px]"}`}
-                            ></div>
-                          </div>
-                        </div>
                       </div>
                     </div>
                   </div>
@@ -3370,7 +3357,7 @@ export default function App() {
                 });
                 const dUser = await res.json();
                 if (dUser?.avatar_decoration_data?.asset) {
-                  fetchedDecorationUrl = `https://cdn.discordapp.com/avatar-decoration-presets/${dUser.avatar_decoration_data.asset}.png?size=256&passthrough=true`;
+                  fetchedDecorationUrl = `https://cdn.discordapp.com/avatar-decoration-presets/${dUser.avatar_decoration_data.asset}.png?size=128&passthrough=false`;
                 }
               } catch (e) {
                 console.error("Failed to fetch discord decoration", e);
