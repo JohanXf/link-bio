@@ -395,15 +395,6 @@ function Hero({
   return (
     <section className="pt-32 pb-16 px-6 max-w-4xl mx-auto flex flex-col items-center justify-center gap-8 min-h-[calc(100vh-4rem)]">
       <div className="w-full flex flex-col items-center text-center pt-10 lg:pt-0">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-sm font-semibold mb-8 shadow-sm"
-        >
-          <Sparkles size={16} className="text-indigo-400" /> Now with Realtime
-          Analytics
-        </motion.div>
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -542,7 +533,7 @@ function Features() {
 
 function Footer() {
   return (
-    <footer className="bg-[#e5e5e5] py-12 px-6 border-t border-[#d4d4d8]">
+    <footer className="bg-[#d4d4d4] py-12 px-6 border-t border-[#c4c4c4]">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center text-white font-josefin font-bold text-[15px] shadow-sm">
@@ -2723,7 +2714,7 @@ function EditPage({
                         <Lock size={16} className="text-white/80" />
                       </div>
                     )}
-                    <span className="text-[14px] font-semibold text-white/85">
+                    <span className="text-[15px] font-semibold text-white/85">
                       Avatar Decoration
                     </span>
                     <div
@@ -2748,66 +2739,6 @@ function EditPage({
                       @{data.username.toLowerCase()}
                     </p>
                   </div>
-                </div>
-              </div>
-
-              {/* Basic Info Card */}
-              <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6 space-y-5 text-center">
-                <div>
-                  <label className="block text-[15px] font-josefin font-bold tracking-tight text-white mb-2">
-                    Username
-                  </label>
-                  <div className="flex items-center bg-[#1a1a1a] rounded-xl border border-white/5 overflow-hidden focus-within:border-white/20 transition-colors">
-                    <div className="px-4 py-3.5 text-white border-r border-[#222] bg-[#171717] font-semibold text-[15px]">
-                      prophile.app/
-                    </div>
-                    <DebouncedInput
-                      type="text"
-                      value={data.username.toLowerCase()}
-                      onChange={(e) =>
-                        onChange({
-                          ...data,
-                          username: e.target.value.toLowerCase().replace(/[^a-z0-9._]/g, ''),
-                        })
-                      }
-                      placeholder="yourname"
-                      className="bg-transparent flex-1 px-4 py-3 text-white outline-none w-full text-[15px] font-semibold text-center placeholder:text-white/25"
-                    />
-                  </div>
-                  <p className="text-[13px] text-gray-500 mt-2 px-1 text-center font-mono">
-                    Username can only be changed once every 7 days.
-                  </p>
-                </div>
-
-                <div>
-                  <label className="block text-[15px] font-josefin font-bold tracking-tight text-white mb-2">
-                    Display name
-                  </label>
-                  <DebouncedInput
-                    type="text"
-                    value={data.displayName}
-                    onChange={(e) =>
-                      onChange({ ...data, displayName: e.target.value })
-                    }
-                    placeholder="What should we call you?"
-                    className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl px-4 py-3.5 text-white outline-none focus:border-white/20 transition-colors text-[15px] font-semibold text-center placeholder:text-white/25"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[15px] font-josefin font-bold tracking-tight text-white mb-2">
-                    Bio
-                  </label>
-                  <DebouncedTextarea
-                    rows={3}
-                    value={data.bio}
-                    onChange={(e) => onChange({ ...data, bio: e.target.value })}
-                    placeholder="Tell visitors about yourself (interests, bio, links)..."
-                    className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl px-4 py-3.5 text-white outline-none focus:border-white/20 transition-colors resize-none text-[15px] font-semibold text-center placeholder:text-white/25"
-                  />
-                  <p className="text-[12px] text-[#555] mt-1.5 text-center font-mono">
-                    {data.bio.length}/160
-                  </p>
                 </div>
               </div>
 
@@ -2849,7 +2780,7 @@ function EditPage({
                   <label className="block text-[18px] font-josefin font-bold tracking-tight text-white mb-3 text-center">
                     Display Name Color
                   </label>
-                  <div className="flex gap-2 mt-2 flex-wrap justify-center">
+                  <div className="flex gap-2 mt-2 flex-wrap justify-center items-center">
                     {["#ffffff", "#fca5a5", "#fdba74", "#fcd34d", "#86efac", "#67e8f9", "#93c5fd", "#c4b5fd", "#f9a8d4", "#fda4af"].map((color) => (
                       <button
                         key={color}
@@ -2874,7 +2805,85 @@ function EditPage({
                         )}
                       </button>
                     ))}
+                    <div className="relative w-8 h-8 rounded-full overflow-hidden border-2 border-transparent hover:scale-105 transition-all shadow-sm">
+                      <div className="absolute inset-0 rounded-full" style={{ background: 'conic-gradient(red, yellow, lime, aqua, blue, magenta, red)' }} />
+                      <input 
+                        type="color"
+                        value={data.displayNameColor || "#ffffff"}
+                        onChange={(e) => {
+                          if (activePlan === 'pro') {
+                            onChange({ ...data, displayNameColor: e.target.value });
+                          } else {
+                            alert("Custom colors are a Premium feature!");
+                          }
+                        }}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      />
+                      {activePlan !== 'pro' && (
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center pointer-events-none">
+                          <Lock size={12} className="text-white/80" />
+                        </div>
+                      )}
+                    </div>
                   </div>
+                </div>
+              </div>
+
+              {/* Basic Info Card */}
+              <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6 space-y-5 text-center">
+                <div>
+                  <label className="block text-[18px] font-josefin font-bold tracking-tight text-white mb-3 text-center">
+                    Username
+                  </label>
+                  <div className="flex items-center bg-[#1a1a1a] rounded-xl border border-white/5 overflow-hidden focus-within:border-white/20 transition-colors">
+                    <div className="px-4 py-3.5 text-white border-r border-[#222] bg-[#171717] font-semibold text-[15px]">
+                      prophile.app/
+                    </div>
+                    <DebouncedInput
+                      type="text"
+                      value={data.username.toLowerCase()}
+                      onChange={(e) =>
+                        onChange({
+                          ...data,
+                          username: e.target.value.toLowerCase().replace(/[^a-z0-9._]/g, ''),
+                        })
+                      }
+                      placeholder="yourname"
+                      className="bg-transparent flex-1 px-4 py-3 text-white outline-none w-full text-[15px] font-semibold text-center placeholder:text-white/25"
+                    />
+                  </div>
+                  <p className="text-[13px] text-gray-500 mt-2 px-1 text-center font-mono">
+                    Username can only be changed once every 7 days.
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-[18px] font-josefin font-bold tracking-tight text-white mb-3 text-center">
+                    Display name
+                  </label>
+                  <DebouncedInput
+                    type="text"
+                    value={data.displayName}
+                    onChange={(e) =>
+                      onChange({ ...data, displayName: e.target.value })
+                    }
+                    placeholder="What should we call you?"
+                    className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl px-4 py-3.5 text-white outline-none focus:border-white/20 transition-colors text-[15px] font-semibold text-center placeholder:text-white/25"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[18px] font-josefin font-bold tracking-tight text-white mb-3 text-center">
+                    Bio
+                  </label>
+                  <DebouncedTextarea
+                    rows={3}
+                    value={data.bio}
+                    onChange={(e) => onChange({ ...data, bio: e.target.value })}
+                    placeholder="Tell visitors about yourself (interests, bio, links)..."
+                    className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl px-4 py-3.5 text-white outline-none focus:border-white/20 transition-colors resize-none text-[15px] font-semibold text-center placeholder:text-white/25"
+                  />
+                  <p className="text-[12px] text-[#555] mt-1.5 text-center font-mono">
+                    {data.bio.length}/160
+                  </p>
                 </div>
               </div>
 
@@ -2907,10 +2916,14 @@ function EditPage({
                   )}
                 </div>
                 {data.audioUrl && (
-                  <div className="w-full bg-transparent border border-white/10 rounded-full px-5 py-3.5 text-gray-300 text-[15px] flex items-center justify-between">
-                    <span className="truncate w-full text-center text-[#ddd] font-semibold">
-                      {data.audioTitle || "No track selected"}
-                    </span>
+                  <div className="flex flex-col gap-3">
+                    <input
+                      type="text"
+                      value={data.audioTitle || ""}
+                      onChange={(e) => onChange({ ...data, audioTitle: e.target.value })}
+                      placeholder="Track title"
+                      className="w-full bg-transparent border border-white/20 rounded-full px-5 py-3.5 text-white text-[15px] outline-none focus:border-white/40 transition-colors font-semibold text-center placeholder:text-white/30"
+                    />
                   </div>
                 )}
                 <p className="text-[14px] text-[#888] text-center leading-relaxed mt-4">
@@ -3290,6 +3303,7 @@ export type ProfileData = {
   videoBackgroundEnabled?: boolean;
   videoBackgroundBlur?: number;
   discordDecorationUrl?: string;
+  showAvatar?: boolean;
   activePlan?: 'free' | 'pro';
   links: Array<{ id: number; title: string; url: string }>;
 };
