@@ -809,29 +809,17 @@ function UserPage({
         <div className="relative z-10 flex flex-col items-center flex-1 mt-0 px-4 w-full">
           {/* Avatar: positioned 50% in banner and 50% in the content container */}
           <div className="relative mb-3 -mt-[48px] select-none">
-            {/* Glow */}
+            {/* Avatar Decoration */}
             {isGlowingEnabled && (
-              <div
-                className="absolute -inset-1 rounded-full blur-[12px] opacity-80"
-                style={{
-                  background:
-                    "conic-gradient(from 0deg, #10b981, #0ea5e9, #8b5cf6, #d946ef, #f43f5e, #f59e0b, #10b981)",
-                }}
-              ></div>
+              <img
+                src={data.discordDecorationUrl || "https://cdn.discordapp.com/avatar-decoration-presets/a_124119d6910a3013d3cc4ec85c15beaa.png?size=96&passthrough=false"}
+                alt="Avatar Decoration"
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[115px] h-[115px] z-20 pointer-events-none scale-110"
+              />
             )}
 
-            {/* Ring Wrapper */}
-            <div
-              className={`rounded-full relative z-10 ${isGlowingEnabled ? "p-[3px]" : "p-0"}`}
-              style={
-                isGlowingEnabled
-                  ? {
-                      background:
-                        "conic-gradient(from 0deg, #10b981, #0ea5e9, #8b5cf6, #d946ef, #f43f5e, #f59e0b, #10b981)",
-                    }
-                  : undefined
-              }
-            >
+            {/* Avatar Wrapper */}
+            <div className="rounded-full relative z-10 p-0">
               <div className="w-[96px] h-[96px] rounded-full bg-[#1b1b1f] flex items-center justify-center overflow-hidden">
                 {data.avatarUrl ? (
                   <img
@@ -996,45 +984,6 @@ function EditPage({
     }
   };
 
-  const handleDiscordFetch = async () => {
-    const discordId = prompt("Enter your Discord ID to fetch your profile:");
-    if (!discordId) return;
-
-    try {
-      const res = await fetch(`https://dcdn.dstn.to/profile/${discordId}`);
-      if (!res.ok) throw new Error("Failed to fetch Discord profile.");
-      
-      const resData = await res.json();
-      const user = resData.user;
-      
-      if (user) {
-        let avatarUrl = "";
-        if (user.avatar) {
-          const isAnimated = user.avatar.startsWith("a_");
-          avatarUrl = `https://cdn.discordapp.com/avatars/${discordId}/${user.avatar}.${isAnimated ? 'gif' : 'png'}?size=512`;
-        }
-
-        let bannerUrl = "";
-        if (user.banner) {
-          const isAnimatedBanner = user.banner.startsWith("a_");
-          bannerUrl = `https://cdn.discordapp.com/banners/${discordId}/${user.banner}.${isAnimatedBanner ? 'gif' : 'png'}?size=1024`;
-        }
-
-        onChange((currentData) => ({
-          ...currentData,
-          displayName: user.global_name || user.username || currentData.displayName,
-          avatarUrl: avatarUrl || currentData.avatarUrl,
-          bannerUrl: bannerUrl || currentData.bannerUrl,
-          bio: user.bio || currentData.bio
-        }));
-      } else {
-         alert("User not found.");
-      }
-    } catch (e: any) {
-      console.error(e);
-      alert("Failed to fetch Discord profile: " + e.message);
-    }
-  };
 
   const handleFileUpload = async (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -2669,7 +2618,7 @@ function EditPage({
                 When thousands of visitors browse your social pages, details
                 matter. Premium equips you with real tools – cinematic portrait
                 video background loops, premium glassmorphism layouts, full
-                analytics tracking, and customizable glowing profiles.
+                analytics tracking, and Discord avatar decorations.
               </p>
               <div className="flex items-center gap-2 text-xs text-yellow-400 font-mono font-bold tracking-widest uppercase">
                 <Sparkles size={12} /> Test different plans above to see active
@@ -2772,15 +2721,6 @@ function EditPage({
                       @{data.username.toLowerCase()}
                     </p>
                   </div>
-                  <button 
-                    onClick={handleDiscordFetch}
-                    className="flex items-center gap-2 mt-2 px-4 py-2 bg-[#5865F2] hover:bg-[#4752C4] text-white rounded-lg text-sm font-semibold transition-colors w-full justify-center"
-                  >
-                    <svg width="18" height="18" viewBox="0 0 127.14 96.36" fill="currentColor">
-                      <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.31,60,73.31,53s5-12.74,11.43-12.74S96.18,46,96.06,53,91,65.69,84.69,65.69Z"/>
-                    </svg>
-                    Fetch from Discord
-                  </button>
                 </div>
               </div>
 
@@ -2848,19 +2788,30 @@ function EditPage({
               <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6 space-y-5 text-center">
                 <div>
                   <label className="block text-[15px] font-josefin font-bold tracking-tight text-white mb-2 flex items-center justify-center gap-2">
-                    Display Name Font
+                    Display Name Font <span className="text-yellow-400 bg-yellow-400/10 px-2 py-0.5 rounded-full text-[10px] uppercase tracking-wider font-sans">Premium</span>
                   </label>
                   <div className="flex flex-wrap gap-2">
                     {["font-sans", "font-serif", "font-mono", "font-josefin", "font-playfair", "font-outfit"].map((font) => (
                       <button
                         key={font}
-                        onClick={() => onChange({ ...data, displayNameFont: font })}
+                        onClick={() => {
+                          if (activePlan === 'pro' || font === 'font-sans' || font === 'font-josefin') {
+                            onChange({ ...data, displayNameFont: font });
+                          } else {
+                            alert("Custom fonts are a Premium feature!");
+                          }
+                        }}
                         className={`flex-1 min-w-[70px] py-2 rounded-lg border ${
                           (data.displayNameFont || "font-josefin") === font
                             ? "bg-white text-black border-white"
                             : "bg-[#1a1a1a] text-white border-white/5 hover:border-white/20"
-                        } text-sm ${font} transition-colors capitalize`}
+                        } text-sm ${font} transition-colors capitalize relative overflow-hidden`}
                       >
+                        {activePlan !== 'pro' && font !== 'font-sans' && font !== 'font-josefin' && (
+                          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                            <Lock size={12} className="text-white/80" />
+                          </div>
+                        )}
                         {font.replace("font-", "")}
                       </button>
                     ))}
@@ -3091,7 +3042,7 @@ function EditPage({
                       >
                         <Lock size={32} className="text-yellow-400 mb-3" />
                         <h4 className="text-white font-josefin font-bold text-lg mb-1">Premium Features</h4>
-                        <p className="text-gray-400 text-[13px] mb-4 text-center max-w-[200px]">Unlock custom banners, glowing rings, and glassmorphism.</p>
+                        <p className="text-gray-400 text-[13px] mb-4 text-center max-w-[200px]">Unlock custom banners and glassmorphism.</p>
                         <span className="bg-yellow-400 text-black text-[11px] font-bold px-4 py-2 rounded-full uppercase tracking-wider">
                           Upgrade Now
                         </span>
@@ -3144,34 +3095,6 @@ function EditPage({
                   <div className="text-center">
                     <div className="space-y-6">
                       <div>
-                        <label className="block text-[18px] font-josefin font-bold tracking-tight text-white mb-3 text-center">
-                          Avatar decoration
-                        </label>
-                        <div className="flex items-center justify-between bg-white/5 border border-white/10 backdrop-blur-md rounded-xl p-4 shadow-lg">
-                          <span className="text-[15px] font-semibold text-white/85">
-                            {activePlan === "pro"
-                              ? data.isGlowing
-                                ? "Glowing ring is ON"
-                                : "Glowing ring is OFF"
-                              : "Glowing ring (Requires Premium)"}
-                          </span>
-                          {/* Glassmorphic Toggle Switch */}
-                          <div
-                            onClick={() => {
-                              if (activePlan === "pro") {
-                                onChange({ ...data, isGlowing: !data.isGlowing })
-                              }
-                            }}
-                            className={`w-12 h-6 rounded-full flex items-center p-0.5 cursor-pointer transition-all border ${activePlan === "pro" && data.isGlowing ? "bg-white/20 border-white/35" : "bg-white/5 border-white/10"}`}
-                          >
-                            <div
-                              className={`w-4 h-4 rounded-full shadow-md transition-transform duration-200 ${activePlan === "pro" && data.isGlowing ? "bg-white translate-x-[24px]" : "bg-white/40 translate-x-[2px]"}`}
-                            ></div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="pt-2">
                         <label className="block text-[18px] font-josefin font-bold tracking-tight text-white mb-3 text-center">
                           Glassmorphic Card
                         </label>
@@ -3253,6 +3176,34 @@ function EditPage({
                             </div>
                           </>
                         )}
+                      </div>
+                      
+                      <div>
+                        <label className="block text-[18px] font-josefin font-bold tracking-tight text-white mb-3 text-center">
+                          Avatar decoration
+                        </label>
+                        <div className="flex items-center justify-between bg-white/5 border border-white/10 backdrop-blur-md rounded-xl p-4 shadow-lg">
+                          <span className="text-[15px] font-semibold text-white/85">
+                            {activePlan === "pro"
+                              ? data.isGlowing
+                                ? "Avatar decoration is ON"
+                                : "Avatar decoration is OFF"
+                              : "Avatar decoration (Requires Premium)"}
+                          </span>
+                          {/* Avatar Decoration Toggle Switch */}
+                          <div
+                            onClick={() => {
+                              if (activePlan === "pro") {
+                                onChange({ ...data, isGlowing: !data.isGlowing })
+                              }
+                            }}
+                            className={`w-12 h-6 rounded-full flex items-center p-0.5 transition-all border ${activePlan === "pro" ? (data.isGlowing ? "bg-white/20 border-white/35 cursor-pointer" : "bg-white/5 border-white/10 cursor-pointer") : "bg-white/5 border-white/10 opacity-40 cursor-not-allowed"}`}
+                          >
+                            <div
+                              className={`w-4 h-4 rounded-full shadow-md transition-transform duration-200 ${activePlan === "pro" && data.isGlowing ? "bg-white translate-x-[24px]" : "bg-white/40 translate-x-[2px]"}`}
+                            ></div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -3357,6 +3308,7 @@ export type ProfileData = {
   videoBackgroundUrl?: string;
   videoBackgroundEnabled?: boolean;
   videoBackgroundBlur?: number;
+  discordDecorationUrl?: string;
   activePlan?: 'free' | 'pro';
   links: Array<{ id: number; title: string; url: string }>;
 };
@@ -3407,7 +3359,26 @@ export default function App() {
         import("./lib/api").then(async (api) => {
           try {
             const profile = await api.fetchProfile(uid);
+            
+            let fetchedDecorationUrl = '';
+            if (session?.provider_token) {
+              try {
+                const res = await fetch("https://discord.com/api/v10/users/@me", {
+                  headers: { Authorization: `Bearer ${session.provider_token}` }
+                });
+                const dUser = await res.json();
+                if (dUser?.avatar_decoration_data?.asset) {
+                  fetchedDecorationUrl = `https://cdn.discordapp.com/avatar-decoration-presets/${dUser.avatar_decoration_data.asset}.png?size=96&passthrough=false`;
+                }
+              } catch (e) {
+                console.error("Failed to fetch discord decoration", e);
+              }
+            }
+
             if (profile) {
+              if (fetchedDecorationUrl && !profile.discordDecorationUrl) {
+                profile.discordDecorationUrl = fetchedDecorationUrl;
+              }
               setProfileData(profile);
               if (profile.activePlan) setActivePlan(profile.activePlan);
             } else if (name) {
@@ -3422,6 +3393,7 @@ export default function App() {
                       displayName: discordName,
                       avatarUrl: avatarUrl,
                       bio: "",
+                      discordDecorationUrl: fetchedDecorationUrl,
                     }
                   : prev,
               );

@@ -11,6 +11,8 @@ function decodeBio(packedBio: string) {
   let isGlassmorphic = true;
   let displayNameFont = 'font-josefin';
   let displayNameColor = '#ffffff';
+  let showAvatar = true;
+  let discordDecorationUrl = '';
   
   if (firstSep !== -1) {
     bio = norm.slice(0, firstSep).trim();
@@ -22,6 +24,8 @@ function decodeBio(packedBio: string) {
       if (part.startsWith('glassmorphic:')) isGlassmorphic = part.slice(13) === 'true';
       if (part.startsWith('font:')) displayNameFont = part.slice(5);
       if (part.startsWith('color:')) displayNameColor = part.slice(6);
+      if (part.startsWith('avatar:')) showAvatar = part.slice(7) === 'true';
+      if (part.startsWith('decoration:')) discordDecorationUrl = part.slice(11);
     }
   }
 
@@ -31,13 +35,15 @@ function decodeBio(packedBio: string) {
     videoBackgroundEnabled,
     isGlassmorphic,
     displayNameFont,
-    displayNameColor
+    displayNameColor,
+    showAvatar,
+    discordDecorationUrl
   };
 }
 
-function encodeBio(rawBio: string, videoUrl: string, videoEnabled: boolean, isGlassmorphic: boolean, font: string, color: string) {
+function encodeBio(rawBio: string, videoUrl: string, videoEnabled: boolean, isGlassmorphic: boolean, font: string, color: string, showAvatar: boolean, decorationUrl: string) {
   const cleanBio = (rawBio || '').trim();
-  return `${cleanBio} ||video:${videoUrl || ''}||enabled:${videoEnabled || false}||glassmorphic:${isGlassmorphic}||font:${font || 'font-josefin'}||color:${color || '#ffffff'}`;
+  return `${cleanBio} ||video:${videoUrl || ''}||enabled:${videoEnabled || false}||glassmorphic:${isGlassmorphic}||font:${font || 'font-josefin'}||color:${color || '#ffffff'}||avatar:${showAvatar}||decoration:${decorationUrl || ''}`;
 }
 
 export async function fetchProfile(userId: string): Promise<ProfileData | null> {
@@ -65,12 +71,14 @@ export async function fetchProfile(userId: string): Promise<ProfileData | null> 
     bio: decoded.bio,
     isGlowing: profile.is_glowing,
     isGlassmorphic: profile.is_glassmorphic !== undefined && profile.is_glassmorphic !== null ? !!profile.is_glassmorphic : decoded.isGlassmorphic,
+    showAvatar: decoded.showAvatar,
     avatarUrl: profile.avatar_url || '',
     bannerUrl: profile.banner_url || '',
     audioUrl: profile.audio_url || '',
     audioTitle: profile.audio_title || '',
     videoBackgroundUrl: profile.video_background_url !== undefined && profile.video_background_url !== null ? profile.video_background_url : decoded.videoBackgroundUrl,
     videoBackgroundEnabled: profile.video_background_enabled !== undefined && profile.video_background_enabled !== null ? !!profile.video_background_enabled : decoded.videoBackgroundEnabled,
+    discordDecorationUrl: decoded.discordDecorationUrl,
     activePlan: profile.active_plan || 'free',
     links: (links || []).map(link => ({
       id: link.id,
@@ -119,12 +127,14 @@ export async function fetchProfileByUsername(username: string): Promise<ProfileD
     bio: decoded.bio,
     isGlowing: profile.is_glowing,
     isGlassmorphic: profile.is_glassmorphic !== undefined && profile.is_glassmorphic !== null ? !!profile.is_glassmorphic : decoded.isGlassmorphic,
+    showAvatar: decoded.showAvatar,
     avatarUrl: profile.avatar_url || '',
     bannerUrl: profile.banner_url || '',
     audioUrl: profile.audio_url || '',
     audioTitle: profile.audio_title || '',
     videoBackgroundUrl: profile.video_background_url !== undefined && profile.video_background_url !== null ? profile.video_background_url : decoded.videoBackgroundUrl,
     videoBackgroundEnabled: profile.video_background_enabled !== undefined && profile.video_background_enabled !== null ? !!profile.video_background_enabled : decoded.videoBackgroundEnabled,
+    discordDecorationUrl: decoded.discordDecorationUrl,
     activePlan: profile.active_plan || 'free',
     links: (links || []).map(link => ({
       id: link.id,
@@ -135,7 +145,7 @@ export async function fetchProfileByUsername(username: string): Promise<ProfileD
 }
 
 export async function saveProfile(userId: string, data: ProfileData) {
-  const packedBio = encodeBio(data.bio, data.videoBackgroundUrl || '', data.videoBackgroundEnabled || false, data.isGlassmorphic !== false, data.displayNameFont || 'font-josefin', data.displayNameColor || '#ffffff');
+  const packedBio = encodeBio(data.bio, data.videoBackgroundUrl || '', data.videoBackgroundEnabled || false, data.isGlassmorphic !== false, data.displayNameFont || 'font-josefin', data.displayNameColor || '#ffffff', data.showAvatar !== false, data.discordDecorationUrl || '');
 
   // 1. Upsert Profile
   const { error: profileError } = await supabase
