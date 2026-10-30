@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Mail, Github, Ticket } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 const DiscordIcon = ({ size = 24 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 127.14 96.36" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -28,6 +28,19 @@ export function AuthModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
   const [password, setPassword] = useState('');
 
   const handleOAuthLogin = async (provider: 'google' | 'discord') => {
+    if (!isSupabaseConfigured) {
+      setLoading(true);
+      setTimeout(() => {
+        const demoEmail = `creator@${provider}.com`;
+        localStorage.setItem("prophile_demo_email", demoEmail);
+        localStorage.setItem("prophile_demo_uid", "demo-" + provider);
+        window.dispatchEvent(new CustomEvent("demo-login", { detail: { email: demoEmail, uid: "demo-" + provider } }));
+        setLoading(false);
+        onSuccess();
+      }, 400);
+      return;
+    }
+
     try {
       setLoading(true);
       setErrorMsg('');
@@ -58,6 +71,18 @@ export function AuthModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
       setErrorMsg('Please enter both email and password.');
       return;
     }
+
+    if (!isSupabaseConfigured) {
+      setLoading(true);
+      setTimeout(() => {
+        localStorage.setItem("prophile_demo_email", email);
+        localStorage.setItem("prophile_demo_uid", "demo-user");
+        window.dispatchEvent(new CustomEvent("demo-login", { detail: { email, uid: "demo-user" } }));
+        setLoading(false);
+        onSuccess();
+      }, 300);
+      return;
+    }
     
     try {
       setLoading(true);
@@ -69,27 +94,41 @@ export function AuthModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
           email,
           password,
         });
-        if (error) throw error;
-        if (data.session) {
-           onSuccess();
+        if (error) {
+          setErrorMsg(error.message || 'Signup failed.');
+          return;
+        }
+        if (data?.session) {
+          onSuccess();
         } else {
-           setSuccessMsg('Check your email to verify your account!');
+          setSuccessMsg('Check your email to verify your account!');
         }
       } else {
         const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password
         });
-        if (error) throw error;
-        if (data.session) {
-           onSuccess();
+        if (error) {
+          setErrorMsg(error.message || 'Login failed.');
+          return;
+        }
+        if (data?.session) {
+          onSuccess();
         }
       }
     } catch (e: any) {
-      setErrorMsg(e.message || 'Authentication failed.');
+      setErrorMsg(e.message || 'Authentication failed. Please check credentials.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleContinueDemo = () => {
+    const demoEmail = email || "creator@prophile.app";
+    localStorage.setItem("prophile_demo_email", demoEmail);
+    localStorage.setItem("prophile_demo_uid", "demo-user");
+    window.dispatchEvent(new CustomEvent("demo-login", { detail: { email: demoEmail, uid: "demo-user" } }));
+    onSuccess();
   };
 
   return (
@@ -117,7 +156,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
             </div>
             
             <p className="text-gray-400 text-sm mb-6 text-center">
-              Welcome to prophile.app. Choose a provider below to continue building your profile.
+              Welcome to Prophile. Choose a provider below to continue building your profile.
             </p>
 
             <div className="space-y-3">
@@ -188,7 +227,16 @@ export function AuthModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
             
             {errorMsg && (
               <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm text-center">
-                {errorMsg}
+                <p>{errorMsg}</p>
+                {(errorMsg.includes("booting") || errorMsg.includes("521") || errorMsg.includes("connect") || errorMsg.includes("unreachable") || errorMsg.includes("server")) && (
+                  <button
+                    type="button"
+                    onClick={handleContinueDemo}
+                    className="mt-2 text-xs font-semibold text-yellow-400 hover:underline block mx-auto cursor-pointer"
+                  >
+                    Continue in Demo Mode instead →
+                  </button>
+                )}
               </div>
             )}
 

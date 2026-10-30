@@ -1,0 +1,42 @@
+        {activeTab === "leaderboard" && (
+          <div className="space-y-6">
+            <div className="mb-4">
+              <h1 className="text-[28px] font-josefin font-bold tracking-tight">Leaderboard</h1>
+              <p className="text-gray-400 mt-1 text-sm">Top performing creators on Prophile</p>
+            </div>
+            <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="font-josefin font-bold text-white text-[16px]">Global Rankings</h3>
+                <div className="flex bg-[#252525] p-1 rounded-lg">
+                  <button onClick={() => setLeaderboardPeriod("today")} className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors ${leaderboardPeriod === "today" ? "bg-white text-black" : "text-gray-400 hover:text-white"}`}>Today</button>
+                  <button onClick={() => setLeaderboardPeriod("week")} className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors ${leaderboardPeriod === "week" ? "bg-white text-black" : "text-gray-400 hover:text-white"}`}>Week</button>
+                  <button onClick={() => setLeaderboardPeriod("all_time")} className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors ${leaderboardPeriod === "all_time" ? "bg-white text-black" : "text-gray-400 hover:text-white"}`}>All Time</button>
+                </div>
+              </div>
+              <div className="space-y-3">
+                {leaderboardData && leaderboardData.length > 0 ? leaderboardData.map((user, idx) => (
+                  <div key={idx} className="flex items-center justify-between bg-white/[0.02] p-3 rounded-xl border border-white/5 hover:bg-white/5 transition-colors cursor-pointer" onClick={() => window.open(`/${user.username}`, "_blank")}>
+                    <div className="flex items-center gap-4">
+                      <span className={`font-mono font-bold w-6 text-center ${idx === 0 ? "text-yellow-400 text-lg" : idx === 1 ? "text-gray-300 text-lg" : idx === 2 ? "text-amber-600 text-lg" : "text-gray-500"}`}>
+                        #{idx + 1}
+                      </span>
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-gray-800 to-gray-600 flex items-center justify-center text-white font-bold text-sm shrink-0 uppercase">
+                        {user.username.substring(0,2)}
+                      </div>
+                      <div>
+                        <h4 className="text-white font-semibold font-josefin text-[15px]">{user.name || user.username}</h4>
+                        <p className="text-gray-400 text-xs">prophile.bio/{user.username}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-white font-mono font-bold block">{user.views.toLocaleString()}</span>
+                      <span className="text-gray-500 text-[10px] uppercase tracking-wider">Views</span>
+                    </div>
+                  </div>
+                )) : (
+                  <div className="text-center py-10 text-gray-500">Loading leaderboard...</div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}

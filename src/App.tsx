@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { motion, AnimatePresence } from "motion/react";
+import { Routes, Route, useNavigate, useParams, Navigate, useLocation } from "react-router-dom";
 import {
   Sparkles,
   ArrowRight,
@@ -43,6 +44,10 @@ import {
   Briefcase,
   Trophy,
   Video,
+  Check,
+  Share2,
+  QrCode,
+  Copy,
 } from "lucide-react";
 import React, { useState, useRef, useEffect } from "react";
 
@@ -107,7 +112,8 @@ function DebouncedTextarea({ value, onChange, delay = 150, ...props }: any) {
 }
 
 import { AuthModal } from "./components/AuthModal";
-import { supabase } from "./lib/supabase";
+import { AmmosLanding } from "./components/AmmosLanding";
+import { supabase, isSupabaseConfigured } from "./lib/supabase";
 
 const VIDEO_PRESETS = [
   {
@@ -321,249 +327,6 @@ function getLinkIcon(url: string, title?: string, iconSize: number = 18) {
   return <LinkIcon size={iconSize} />;
 }
 
-function Navbar({
-  onLoginClick,
-  userEmail,
-  onSignOut,
-  onDashboardClick,
-}: {
-  onLoginClick: () => void;
-  userEmail: string | null;
-  onSignOut: () => void;
-  onDashboardClick: () => void;
-}) {
-  return (
-    <div className="fixed top-0 left-0 right-0 z-50 pt-4 px-4 pointer-events-none">
-      <nav className="mx-auto max-w-5xl bg-texture/90 backdrop-blur-md border border-[#e5e5e5] rounded-full shadow-sm pointer-events-auto">
-        <div className="px-6 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center text-white font-josefin font-bold text-[15px]">
-              N
-            </div>
-            <span className="font-josefin font-bold text-[15px] tracking-tight text-black">
-              Prophile
-            </span>
-          </div>
-          <div className="flex items-center gap-4">
-            {userEmail ? (
-              <>
-                <button
-                  onClick={onDashboardClick}
-                  className="text-sm font-semibold text-gray-700 hover:text-black transition-colors cursor-pointer"
-                >
-                  Editor
-                </button>
-                <button
-                  onClick={onSignOut}
-                  className="bg-[#18181b] hover:bg-[#27272a] py-1.5 px-4 rounded-[1.5rem] font-josefin font-bold text-[14px] transition-colors text-white shadow-md tracking-tight cursor-pointer"
-                >
-                  Sign out
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  onClick={onLoginClick}
-                  className="font-josefin font-bold text-[14px] text-gray-700 hover:text-black transition-colors hidden sm:block cursor-pointer"
-                >
-                  Log in
-                </button>
-                <button
-                  onClick={onLoginClick}
-                  className="bg-[#18181b] hover:bg-[#27272a] py-1.5 px-4 rounded-[1.5rem] font-josefin font-bold text-[14px] transition-colors text-white shadow-md tracking-tight cursor-pointer"
-                >
-                  Sign up
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      </nav>
-    </div>
-  );
-}
-
-function Hero({
-  onNavigate,
-  onLoginClick,
-  data,
-}: {
-  onNavigate: () => void;
-  onLoginClick: () => void;
-  data: ProfileData;
-}) {
-  return (
-    <section className="pt-32 pb-16 px-6 max-w-4xl mx-auto flex flex-col items-center justify-center gap-8 min-h-[calc(100vh-4rem)]">
-      <div className="w-full flex flex-col items-center text-center pt-10 lg:pt-0">
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-5xl md:text-6xl lg:text-7xl font-josefin font-bold tracking-tight text-black leading-[1.05]"
-        >
-          Your bio, <br className="hidden md:block" />
-          <span className="text-black bg-clip-text">one Prophile link.</span>
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="mt-6 text-xl text-gray-600 max-w-2xl leading-relaxed"
-        >
-          Sign in, pick your username, and share every link that matters from
-          one beautifully simple page. Builder. Writer. Creator.
-        </motion.p>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 w-full"
-        >
-          <div className="flex items-center w-full max-w-md bg-[#141414] rounded-full p-2 border-2 border-white/10 shadow-sm focus-within:ring-4 focus-within:ring-indigo-500/20 focus-within:border-indigo-500/50 transition-all hover:border-white/20">
-            <span className="text-gray-550 pl-4 pr-1 font-semibold text-lg hidden sm:block">
-              prophile.app/
-            </span>
-            <input
-              type="text"
-              placeholder="username"
-              className="flex-1 bg-transparent px-2 py-3 outline-none text-white font-semibold text-lg placeholder:text-white/30 w-full"
-            />
-            <button
-              onClick={onLoginClick}
-              className="bg-white text-black px-8 py-3 rounded-full font-semibold hover:bg-gray-200 transition-colors flex items-center gap-2 shrink-0 shadow-lg shadow-black/20 active:scale-95"
-            >
-              Claim Link <ArrowRight size={18} />
-            </button>
-          </div>
-        </motion.div>
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.6 }}
-          className="mt-5 text-sm font-medium text-gray-550"
-        >
-          It's free, forever. No credit card required.
-        </motion.p>
-      </div>
-    </section>
-  );
-}
-
-function Features() {
-  const features = [
-    {
-      title: "Custom Banner",
-      description:
-        "Personalize your page visually with stunning gradient banners or vibrant image uploads.",
-      icon: <ImageIcon size={24} />,
-      color: "from-pink-500 to-rose-500",
-    },
-    {
-      title: "Animated Glow",
-      description:
-        "Stand out immediately with a dynamic, pulsing profile picture ring around your avatar.",
-      icon: <Sparkles size={24} />,
-      color: "from-violet-500 to-purple-500",
-    },
-    {
-      title: "Music Player",
-      description:
-        "Embed custom background tracks or atmospheric soundscapes directly on your page.",
-      icon: <Music size={24} />,
-      color: "from-blue-500 to-cyan-500",
-    },
-    {
-      title: "Realtime Analytics",
-      description:
-        "Know exactly who is clicking your links with beautifully simple chart visualizers.",
-      icon: <BarChart2 size={24} />,
-      color: "from-emerald-500 to-teal-500",
-    },
-  ];
-
-  return (
-    <section className="py-24 bg-texture px-6 relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-[800px] h-[400px] bg-gradient-to-bl from-indigo-500/10 to-transparent rounded-bl-[100px] -z-10" />
-      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-gradient-to-tr from-purple-500/10 to-transparent rounded-tr-[100px] -z-10" />
-
-      <div className="max-w-7xl mx-auto relative z-10">
-        <div className="text-center max-w-2xl mx-auto mb-20">
-          <h2 className="text-4xl md:text-5xl font-josefin font-bold tracking-tight text-black">
-            Stand out with <br />
-            <span className="text-black bg-clip-text">
-              Premium integrations.
-            </span>
-          </h2>
-          <p className="mt-6 text-gray-600 text-lg leading-relaxed">
-            Everything you need to express yourself, share your creations, and
-            grow your audience in one incredibly simple place.
-          </p>
-        </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {features.map((f, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{
-                duration: 0.6,
-                delay: i * 0.1,
-                type: "spring",
-                stiffness: 60,
-              }}
-              className="p-8 rounded-3xl bg-[#141414] border border-white/5 hover:shadow-2xl hover:shadow-indigo-500/10 hover:-translate-y-2 transition-all duration-300 group"
-            >
-              <div
-                className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${f.color} text-white flex items-center justify-center mb-6 shadow-lg transform group-hover:scale-110 transition-transform duration-300`}
-              >
-                {f.icon}
-              </div>
-              <h3 className="text-xl font-josefin font-bold text-white mb-3">
-                {f.title}
-              </h3>
-              <p className="text-gray-400 leading-relaxed">{f.description}</p>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Footer() {
-  return (
-    <footer className="bg-[#d4d4d4] py-12 px-6 border-t border-[#c4c4c4]">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center text-white font-josefin font-bold text-[15px] shadow-sm">
-            N
-          </div>
-          <span className="font-josefin font-bold text-[15px] tracking-tight text-black">
-            Prophile
-          </span>
-        </div>
-        <p className="text-gray-500 font-medium">
-          © {new Date().getFullYear()} Prophile. All rights reserved.
-        </p>
-        <div className="flex gap-5 text-gray-400">
-          <Twitter
-            size={22}
-            className="hover:text-indigo-400 cursor-pointer transition-colors"
-          />
-          <Github
-            size={22}
-            className="hover:text-indigo-400 cursor-pointer transition-colors"
-          />
-          <Instagram
-            size={22}
-            className="hover:text-indigo-400 cursor-pointer transition-colors"
-          />
-        </div>
-      </div>
-    </footer>
-  );
-}
 
 function AudioPlayer({
   audioTitle,
@@ -733,11 +496,13 @@ function UserPage({
   onEdit,
   data,
   activePlan = "pro",
+  isPublic = false,
 }: {
-  onBack: () => void;
-  onEdit: () => void;
+  onBack?: () => void;
+  onEdit?: () => void;
   data: ProfileData;
   activePlan?: "free" | "pro";
+  isPublic?: boolean;
 }) {
   const isVideoBg = !!(
     data.videoBackgroundEnabled &&
@@ -750,7 +515,7 @@ function UserPage({
 
   return (
     <div
-      className={`min-h-screen flex flex-col items-center py-12 px-4 relative font-sans transition-colors duration-500 overflow-hidden ${isVideoBg ? "bg-black text-white" : "bg-white text-black"}`}
+      className={`min-h-screen flex flex-col items-center py-12 px-4 relative font-sans transition-colors duration-500 overflow-hidden ${isVideoBg ? "bg-black text-white" : "bg-[#d4d4d4] text-black"}`}
     >
       {isVideoBg && (
         <>
@@ -906,14 +671,16 @@ function UserPage({
       )}
 
       {/* Back to Editor button sent below */}
-      <button
-        onClick={onBack}
-        id="profile-back-button"
-        className="mt-8 flex items-center gap-2 px-5 py-2.5 bg-[#141414] text-gray-300 hover:text-white hover:bg-[#1c1c1c] border border-white/5 rounded-full text-sm font-semibold transition-all shadow-md active:scale-95 cursor-pointer z-30"
-      >
-        <ArrowLeft size={16} className="text-gray-400" />
-        <span>Back to Editor</span>
-      </button>
+      {!isPublic && onBack && (
+        <button
+          onClick={onBack}
+          id="profile-back-button"
+          className="mt-8 flex items-center gap-2 px-5 py-2.5 bg-[#141414] text-gray-300 hover:text-white hover:bg-[#1c1c1c] border border-white/5 rounded-full text-sm font-semibold transition-all shadow-md active:scale-95 cursor-pointer z-30"
+        >
+          <ArrowLeft size={16} className="text-gray-400" />
+          <span>Back to Editor</span>
+        </button>
+      )}
     </div>
   );
 }
@@ -952,11 +719,43 @@ function EditPage({
   const [leaderboardPeriod, setLeaderboardPeriod] = useState<
     "Daily" | "Weekly" | "Monthly" | "All Time"
   >("All Time");
+  const [leaderboardData, setLeaderboardData] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [hoveredDay, setHoveredDay] = useState<number | null>(null);
   const [analyticsPeriod, setAnalyticsPeriod] = useState<
     "Daily" | "Weekly" | "Monthly" | "All Time"
   >("Weekly");
+
+  const [analyticsData, setAnalyticsData] = useState<any>(null);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [showQRCodeView, setShowQRCodeView] = useState(false);
+  const [copiedShareUrl, setCopiedShareUrl] = useState(false);
+
+  const shareDisplayUrl = `prophile.app/${data.username || "username"}`;
+  const shareFullUrl = `${window.location.origin}/${data.username || "preview"}`;
+
+  const handleCopyShareUrl = () => {
+    navigator.clipboard.writeText(shareFullUrl).catch(() => {});
+    setCopiedShareUrl(true);
+    setTimeout(() => setCopiedShareUrl(false), 2000);
+  };
+
+  useEffect(() => {
+    if (activeTab === "leaderboard") {
+      import("./lib/api").then(api => {
+        if (api.fetchLeaderboard) {
+          api.fetchLeaderboard().then(data => setLeaderboardData(data));
+        }
+      });
+    }
+    if (activeTab === "analytics" && userId) {
+      import("./lib/api").then(api => {
+        if ((api as any).fetchAnalytics) {
+          (api as any).fetchAnalytics(userId).then((data: any) => setAnalyticsData(data));
+        }
+      });
+    }
+  }, [activeTab, userId]);
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -1132,18 +931,20 @@ function EditPage({
               className="fixed top-0 left-0 bottom-0 w-[85%] max-w-[320px] bg-[#1a1a1a] z-[70] shadow-2xl flex flex-col rounded-r-[24px]"
             >
               <div className="flex items-center justify-between p-5 border-b border-white/5">
-                <div className="flex items-center gap-2 text-white">
-                  <Sparkles size={18} />
-                  <span
-                    onClick={onHome}
-                    className="font-josefin font-bold text-lg hover:text-indigo-400 transition-colors cursor-pointer text-white"
-                  >
+                <div
+                  onClick={onHome}
+                  className="flex items-center gap-2.5 text-white cursor-pointer hover:opacity-80 transition-opacity"
+                >
+                  <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center text-black font-josefin font-bold text-xs">
+                    P
+                  </div>
+                  <span className="font-josefin font-bold text-lg text-white tracking-tight">
                     Prophile
                   </span>
                 </div>
                 <button
                   onClick={() => setIsSidebarOpen(false)}
-                  className="text-gray-400 hover:text-white transition-colors p-1"
+                  className="text-gray-400 hover:text-white transition-colors p-1 cursor-pointer"
                 >
                   <X size={20} />
                 </button>
@@ -1192,17 +993,12 @@ function EditPage({
                       size={18}
                       className={
                         activeTab === "premium"
-                          ? "text-yellow-400"
+                          ? "text-white"
                           : "text-gray-300"
                       }
                     />
                     <span className="font-josefin font-semibold text-[15px]">
                       Premium
-                    </span>
-                    <span
-                      className={`ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest transition-colors ${activeTab === "premium" ? "bg-yellow-400 text-black" : "bg-[#333] group-hover:bg-white group-hover:text-black text-gray-300"}`}
-                    >
-                      Pro
                     </span>
                   </button>
 
@@ -1260,33 +1056,154 @@ function EditPage({
                 </div>
               </div>
 
-              <div className="p-5 border-t border-white/5 mt-auto">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
+              <div className="p-4 border-t border-white/5 mt-auto space-y-2.5">
+                <button
+                  onClick={() => {
+                    setIsSidebarOpen(false);
+                    setShowQRCodeView(false);
+                    setIsShareModalOpen(true);
+                  }}
+                  className="w-full flex items-center justify-center gap-2.5 py-3 px-4 rounded-2xl bg-[#141414] border border-white/10 hover:bg-[#222] transition-colors text-white font-josefin font-bold text-[15px] cursor-pointer"
+                >
+                  <Share2 size={17} className="text-white" />
+                  <span>Share Your Profile</span>
+                </button>
+
+                <div className="flex items-center justify-between p-3 rounded-2xl bg-[#141414] border border-white/10">
+                  <div className="flex items-center gap-3 overflow-hidden">
                     {data.avatarUrl ? (
-                      <img src={data.avatarUrl} className="w-10 h-10 rounded-full object-cover border border-white/10" />
+                      <img src={data.avatarUrl} className="w-10 h-10 rounded-full object-cover border border-white/10 shrink-0" />
                     ) : (
-                      <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center font-bold text-white">
+                      <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center font-bold text-white shrink-0">
                         {data.username?.charAt(0).toUpperCase() || "U"}
                       </div>
                     )}
-                    <div className="flex flex-col">
-                      <span className="font-semibold text-white text-sm">
-                        {data.displayName || data.username || "User"}
+                    <div className="flex flex-col truncate">
+                      <span className="font-semibold text-white text-sm truncate">
+                        {data.username || data.displayName || "User"}
                       </span>
-                      <span className="text-xs text-gray-400 max-w-[120px] truncate">
-                        {userEmail}
-                      </span>
+                      {userEmail && (
+                        <span className="text-xs text-gray-400 max-w-[130px] truncate">
+                          {userEmail}
+                        </span>
+                      )}
                     </div>
                   </div>
                   <button
                     onClick={onSignOut}
-                    className="text-gray-400 hover:text-red-400 transition-colors p-2 rounded-xl hover:bg-white/5 cursor-pointer"
+                    className="text-gray-400 hover:text-red-400 transition-colors p-2 rounded-xl hover:bg-white/5 cursor-pointer shrink-0"
                   >
                     <LogOut size={18} />
                   </button>
                 </div>
               </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Share Your Profile Modal */}
+      <AnimatePresence>
+        {isShareModalOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsShareModalOpen(false)}
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[80]"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 16 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 16 }}
+              transition={{ duration: 0.2 }}
+              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[92%] max-w-[380px] bg-[#141414] border border-white/10 rounded-[26px] p-6 z-[90] shadow-2xl"
+            >
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-josefin font-bold text-white tracking-tight">
+                  {showQRCodeView ? "Profile QR Code" : "Share Your Profile"}
+                </h2>
+                <button
+                  onClick={() => setIsShareModalOpen(false)}
+                  className="text-gray-400 hover:text-white transition-colors p-1 cursor-pointer"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <p className="text-sm text-gray-400 mt-1.5 leading-relaxed">
+                {showQRCodeView
+                  ? "Scan this QR code to open your Prophile page directly."
+                  : "Share your Prophile link everywhere you're active."}
+              </p>
+
+              {showQRCodeView ? (
+                <div className="mt-5 flex flex-col items-center gap-4">
+                  <div className="p-4 bg-white rounded-2xl shadow-lg">
+                    <img
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(shareFullUrl)}`}
+                      alt="Profile QR Code"
+                      width={180}
+                      height={180}
+                      className="w-44 h-44 block"
+                      referrerPolicy="no-referrer"
+                    />
+                  </div>
+                  <span className="font-mono text-xs text-gray-400">{shareDisplayUrl}</span>
+                  <button
+                    onClick={() => setShowQRCodeView(false)}
+                    className="w-full py-3 rounded-2xl bg-[#1a1a1a] hover:bg-[#252525] border border-white/10 text-white font-josefin font-bold text-sm transition-colors cursor-pointer"
+                  >
+                    Back
+                  </button>
+                </div>
+              ) : (
+                <div className="mt-5 space-y-2.5">
+                  {/* QR Code Option */}
+                  <button
+                    onClick={() => setShowQRCodeView(true)}
+                    className="w-full flex items-center gap-3.5 p-3 rounded-2xl bg-[#1a1a1a] border border-white/10 hover:bg-[#222] transition-colors cursor-pointer text-left"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-[#252525] flex items-center justify-center text-white shrink-0">
+                      <QrCode size={19} />
+                    </div>
+                    <span className="font-josefin font-semibold text-white text-[15px]">
+                      Prophile QR Code
+                    </span>
+                  </button>
+
+                  {/* Open my Page Option */}
+                  <button
+                    onClick={() => {
+                      setIsShareModalOpen(false);
+                      onBack();
+                    }}
+                    className="w-full flex items-center gap-3.5 p-3 rounded-2xl bg-[#1a1a1a] border border-white/10 hover:bg-[#222] transition-colors cursor-pointer text-left"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-[#252525] flex items-center justify-center text-white shrink-0">
+                      <ExternalLink size={19} />
+                    </div>
+                    <span className="font-josefin font-semibold text-white text-[15px]">
+                      Open my Page
+                    </span>
+                  </button>
+
+                  {/* Copy URL Bar */}
+                  <div className="w-full flex items-center justify-between gap-2 p-2 pl-4 rounded-2xl bg-[#1a1a1a] border border-white/10">
+                    <span className="font-mono text-xs sm:text-sm text-gray-300 truncate">
+                      {shareDisplayUrl}
+                    </span>
+                    <button
+                      onClick={handleCopyShareUrl}
+                      className="bg-[#d4d4d4] hover:bg-white text-black font-josefin font-bold text-xs sm:text-sm px-4 py-2.5 rounded-full flex items-center gap-1.5 transition-all shrink-0 cursor-pointer active:scale-95"
+                    >
+                      {copiedShareUrl ? <Check size={15} /> : <Copy size={15} />}
+                      <span>{copiedShareUrl ? "Copied!" : "Copy URL"}</span>
+                    </button>
+                  </div>
+                </div>
+              )}
             </motion.div>
           </>
         )}
@@ -1322,107 +1239,58 @@ function EditPage({
         </header>
       </div>
 
-      <main className="flex-1 w-full max-w-[400px] mx-auto px-4 pt-8 md:pt-12">
+      <main className={`flex-1 w-full ${activeTab === "premium" || activeTab === "analytics" || activeTab === "help" ? "max-w-2xl" : "max-w-[400px]"} mx-auto px-4 pt-8 md:pt-12`}>
         {activeTab === "home" && (
           <div className="space-y-6 pb-12">
-            <div className="mb-8">
+            <div className="mb-6">
               <h1 className="text-[28px] font-josefin font-bold tracking-tight">
-                Welcome to Prophile!
+                Welcome to Prophile
               </h1>
-              <p className="text-gray-400 mt-2 text-sm leading-relaxed">
-                Your ultimate link-in-bio and personal landing page builder.
-                Setup all your content links, featured music, and socials into
-                one elegant, customizable page securely connected to your online
-                identity.
+              <p className="text-gray-600 mt-1.5 text-sm leading-relaxed">
+                Manage your links, profile music, and appearance from one place.
               </p>
             </div>
 
-            <div className="bg-gradient-to-br from-[#252525] to-[#141414] border border-white/5 rounded-[1.5rem] p-6 relative overflow-hidden">
-              <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/5 rounded-full blur-2xl"></div>
-              <h3 className="text-lg font-josefin font-bold text-white relative z-10 flex items-center gap-2">
-                <Sparkles size={18} className="text-yellow-400" /> Getting
-                Started
+            <div className="bg-[#141414] border border-white/10 rounded-[1.5rem] p-6">
+              <h3 className="text-lg font-josefin font-bold text-white">
+                Getting Started
               </h3>
-              <p className="text-gray-400 text-sm mt-3 relative z-10 leading-relaxed mb-5">
-                Ready to share your identity with the world? Your public profile
-                is live and ready to be customized. Head over to the{" "}
+              <p className="text-gray-400 text-sm mt-2 leading-relaxed mb-5">
+                Your public profile is live. Head over to{" "}
                 <strong
-                  className="text-white font-medium cursor-pointer"
+                  className="text-white font-semibold cursor-pointer underline"
                   onClick={() => setActiveTab("edit")}
                 >
-                  Edit Profile
+                  Edit profile
                 </strong>{" "}
-                tab to add your links, configure your appearance, and set up
-                your embedded audio player.
+                to customize your links, background, and music player.
               </p>
-              <div className="flex gap-4 items-center relative z-10">
-                <a
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onBack();
-                  }}
-                  className="bg-white text-black font-medium py-2.5 px-5 rounded-full hover:bg-gray-200 transition-colors flex items-center gap-2 text-sm"
-                >
-                  View My Public Page <ArrowRight size={16} />
-                </a>
-              </div>
+              <button
+                onClick={onBack}
+                className="bg-[#d4d4d4] hover:bg-white text-black font-semibold py-2.5 px-5 rounded-full transition-colors flex items-center gap-2 text-sm cursor-pointer"
+              >
+                View My Public Page <ArrowRight size={16} />
+              </button>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 max-w-[400px]">
+            <div className="grid grid-cols-2 gap-4">
               <div
-                className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6 text-center hover:bg-white/[0.02] transition-colors cursor-pointer"
+                className="bg-[#141414] border border-white/10 rounded-[1.5rem] p-6 text-center hover:bg-[#1a1a1a] transition-colors cursor-pointer"
                 onClick={() => setActiveTab("analytics")}
               >
                 <div className="text-3xl font-bold text-white mb-1">
-                  {Math.floor(Math.random() * 500) + 120}
+                  {analyticsData ? analyticsData.views : "0"}
                 </div>
                 <div className="text-gray-400 text-sm">Total Views</div>
               </div>
               <div
-                className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6 text-center hover:bg-white/[0.02] transition-colors cursor-pointer"
+                className="bg-[#141414] border border-white/10 rounded-[1.5rem] p-6 text-center hover:bg-[#1a1a1a] transition-colors cursor-pointer"
                 onClick={() => setActiveTab("edit")}
               >
                 <div className="text-3xl font-bold text-white mb-1">
                   {data.links.length}
                 </div>
                 <div className="text-gray-400 text-sm">Active Links</div>
-              </div>
-            </div>
-
-            <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6 space-y-4">
-              <h3 className="text-lg font-josefin font-bold text-white">
-                What's new
-              </h3>
-              <div className="space-y-4">
-                <div className="flex gap-3">
-                  <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center shrink-0">
-                    <Trophy size={14} className="text-blue-400" />
-                  </div>
-                  <div>
-                    <h4 className="text-white text-sm font-josefin font-bold">
-                      Leaderboards are live
-                    </h4>
-                    <p className="text-gray-400 text-[13px] mt-1">
-                      See how your page performs compared to other top creators
-                      on Prophile.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex gap-3">
-                  <div className="w-8 h-8 rounded-full bg-purple-500/10 flex items-center justify-center shrink-0">
-                    <Music size={14} className="text-purple-400" />
-                  </div>
-                  <div>
-                    <h4 className="text-white text-sm font-josefin font-bold">
-                      Enhaced audio player
-                    </h4>
-                    <p className="text-gray-400 text-[13px] mt-1">
-                      Add autoplaying background music or feature a specific
-                      track on your page.
-                    </p>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -1434,990 +1302,148 @@ function EditPage({
                 <h1 className="text-[28px] font-josefin font-bold tracking-tight">
                   Analytics
                 </h1>
-                <p className="text-gray-400 mt-1 text-sm">
-                  Detailed performance stats for your profile
+                <p className="text-gray-600 mt-1 text-sm">
+                  Performance stats for your profile
                 </p>
               </div>
             </div>
 
             {activePlan === "free" ? (
-              <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-8 text-center flex flex-col items-center justify-center">
-                <div className="w-16 h-16 bg-yellow-500/10 rounded-full flex items-center justify-center mb-4">
-                  <BarChart2 size={32} className="text-yellow-500" />
+              <div className="bg-[#141414] border border-white/10 rounded-[1.5rem] p-8 text-center flex flex-col items-center justify-center">
+                <div className="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center mb-4">
+                  <BarChart2 size={26} className="text-white" />
                 </div>
-                <h3 className="text-xl font-josefin font-bold text-white mb-2">Pro Feature</h3>
+                <h3 className="text-xl font-josefin font-bold text-white mb-2">Premium Feature</h3>
                 <p className="text-gray-400 text-sm max-w-sm mb-6">
-                  Analytics is a premium feature. Upgrade to Premium to track your page views, clicks, and engagement over time.
+                  Upgrade to Premium to track your page views, link clicks, and audience engagement.
                 </p>
                 <button
                   onClick={() => setActiveTab("premium")}
-                  className="bg-white text-black px-6 py-3 rounded-full font-semibold transition-colors hover:bg-gray-200 cursor-pointer"
+                  className="bg-[#d4d4d4] text-black px-6 py-3 rounded-full font-semibold transition-colors hover:bg-white cursor-pointer"
                 >
-                  Upgrade to Premium
+                  View Plans
                 </button>
               </div>
             ) : (
               <>
-              {/* Timeframe selector */}
-              <div className="flex items-center justify-between bg-[#141414] border border-white/5 p-2 rounded-full mb-6 w-full gap-1">
-                {(
-                  [
-                    { id: "Daily", label: "Daily" },
-                    { id: "Weekly", label: "Weekly" },
-                    { id: "Monthly", label: "Monthly" },
-                    { id: "All Time", label: "All Time" },
-                  ] as const
-                ).map((p) => (
-                  <button
-                    key={p.id}
-                    onClick={() => setAnalyticsPeriod(p.id)}
-                    className={`flex-1 py-3 px-2 rounded-full text-[15px] font-josefin font-bold tracking-tight whitespace-nowrap transition-all cursor-pointer ${p.id === analyticsPeriod ? "bg-[#252525] text-white shadow-md" : "text-gray-500 hover:text-gray-300 bg-transparent"}`}
-                  >
-                    {p.label}
-                  </button>
-                ))}
-              </div>
-
-            {/* KPI Bento Grid */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-[#141414] border border-white/5 p-4 rounded-2xl flex flex-col justify-between">
-                <div>
-                  <span className="text-gray-400 font-mono text-[10px] uppercase tracking-wider font-semibold">
-                    Page Views
-                  </span>
-                  <h3 className="text-2xl font-josefin font-bold text-white mt-1">
-                    {
-                      {
-                        Daily: "492",
-                        Weekly: "3,482",
-                        Monthly: "14,842",
-                        "All Time": "142,482",
-                      }[analyticsPeriod]
-                    }
-                  </h3>
-                </div>
-                <div className="text-emerald-400 text-xs font-mono font-medium mt-3 flex items-center gap-1">
-                  <span>
-                    ↑{" "}
-                    {
-                      {
-                        Daily: "+12.4%",
-                        Weekly: "+18.4%",
-                        Monthly: "+25.1%",
-                        "All Time": "+100%",
-                      }[analyticsPeriod]
-                    }
-                  </span>
-                  <span className="text-gray-500 font-sans">
-                    {
-                      {
-                        Daily: "today",
-                        Weekly: "this week",
-                        Monthly: "this month",
-                        "All Time": "all time",
-                      }[analyticsPeriod]
-                    }
-                  </span>
-                </div>
-              </div>
-
-              <div className="bg-[#141414] border border-white/5 p-4 rounded-2xl flex flex-col justify-between">
-                <div>
-                  <span className="text-gray-400 font-mono text-[10px] uppercase tracking-wider font-semibold">
-                    Link Clicks
-                  </span>
-                  <h3 className="text-2xl font-josefin font-bold text-white mt-1">
-                    {
-                      {
-                        Daily: "182",
-                        Weekly: "1,294",
-                        Monthly: "5,194",
-                        "All Time": "54,294",
-                      }[analyticsPeriod]
-                    }
-                  </h3>
-                </div>
-                <div className="text-emerald-400 text-xs font-mono font-medium mt-3 flex items-center gap-1">
-                  <span>
-                    ↑{" "}
-                    {
-                      {
-                        Daily: "+8.1%",
-                        Weekly: "+22.1%",
-                        Monthly: "+15.2%",
-                        "All Time": "+100%",
-                      }[analyticsPeriod]
-                    }
-                  </span>
-                  <span className="text-gray-500 font-sans">
-                    {
-                      {
-                        Daily: "CTR: 37.0%",
-                        Weekly: "CTR: 37.2%",
-                        Monthly: "CTR: 35.0%",
-                        "All Time": "CTR: 38.1%",
-                      }[analyticsPeriod]
-                    }
-                  </span>
-                </div>
-              </div>
-
-              <div className="bg-[#141414] border border-white/5 p-4 rounded-2xl flex flex-col justify-between">
-                <div>
-                  <span className="text-gray-400 font-mono text-[10px] uppercase tracking-wider font-semibold font-sans">
-                    Avg. Session
-                  </span>
-                  <h3 className="text-2xl font-josefin font-bold text-white mt-1">
-                    {
-                      {
-                        Daily: "1m 24s",
-                        Weekly: "1m 45s",
-                        Monthly: "1m 32s",
-                        "All Time": "2m 15s",
-                      }[analyticsPeriod]
-                    }
-                  </h3>
-                </div>
-                <div
-                  className={`text-xs font-mono font-medium mt-3 flex items-center gap-1 ${analyticsPeriod === "Monthly" ? "text-red-400" : "text-emerald-400"}`}
-                >
-                  <span>
-                    {
-                      {
-                        Daily: "↑ +4.2%",
-                        Weekly: "↑ +8.2%",
-                        Monthly: "↓ -1.5%",
-                        "All Time": "↑ +15.2%",
-                      }[analyticsPeriod]
-                    }
-                  </span>
-                  <span className="text-gray-500 font-sans">
-                    {
-                      {
-                        Daily: "vs yesterday",
-                        Weekly: "up from 1m 37s",
-                        Monthly: "down from 1m 35s",
-                        "All Time": "avg overall",
-                      }[analyticsPeriod]
-                    }
-                  </span>
-                </div>
-              </div>
-
-              <div className="bg-[#141414] border border-white/5 p-4 rounded-2xl flex flex-col justify-between">
-                <div>
-                  <span className="text-gray-400 font-mono text-[10px] uppercase tracking-wider font-semibold font-sans">
-                    Unique Visitors
-                  </span>
-                  <h3 className="text-2xl font-josefin font-bold text-white mt-1">
-                    {
-                      {
-                        Daily: "298",
-                        Weekly: "1,842",
-                        Monthly: "8,482",
-                        "All Time": "98,842",
-                      }[analyticsPeriod]
-                    }
-                  </h3>
-                </div>
-                <div className="text-emerald-400 text-xs font-mono font-medium mt-3 flex items-center gap-1">
-                  <span>
-                    ↑{" "}
-                    {
-                      {
-                        Daily: "+9.3%",
-                        Weekly: "+12.3%",
-                        Monthly: "+18.1%",
-                        "All Time": "+100%",
-                      }[analyticsPeriod]
-                    }
-                  </span>
-                  <span className="text-gray-500 font-sans">
-                    {
-                      {
-                        Daily: "today",
-                        Weekly: "this week",
-                        Monthly: "this month",
-                        "All Time": "all time",
-                      }[analyticsPeriod]
-                    }
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Main Interactive Graph Panel */}
-            <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-5">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="font-josefin font-bold text-white text-[17px]">
-                  Profile Views & Engagement Trend
-                </h3>
-                <div className="flex items-center gap-4 text-xs">
-                  <div className="flex items-center gap-1.5 text-gray-300">
-                    <span className="w-2.5 h-2.5 bg-yellow-400 rounded-full inline-block" />
-                    <span>Views</span>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="bg-[#141414] border border-white/10 p-4 rounded-2xl flex flex-col justify-between">
+                    <div>
+                      <span className="text-gray-400 font-mono text-[10px] uppercase tracking-wider font-semibold">Page Views</span>
+                      <h3 className="text-2xl font-josefin font-bold text-white mt-1">{analyticsData ? analyticsData.views : "..."}</h3>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1.5 text-gray-300">
-                    <span className="w-2.5 h-2.5 bg-white rounded-full inline-block" />
-                    <span>Clicks</span>
+                  <div className="bg-[#141414] border border-white/10 p-4 rounded-2xl flex flex-col justify-between">
+                    <div>
+                      <span className="text-gray-400 font-mono text-[10px] uppercase tracking-wider font-semibold">Link Clicks</span>
+                      <h3 className="text-2xl font-josefin font-bold text-white mt-1">{analyticsData ? analyticsData.clicks : "..."}</h3>
+                    </div>
+                  </div>
+                  <div className="bg-[#141414] border border-white/10 p-4 rounded-2xl flex flex-col justify-between">
+                    <div>
+                      <span className="text-gray-400 font-mono text-[10px] uppercase tracking-wider font-semibold">CTR</span>
+                      <h3 className="text-2xl font-josefin font-bold text-white mt-1">{analyticsData ? analyticsData.ctr + "%" : "..."}</h3>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Custom Graphic Bar Chart */}
-              <div className="relative h-[200px] flex items-end gap-3.5 md:gap-7 w-full pt-8 px-2">
-                {/* Y-axis Guides */}
-                <div className="absolute left-0 right-0 top-8 border-t border-white/5" />
-                <div className="absolute left-0 right-0 top-24 border-t border-white/5" />
-                <div className="absolute left-0 right-0 top-40 border-t border-white/5" />
-
-                {(
-                  {
-                    "7d": [
-                      { label: "Mon", views: 240, clicks: 82, ctr: "34.1%" },
-                      { label: "Tue", views: 310, clicks: 112, ctr: "36.1%" },
-                      { label: "Wed", views: 480, clicks: 185, ctr: "38.5%" },
-                      { label: "Thu", views: 390, clicks: 140, ctr: "35.8%" },
-                      { label: "Fri", views: 520, clicks: 215, ctr: "41.3%" },
-                      { label: "Sat", views: 680, clicks: 298, ctr: "43.8%" },
-                      { label: "Sun", views: 862, clicks: 362, ctr: "42.0%" },
-                    ],
-                    "30d": [
-                      {
-                        label: "Week 1",
-                        views: 2400,
-                        clicks: 820,
-                        ctr: "34.1%",
-                      },
-                      {
-                        label: "Week 2",
-                        views: 3100,
-                        clicks: 1120,
-                        ctr: "36.1%",
-                      },
-                      {
-                        label: "Week 3",
-                        views: 4800,
-                        clicks: 1850,
-                        ctr: "38.5%",
-                      },
-                      {
-                        label: "Week 4",
-                        views: 2182,
-                        clicks: 504,
-                        ctr: "23.1%",
-                      },
-                    ],
-                    all: [
-                      {
-                        label: "Jan",
-                        views: 12400,
-                        clicks: 4820,
-                        ctr: "38.8%",
-                      },
-                      {
-                        label: "Feb",
-                        views: 15100,
-                        clicks: 6120,
-                        ctr: "40.5%",
-                      },
-                      {
-                        label: "Mar",
-                        views: 24800,
-                        clicks: 9850,
-                        ctr: "39.7%",
-                      },
-                      {
-                        label: "Apr",
-                        views: 31000,
-                        clicks: 12400,
-                        ctr: "40.0%",
-                      },
-                      {
-                        label: "May",
-                        views: 28500,
-                        clicks: 10210,
-                        ctr: "35.8%",
-                      },
-                      {
-                        label: "Jun",
-                        views: 30682,
-                        clicks: 10894,
-                        ctr: "35.5%",
-                      },
-                    ],
-                  }[analyticsPeriod] || []
-                ).map((dataNode, index) => {
-                  const maxViews =
-                    { "7d": 900, "30d": 5000, all: 35000 }[analyticsPeriod] ||
-                    900;
-                  const barHeightPercent = Math.max(
-                    15,
-                    (dataNode.views / maxViews) * 100,
-                  );
-                  const clickHeightPercent = Math.max(
-                    10,
-                    (dataNode.clicks / maxViews) * 100,
-                  );
-
-                  return (
-                    <div
-                      key={dataNode.label}
-                      className="flex-1 flex flex-col items-center h-full relative group"
-                      onMouseEnter={() => setHoveredDay(index)}
-                      onMouseLeave={() => setHoveredDay(null)}
-                    >
-                      {/* Hover tooltip overlay */}
-                      {hoveredDay === index && (
-                        <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-white text-black px-2.5 py-1.5 rounded-lg shadow-2xl text-[11px] font-semibold flex flex-col gap-0.5 z-40 whitespace-nowrap">
-                          <div className="font-bold border-b border-gray-100 pb-0.5 mb-0.5 text-center">
-                            {dataNode.label} Summary
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="bg-[#141414] border border-white/10 rounded-[1.5rem] p-5">
+                    <h3 className="font-josefin font-bold text-white text-[16px] mb-4">Traffic Referrals</h3>
+                    <div className="space-y-4">
+                      {analyticsData ? analyticsData.sources.map((item: any) => (
+                        <div key={item.source} className="flex flex-col gap-1.5">
+                          <div className="flex justify-between items-center text-[13px]">
+                            <span className="text-gray-300 font-semibold font-sans">{item.source}</span>
+                            <div className="flex items-center gap-3">
+                              <span className="text-white font-mono font-bold">{item.clicks}</span>
+                              <span className="text-gray-500 font-mono w-8 text-right">{item.pct}%</span>
+                            </div>
                           </div>
-                          <div className="text-gray-700">
-                            👁 Views:{" "}
-                            <strong className="text-black font-extrabold">
-                              {dataNode.views}
-                            </strong>
-                          </div>
-                          <div className="text-gray-700">
-                            🎯 Clicks:{" "}
-                            <strong className="text-black font-extrabold">
-                              {dataNode.clicks}
-                            </strong>
-                          </div>
-                          <div className="text-gray-750">
-                            📈 CTR:{" "}
-                            <strong className="text-black font-extrabold">
-                              {dataNode.ctr}
-                            </strong>
+                          <div className="w-full h-1.5 bg-[#252525] rounded-full overflow-hidden">
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: `${item.pct}%` }}
+                              transition={{ duration: 1, ease: "easeOut" }}
+                              className="h-full bg-white"
+                            />
                           </div>
                         </div>
-                      )}
-
-                      {/* Interactive Bar */}
-                      <div className="w-full max-w-[28px] h-full flex items-end justify-center relative select-none cursor-pointer">
-                        {/* Views bar (back) */}
-                        <div
-                          className={`w-full rounded-t-md transition-all duration-300 relative ${hoveredDay === index ? "bg-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.25)]" : "bg-[#2a2a30]"}`}
-                          style={{ height: `${barHeightPercent}%` }}
-                        />
-                        {/* Clicks bar (front) */}
-                        <div
-                          className={`w-1/2 rounded-t-sm transition-all duration-300 absolute bottom-0 left-1/4 ${hoveredDay === index ? "bg-white" : "bg-gray-500"}`}
-                          style={{ height: `${clickHeightPercent}%` }}
-                        />
-                      </div>
-
-                      {/* Label */}
-                      <span
-                        className={`text-[11px] mt-2 font-mono font-bold transition-colors ${hoveredDay === index ? "text-white" : "text-gray-500"}`}
-                      >
-                        {dataNode.label}
-                      </span>
+                      )) : "..."}
                     </div>
-                  );
-                })}
-              </div>
-            </div>
+                  </div>
 
-            {/* Secondary breakdown blocks */}
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Referral Channels */}
-              <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-5">
-                <h3 className="font-josefin font-bold text-white text-[16px] mb-4">
-                  Traffic Referrals
-                </h3>
-                <div className="space-y-4">
-                  {(
-                    {
-                      Daily: [
-                        {
-                          source: "Twitter / X",
-                          clicks: 82,
-                          pct: 50,
-                          color: "bg-yellow-400",
-                        },
-                        {
-                          source: "GitHub",
-                          clicks: 49,
-                          pct: 30,
-                          color: "bg-white",
-                        },
-                        {
-                          source: "LinkedIn",
-                          clicks: 24,
-                          pct: 15,
-                          color: "bg-gray-400",
-                        },
-                        {
-                          source: "Direct / Other",
-                          clicks: 8,
-                          pct: 5,
-                          color: "bg-gray-600",
-                        },
-                      ],
-                      Weekly: [
-                        {
-                          source: "Twitter / X",
-                          clicks: 612,
-                          pct: 47,
-                          color: "bg-yellow-400",
-                        },
-                        {
-                          source: "GitHub",
-                          clicks: 365,
-                          pct: 28,
-                          color: "bg-white",
-                        },
-                        {
-                          source: "LinkedIn",
-                          clicks: 195,
-                          pct: 15,
-                          color: "bg-gray-400",
-                        },
-                        {
-                          source: "Direct / Other",
-                          clicks: 122,
-                          pct: 10,
-                          color: "bg-gray-600",
-                        },
-                      ],
-                      Monthly: [
-                        {
-                          source: "Twitter / X",
-                          clicks: 1612,
-                          pct: 40,
-                          color: "bg-yellow-400",
-                        },
-                        {
-                          source: "GitHub",
-                          clicks: 1365,
-                          pct: 32,
-                          color: "bg-white",
-                        },
-                        {
-                          source: "LinkedIn",
-                          clicks: 895,
-                          pct: 18,
-                          color: "bg-gray-400",
-                        },
-                        {
-                          source: "Direct / Other",
-                          clicks: 422,
-                          pct: 10,
-                          color: "bg-gray-600",
-                        },
-                      ],
-                      "All Time": [
-                        {
-                          source: "Twitter / X",
-                          clicks: 21612,
-                          pct: 45,
-                          color: "bg-yellow-400",
-                        },
-                        {
-                          source: "GitHub",
-                          clicks: 18365,
-                          pct: 30,
-                          color: "bg-white",
-                        },
-                        {
-                          source: "LinkedIn",
-                          clicks: 9895,
-                          pct: 15,
-                          color: "bg-gray-400",
-                        },
-                        {
-                          source: "Direct / Other",
-                          clicks: 4422,
-                          pct: 10,
-                          color: "bg-gray-600",
-                        },
-                      ],
-                    }[analyticsPeriod] || []
-                  ).map((ref) => (
-                    <div key={ref.source} className="space-y-1.5">
-                      <div className="flex items-center justify-between text-xs font-medium">
-                        <span className="text-gray-300">{ref.source}</span>
-                        <span className="text-gray-400 font-mono">
-                          {ref.clicks} clicks ({ref.pct}%)
-                        </span>
-                      </div>
-                      <div className="w-full bg-[#1e1e24] h-1.5 rounded-full overflow-hidden">
-                        <div
-                          className={`h-full ${ref.color} rounded-full`}
-                          style={{ width: `${ref.pct}%` }}
-                        />
-                      </div>
+                  <div className="bg-[#141414] border border-white/10 rounded-[1.5rem] p-5">
+                    <h3 className="font-josefin font-bold text-white text-[16px] mb-4">Top Geographies</h3>
+                    <div className="space-y-3">
+                      {analyticsData ? analyticsData.countries.map((loc: any) => (
+                        <div key={loc.country} className="flex justify-between items-center bg-white/[0.02] hover:bg-white/5 transition-colors p-2 rounded-lg border border-white/5">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[13px] text-gray-200 font-semibold">{loc.country}</span>
+                          </div>
+                          <div className="flex items-center gap-3 text-[13px]">
+                            <span className="text-white font-mono font-bold">{loc.visitors}</span>
+                            <span className="text-gray-500 font-mono w-8 text-right">{loc.pct}%</span>
+                          </div>
+                        </div>
+                      )) : "..."}
                     </div>
-                  ))}
+                  </div>
                 </div>
-              </div>
-
-              {/* Device & Location Split */}
-              <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-5">
-                <h3 className="font-josefin font-bold text-white text-[16px] mb-4">
-                  Device & Top Geographies
-                </h3>
-
-                {/* Devices */}
-                <div className="flex items-center gap-3 mb-5 p-3 rounded-xl bg-white/2">
-                  <span className="text-gray-400 text-xs font-sans">
-                    Devices:
-                  </span>
-                  <span className="px-2 py-0.5 rounded-md bg-[#252525] text-white text-[11px] font-mono font-bold">
-                    📱 Mobile (
-                    {{ "7d": "68%", "30d": "71%", all: "65%" }[analyticsPeriod]}
-                    )
-                  </span>
-                  <span className="px-2 py-0.5 rounded-md bg-[#252525] text-white text-[11px] font-mono font-bold">
-                    💻 Desktop (
-                    {{ "7d": "27%", "30d": "24%", all: "30%" }[analyticsPeriod]}
-                    )
-                  </span>
-                  <span className="px-2 py-0.5 rounded-md bg-[#252525] text-white text-[11px] font-mono font-bold">
-                    📟 Tablet (
-                    {{ "7d": "5%", "30d": "5%", all: "5%" }[analyticsPeriod]})
-                  </span>
-                </div>
-
-                {/* Countries */}
-                <div className="space-y-3">
-                  {(
-                    {
-                      Daily: [
-                        { country: "🇺🇸 United States", visitors: 120, pct: 48 },
-                        { country: "🇬🇧 United Kingdom", visitors: 42, pct: 17 },
-                        { country: "🇩🇪 Germany", visitors: 22, pct: 9 },
-                        { country: "🇯🇵 Japan", visitors: 15, pct: 6 },
-                        { country: "🇸🇬 Singapore", visitors: 12, pct: 5 },
-                      ],
-                      Weekly: [
-                        { country: "🇺🇸 United States", visitors: 824, pct: 45 },
-                        {
-                          country: "🇬🇧 United Kingdom",
-                          visitors: 310,
-                          pct: 17,
-                        },
-                        { country: "🇩🇪 Germany", visitors: 164, pct: 9 },
-                        { country: "🇯🇵 Japan", visitors: 110, pct: 6 },
-                        { country: "🇸🇬 Singapore", visitors: 91, pct: 5 },
-                      ],
-                      Monthly: [
-                        {
-                          country: "🇺🇸 United States",
-                          visitors: 2824,
-                          pct: 41,
-                        },
-                        {
-                          country: "🇬🇧 United Kingdom",
-                          visitors: 1310,
-                          pct: 21,
-                        },
-                        { country: "🇩🇪 Germany", visitors: 864, pct: 14 },
-                        { country: "🇯🇵 Japan", visitors: 510, pct: 8 },
-                        { country: "🇸🇬 Singapore", visitors: 291, pct: 5 },
-                      ],
-                      "All Time": [
-                        {
-                          country: "🇺🇸 United States",
-                          visitors: 42824,
-                          pct: 45,
-                        },
-                        {
-                          country: "🇬🇧 United Kingdom",
-                          visitors: 18310,
-                          pct: 19,
-                        },
-                        { country: "🇩🇪 Germany", visitors: 11864, pct: 12 },
-                        { country: "🇯🇵 Japan", visitors: 8510, pct: 9 },
-                        { country: "🇸🇬 Singapore", visitors: 4291, pct: 5 },
-                      ],
-                    }[analyticsPeriod] || []
-                  ).map((geo, idx) => (
-                    <div
-                      key={geo.country}
-                      className="flex items-center justify-between text-xs"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="text-gray-400 font-medium font-mono">
-                          #{idx + 1}
-                        </span>
-                        <span className="text-gray-300 font-medium">
-                          {geo.country}
-                        </span>
-                      </div>
-                      <span className="text-gray-400 font-mono font-semibold">
-                        {geo.visitors} visitors
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
               </>
             )}
           </div>
         )}
+
         {activeTab === "leaderboard" && (
           <div className="space-y-6">
             <div className="mb-4">
-              <h1 className="text-[28px] font-josefin font-bold tracking-tight">
-                Leaderboard
-              </h1>
-              <p className="text-gray-400 mt-2 text-sm">
-                See who has the most views.
-              </p>
+              <h1 className="text-[28px] font-josefin font-bold tracking-tight">Leaderboard</h1>
+              <p className="text-gray-600 mt-1 text-sm">Top creators on Prophile</p>
             </div>
-
-            <div className="flex items-center justify-between bg-[#141414] border border-white/5 p-2 rounded-full mb-6 w-full gap-1">
-              {(["Daily", "Weekly", "Monthly", "All Time"] as const).map(
-                (period) => (
-                  <button
-                    key={period}
-                    onClick={() => setLeaderboardPeriod(period)}
-                    className={`flex-1 py-3 px-2 rounded-full text-[15px] font-josefin font-bold tracking-tight whitespace-nowrap transition-all ${period === leaderboardPeriod ? "bg-[#252525] text-white shadow-md" : "text-gray-500 hover:text-gray-300 bg-transparent"}`}
-                  >
-                    {period}
-                  </button>
-                ),
-              )}
-            </div>
-
-            <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-4 space-y-2">
-              {{
-                Daily: [
-                  {
-                    name: "Sarah L.",
-                    handle: "@sarah",
-                    views: "2.1K",
-                    rank: 1,
-                    img: "https://i.pravatar.cc/100?img=9",
-                  },
-                  {
-                    name: "Mike T.",
-                    handle: "@miket",
-                    views: "1.8K",
-                    rank: 2,
-                    img: "https://i.pravatar.cc/100?img=12",
-                  },
-                  {
-                    name: "Alice Smith",
-                    handle: "@alice",
-                    views: "1.5K",
-                    rank: 3,
-                    img: "https://i.pravatar.cc/100?img=1",
-                  },
-                  {
-                    name: "Eve",
-                    handle: "@eve_xyz",
-                    views: "1.2K",
-                    rank: 4,
-                    img: "https://i.pravatar.cc/100?img=5",
-                  },
-                  {
-                    name: "Bob Jones",
-                    handle: "@bobjones",
-                    views: "980",
-                    rank: 5,
-                    img: "https://i.pravatar.cc/100?img=11",
-                  },
-                  {
-                    name: "David K.",
-                    handle: "@david_k",
-                    views: "850",
-                    rank: 6,
-                    img: "https://i.pravatar.cc/100?img=15",
-                  },
-                  {
-                    name: "Clara M.",
-                    handle: "@claram",
-                    views: "790",
-                    rank: 7,
-                    img: "https://i.pravatar.cc/100?img=20",
-                  },
-                  {
-                    name: "James P.",
-                    handle: "@james_p",
-                    views: "640",
-                    rank: 8,
-                    img: "https://i.pravatar.cc/100?img=32",
-                  },
-                  {
-                    name: "Nina R.",
-                    handle: "@ninar",
-                    views: "520",
-                    rank: 9,
-                    img: "https://i.pravatar.cc/100?img=28",
-                  },
-                  {
-                    name: "Tom B.",
-                    handle: "@tomb",
-                    views: "450",
-                    rank: 10,
-                    img: "https://i.pravatar.cc/100?img=33",
-                  },
-                ],
-                Weekly: [
-                  {
-                    name: "Diana P.",
-                    handle: "@diana",
-                    views: "8.4K",
-                    rank: 1,
-                    img: "https://i.pravatar.cc/100?img=44",
-                  },
-                  {
-                    name: "Alice Smith",
-                    handle: "@alice",
-                    views: "7.5K",
-                    rank: 2,
-                    img: "https://i.pravatar.cc/100?img=1",
-                  },
-                  {
-                    name: "Charlie",
-                    handle: "@charlie_d",
-                    views: "6.1K",
-                    rank: 3,
-                    img: "https://i.pravatar.cc/100?img=33",
-                  },
-                  {
-                    name: "Sarah L.",
-                    handle: "@sarah",
-                    views: "5.8K",
-                    rank: 4,
-                    img: "https://i.pravatar.cc/100?img=9",
-                  },
-                  {
-                    name: "Mike T.",
-                    handle: "@miket",
-                    views: "4.2K",
-                    rank: 5,
-                    img: "https://i.pravatar.cc/100?img=12",
-                  },
-                  {
-                    name: "Ryan G.",
-                    handle: "@ryan_g",
-                    views: "3.9K",
-                    rank: 6,
-                    img: "https://i.pravatar.cc/100?img=47",
-                  },
-                  {
-                    name: "Chloe W.",
-                    handle: "@chloe_w",
-                    views: "3.1K",
-                    rank: 7,
-                    img: "https://i.pravatar.cc/100?img=49",
-                  },
-                  {
-                    name: "Lucas N.",
-                    handle: "@lucas_n",
-                    views: "2.8K",
-                    rank: 8,
-                    img: "https://i.pravatar.cc/100?img=52",
-                  },
-                  {
-                    name: "Sophia V.",
-                    handle: "@sophia_v",
-                    views: "2.4K",
-                    rank: 9,
-                    img: "https://i.pravatar.cc/100?img=54",
-                  },
-                  {
-                    name: "Ethan S.",
-                    handle: "@ethan_s",
-                    views: "1.9K",
-                    rank: 10,
-                    img: "https://i.pravatar.cc/100?img=58",
-                  },
-                ],
-                Monthly: [
-                  {
-                    name: "Alice Smith",
-                    handle: "@alice",
-                    views: "24.5K",
-                    rank: 1,
-                    img: "https://i.pravatar.cc/100?img=1",
-                  },
-                  {
-                    name: "Charlie",
-                    handle: "@charlie_d",
-                    views: "22.1K",
-                    rank: 2,
-                    img: "https://i.pravatar.cc/100?img=33",
-                  },
-                  {
-                    name: "Bob Jones",
-                    handle: "@bobjones",
-                    views: "18.2K",
-                    rank: 3,
-                    img: "https://i.pravatar.cc/100?img=11",
-                  },
-                  {
-                    name: "Diana P.",
-                    handle: "@diana",
-                    views: "12.4K",
-                    rank: 4,
-                    img: "https://i.pravatar.cc/100?img=44",
-                  },
-                  {
-                    name: "Eve",
-                    handle: "@eve_xyz",
-                    views: "9.8K",
-                    rank: 5,
-                    img: "https://i.pravatar.cc/100?img=5",
-                  },
-                  {
-                    name: "Oliver H.",
-                    handle: "@oliver_h",
-                    views: "8.7K",
-                    rank: 6,
-                    img: "https://i.pravatar.cc/100?img=60",
-                  },
-                  {
-                    name: "Lily B.",
-                    handle: "@lily_b",
-                    views: "7.9K",
-                    rank: 7,
-                    img: "https://i.pravatar.cc/100?img=62",
-                  },
-                  {
-                    name: "Marcus J.",
-                    handle: "@marcus_j",
-                    views: "6.5K",
-                    rank: 8,
-                    img: "https://i.pravatar.cc/100?img=64",
-                  },
-                  {
-                    name: "Amelia F.",
-                    handle: "@amelia_f",
-                    views: "5.8K",
-                    rank: 9,
-                    img: "https://i.pravatar.cc/100?img=66",
-                  },
-                  {
-                    name: "Henry T.",
-                    handle: "@henry_t",
-                    views: "4.9K",
-                    rank: 10,
-                    img: "https://i.pravatar.cc/100?img=68",
-                  },
-                ],
-                "All Time": [
-                  {
-                    name: "Alice Smith",
-                    handle: "@alice",
-                    views: "145K",
-                    rank: 1,
-                    img: "https://i.pravatar.cc/100?img=1",
-                  },
-                  {
-                    name: "Bob Jones",
-                    handle: "@bobjones",
-                    views: "112K",
-                    rank: 2,
-                    img: "https://i.pravatar.cc/100?img=11",
-                  },
-                  {
-                    name: "Charlie",
-                    handle: "@charlie_d",
-                    views: "98K",
-                    rank: 3,
-                    img: "https://i.pravatar.cc/100?img=33",
-                  },
-                  {
-                    name: "Diana P.",
-                    handle: "@diana",
-                    views: "76K",
-                    rank: 4,
-                    img: "https://i.pravatar.cc/100?img=44",
-                  },
-                  {
-                    name: "Eve",
-                    handle: "@eve_xyz",
-                    views: "54K",
-                    rank: 5,
-                    img: "https://i.pravatar.cc/100?img=5",
-                  },
-                  {
-                    name: "Sarah L.",
-                    handle: "@sarah",
-                    views: "49K",
-                    rank: 6,
-                    img: "https://i.pravatar.cc/100?img=9",
-                  },
-                  {
-                    name: "Mike T.",
-                    handle: "@miket",
-                    views: "42K",
-                    rank: 7,
-                    img: "https://i.pravatar.cc/100?img=12",
-                  },
-                  {
-                    name: "Leo V.",
-                    handle: "@leov",
-                    views: "38K",
-                    rank: 8,
-                    img: "https://i.pravatar.cc/100?img=70",
-                  },
-                  {
-                    name: "Grace E.",
-                    handle: "@grace_e",
-                    views: "31K",
-                    rank: 9,
-                    img: "https://i.pravatar.cc/100?img=72",
-                  },
-                  {
-                    name: "Arthur M.",
-                    handle: "@arthurm",
-                    views: "25K",
-                    rank: 10,
-                    img: "https://i.pravatar.cc/100?img=74",
-                  },
-                ],
-              }[leaderboardPeriod].map((user) => (
-                <div
-                  key={user.rank}
-                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors"
-                >
-                  <div className="w-6 text-center font-bold text-gray-500 text-sm">
-                    {user.rank}
-                  </div>
-                  <img
-                    src={user.img}
-                    className="w-10 h-10 rounded-full object-cover border border-white/10"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium text-white truncate text-[15px]">
-                      {user.name}
-                    </div>
-                    <div className="text-gray-500 text-[13px] truncate">
-                      {user.handle}
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-bold text-white text-[15px]">
-                      {user.views}
-                    </div>
-                    <div className="text-gray-500 text-[11px] uppercase">
-                      Views
-                    </div>
-                  </div>
+            <div className="bg-[#141414] border border-white/10 rounded-[1.5rem] p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="font-josefin font-bold text-white text-[16px]">Global Rankings</h3>
+                <div className="flex bg-[#252525] p-1 rounded-lg">
+                  <button onClick={() => setLeaderboardPeriod("Daily")} className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors cursor-pointer ${leaderboardPeriod === "Daily" ? "bg-[#d4d4d4] text-black" : "text-gray-400 hover:text-white"}`}>Today</button>
+                  <button onClick={() => setLeaderboardPeriod("Weekly")} className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors cursor-pointer ${leaderboardPeriod === "Weekly" ? "bg-[#d4d4d4] text-black" : "text-gray-400 hover:text-white"}`}>Week</button>
+                  <button onClick={() => setLeaderboardPeriod("All Time")} className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors cursor-pointer ${leaderboardPeriod === "All Time" ? "bg-[#d4d4d4] text-black" : "text-gray-400 hover:text-white"}`}>All Time</button>
                 </div>
-              ))}
+              </div>
+              <div className="space-y-3">
+                {leaderboardData && leaderboardData.length > 0 ? leaderboardData.map((user, idx) => (
+                  <div key={idx} className="flex items-center justify-between bg-white/[0.02] p-3 rounded-xl border border-white/5 hover:bg-white/5 transition-colors cursor-pointer" onClick={() => navigate(`/${user?.username || ""}`)}>
+                    <div className="flex items-center gap-4">
+                      <span className={`font-mono font-bold w-6 text-center ${idx === 0 ? "text-white text-lg" : "text-gray-400"}`}>
+                        #{idx + 1}
+                      </span>
+                      <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white font-bold text-sm shrink-0 uppercase">
+                        {user?.username?.substring(0,2) || "U"}
+                      </div>
+                      <div>
+                        <h4 className="text-white font-semibold font-josefin text-[15px]">{user?.name || user?.username || "Anonymous"}</h4>
+                        <p className="text-gray-400 text-xs">prophile.app/{user?.username || "unknown"}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-white font-mono font-bold block">{(user?.views || 0).toLocaleString()}</span>
+                      <span className="text-gray-500 text-[10px] uppercase tracking-wider">Views</span>
+                    </div>
+                  </div>
+                )) : (
+                  <div className="text-center py-10 text-gray-500">Loading leaderboard...</div>
+                )}
+              </div>
             </div>
           </div>
         )}
+
         {activeTab === "settings" && (
           <div className="space-y-6">
-            <div className="mb-8">
-              <h1 className="text-[28px] font-josefin font-bold tracking-tight">
-                Settings
-              </h1>
-              <p className="text-gray-400 mt-2 text-sm">
-                Manage your account preferences
-              </p>
+            <div className="mb-4">
+              <h1 className="text-[28px] font-josefin font-bold tracking-tight">Settings</h1>
             </div>
-            <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6 space-y-2">
+            <div className="bg-[#141414] border border-white/10 rounded-[1.5rem] p-6 space-y-2">
               <div className="flex justify-between items-center py-2 pb-4 border-b border-white/5">
                 <div>
                   <p className="text-white font-medium font-josefin text-lg">Email Address</p>
@@ -2435,22 +1461,25 @@ function EditPage({
                         window.dispatchEvent(event);
                       }
                     }}
-                    className="px-4 py-2 rounded-full text-sm font-semibold transition-colors bg-white text-black hover:bg-gray-200 cursor-pointer"
+                    className="px-4 py-2 rounded-full text-sm font-semibold transition-colors bg-[#d4d4d4] text-black hover:bg-white cursor-pointer"
                   >
                     Add Email
                   </button>
                 )}
               </div>
-              <div className="pt-4 border-t border-white/5">
+              <div className="pt-4">
                 <button 
                   onClick={async () => {
                     if (confirm("Are you sure you want to delete your account? This action is irreversible.")) {
-                      // In a real production app, this would call an API or Supabase Edge Function 
-                      // to delete the user object. For now we will delete their profile row.
-                      if (userId) {
-                        await supabase.from('profiles').delete().eq('id', userId);
+                      if (isSupabaseConfigured && userId) {
+                        try {
+                          await supabase.from('profiles').delete().eq('id', userId);
+                          await supabase.auth.signOut();
+                        } catch {}
                       }
-                      await supabase.auth.signOut();
+                      localStorage.removeItem("prophile_demo_email");
+                      localStorage.removeItem("prophile_demo_uid");
+                      localStorage.removeItem("prophile_demo_profile");
                       window.location.reload();
                     }
                   }}
@@ -2464,199 +1493,162 @@ function EditPage({
         )}
         {activeTab === "premium" && (
           <div className="space-y-6 animate-fadeIn">
-            <div className="mb-8">
-              <h1 className="text-[28px] font-josefin font-bold tracking-tight">
-                Subscription Plans
+            <div className="mb-6 flex flex-col items-center text-center">
+              <h1 className="text-3xl md:text-4xl font-josefin font-bold tracking-tight text-black mb-2">
+                Prophile Premium
               </h1>
-              <p className="text-gray-400 mt-2 text-sm">
-                Select a plan to test custom features instantly in real-time
+              <p className="text-gray-600 text-sm max-w-md mx-auto leading-relaxed">
+                Start free. Unlock advanced customization and effects with Premium — pay once, keep forever.
               </p>
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-2 gap-6 pt-2">
               {/* Free Tier */}
               <div
-                className={`bg-[#141414] border rounded-[1.5rem] p-5 flex flex-col justify-between shadow-xl relative overflow-hidden transition-all ${activePlan === "free" ? "border-yellow-400" : "border-white/5"}`}
+                className={`bg-[#141414] border rounded-[1.75rem] p-7 flex flex-col justify-between relative transition-all duration-300 overflow-hidden shadow-xl ${activePlan === "free" ? "border-white/30" : "border-white/10"}`}
               >
                 {activePlan === "free" && (
-                  <div className="absolute top-0 right-0 bg-yellow-400 text-black text-[9px] font-bold px-3 py-1 rounded-bl-xl uppercase tracking-widest font-sans">
+                  <div className="absolute top-0 right-0 bg-[#d4d4d4] text-black text-[10px] font-bold px-4 py-1 rounded-bl-xl uppercase tracking-widest font-sans">
                     Active
                   </div>
                 )}
                 <div>
-                  <span className="text-gray-500 font-mono text-[10px] uppercase tracking-wider font-semibold">
-                    Basic Level
-                  </span>
-                  <h3 className="text-xl font-josefin font-bold text-white mt-1">
-                    Free Tier
+                  <h3 className="text-2xl font-josefin font-bold text-white">
+                    Free
                   </h3>
-                  <p className="text-gray-400 text-xs mt-2 leading-relaxed">
-                    Perfect for standard profiles needing basic connection
-                    directories.
+                  <p className="text-gray-400 text-xs mt-1.5 leading-relaxed">
+                    Build a personalized profile at no cost.
                   </p>
 
-                  <div className="flex items-baseline gap-1 mt-5 mb-5">
-                    <span className="text-2xl font-josefin font-bold text-white">
+                  <div className="flex items-baseline gap-1 mt-6 mb-7">
+                    <span className="text-4xl font-josefin font-bold text-white">
                       $0
                     </span>
-                    <span className="text-gray-500 text-xs">/ month</span>
+                    <span className="text-gray-400 text-sm font-medium">/ lifetime</span>
                   </div>
 
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2 text-xs text-gray-300">
-                      <span className="text-emerald-400">✓</span>
-                      <span>Up to 5 custom social link items</span>
+                  <div className="space-y-3.5 text-xs text-gray-300">
+                    <div className="flex items-center gap-3">
+                      <Check size={15} className="text-white shrink-0" />
+                      <span>Up to 5 custom social links</span>
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-300">
-                      <span className="text-emerald-400">✓</span>
-                      <span>Core bio details & configuration</span>
+                    <div className="flex items-center gap-3">
+                      <Check size={15} className="text-white shrink-0" />
+                      <span>Basic themes & colors</span>
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                      <span>✗</span>
-                      <span>Custom Audio Music Player</span>
+                    <div className="flex items-center gap-3">
+                      <Check size={15} className="text-white shrink-0" />
+                      <span>Background music upload</span>
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                      <span>✗</span>
-                      <span>Conic Glow avatar rings</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                      <span>✗</span>
-                      <span>Glassmorphic Card & Effects</span>
+                    <div className="flex items-center gap-3">
+                      <Check size={15} className="text-white shrink-0" />
+                      <span>Standard profile layouts</span>
                     </div>
                   </div>
                 </div>
 
                 <button
-                  onClick={() => {
-                    setActivePlan("free");
-                  }}
-                  className={`w-full font-semibold text-xs py-2.5 rounded-full mt-6 transition-all active:scale-[0.98] cursor-pointer ${activePlan === "free" ? "bg-[#252525] text-white border border-white/5 cursor-default" : "bg-white hover:bg-gray-100 text-black"}`}
+                  onClick={() => setActivePlan("free")}
+                  className={`w-full font-bold text-xs uppercase tracking-wider py-3.5 rounded-full mt-8 transition-all ${activePlan === "free" ? "bg-[#252525] text-white border border-white/10 cursor-default" : "bg-[#d4d4d4] hover:bg-white text-black cursor-pointer"}`}
                   disabled={activePlan === "free"}
                 >
-                  {activePlan === "free" ? "Active Plan" : "Select Free"}
+                  {activePlan === "free" ? "Current Plan" : "Switch to Free"}
                 </button>
               </div>
 
               {/* Premium Tier */}
               <div
-                className={`bg-[#141414] border rounded-[1.5rem] p-5 flex flex-col justify-between shadow-xl relative overflow-hidden transition-all ${activePlan === "pro" ? "border-yellow-400" : "border-white/5"}`}
+                className={`bg-[#141414] border-2 rounded-[1.75rem] p-7 flex flex-col justify-between relative transition-all duration-300 overflow-hidden shadow-2xl ${activePlan === "pro" ? "border-white/40" : "border-white/15"}`}
               >
-                {activePlan === "pro" && (
-                  <div className="absolute top-0 right-0 bg-yellow-400 text-black text-[9px] font-bold px-3 py-1 rounded-bl-xl uppercase tracking-widest font-sans">
-                    Active
-                  </div>
-                )}
+                <div className="absolute top-0 right-0 bg-white text-black text-[10px] font-bold px-4 py-1 rounded-bl-xl uppercase tracking-widest font-sans">
+                  {activePlan === "pro" ? "Active" : "Lifetime"}
+                </div>
                 <div>
-                  <span className="text-gray-500 font-mono text-[10px] uppercase tracking-wider font-semibold">
-                    Popular
-                  </span>
-                  <h3 className="text-xl font-josefin font-bold text-white mt-1">
-                    Premium Plan
+                  <h3 className="text-2xl font-josefin font-bold text-white">
+                    Premium
                   </h3>
-                  <p className="text-gray-400 text-xs mt-2 leading-relaxed">
-                    The ultimate creator experience with cinematic backgrounds,
-                    glassmorphism, and analytics.
+                  <p className="text-gray-400 text-xs mt-1.5 leading-relaxed">
+                    More control. More effects. More everything.
                   </p>
 
-                  <div className="flex items-baseline gap-1 mt-5 mb-5">
-                    <span className="text-2xl font-josefin font-bold text-white">
-                      $1
+                  <div className="flex items-baseline gap-1 mt-6 mb-7">
+                    <span className="text-4xl font-josefin font-bold text-white">
+                      $4.99
                     </span>
-                    <span className="text-gray-500 text-xs">/ month</span>
+                    <span className="text-gray-400 text-sm font-medium">/ lifetime</span>
                   </div>
 
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2 text-xs text-gray-300">
-                      <span className="text-emerald-400">✓</span>
-                      <span>Everything in Free Plan</span>
+                  <div className="space-y-3.5 text-xs text-gray-200 font-medium">
+                    <div className="flex items-center gap-3">
+                      <Check size={15} className="text-white shrink-0" />
+                      <span>Everything in Free</span>
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-emerald-400 font-bold">
-                      <span>✓</span>
-                      <span>Cinematic 4K Video Backgrounds & Blur</span>
+                    <div className="flex items-center gap-3">
+                      <Check size={15} className="text-white shrink-0" />
+                      <span>Cinematic 4K video backgrounds</span>
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-emerald-400 font-bold">
-                      <span>✓</span>
-                      <span>Glassmorphic Cards & Effects</span>
+                    <div className="flex items-center gap-3">
+                      <Check size={15} className="text-white shrink-0" />
+                      <span>Advanced traffic analytics</span>
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-300">
-                      <span className="text-emerald-400">✓</span>
-                      <span>Full analytical reports & CTR metrics</span>
+                    <div className="flex items-center gap-3">
+                      <Check size={15} className="text-white shrink-0" />
+                      <span>Custom fonts, colors & glassmorphism</span>
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-300">
-                      <span className="text-emerald-400">✓</span>
-                      <span>Conic Glow avatar borders</span>
+                    <div className="flex items-center gap-3">
+                      <Check size={15} className="text-white shrink-0" />
+                      <span>Verified profile badge</span>
                     </div>
                   </div>
                 </div>
 
                 <button
-                  onClick={() => {
-                    setActivePlan("pro");
-                  }}
-                  className={`w-full font-semibold text-xs py-2.5 rounded-full mt-6 transition-all active:scale-[0.98] cursor-pointer ${activePlan === "pro" ? "bg-[#252525] text-white border border-white/5 cursor-default" : "bg-yellow-400 hover:bg-yellow-350 text-black"}`}
+                  onClick={() => setActivePlan("pro")}
+                  className={`w-full font-bold text-xs uppercase tracking-wider py-3.5 rounded-full mt-8 transition-all ${activePlan === "pro" ? "bg-[#252525] text-white border border-white/10 cursor-default" : "bg-white hover:bg-gray-200 text-black shadow-md cursor-pointer"}`}
                   disabled={activePlan === "pro"}
                 >
-                  {activePlan === "pro"
-                    ? "Active Plan"
-                    : "Upgrade to Premium ($1)"}
+                  {activePlan === "pro" ? "Current Plan" : "Get Premium"}
                 </button>
-              </div>
-            </div>
-
-            <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6">
-              <h3 className="font-josefin font-bold text-white text-lg mb-2">
-                Why Premium?
-              </h3>
-              <p className="text-gray-400 text-sm leading-relaxed mb-4">
-                When thousands of visitors browse your social pages, details
-                matter. Premium equips you with real tools – cinematic portrait
-                video background loops, premium glassmorphism layouts, full
-                analytics tracking, and Discord avatar decorations.
-              </p>
-              <div className="flex items-center gap-2 text-xs text-yellow-400 font-mono font-bold tracking-widest uppercase">
-                <Sparkles size={12} /> Test different plans above to see active
-                features adapt in real-time!
               </div>
             </div>
           </div>
         )}
         {activeTab === "help" && (
           <div className="space-y-6">
-            <div className="mb-8">
+            <div className="mb-6 text-center">
               <h1 className="text-[28px] font-josefin font-bold tracking-tight">
-                Help & FAQ
+                Help & Support
               </h1>
-              <p className="text-gray-400 mt-2 text-sm">
-                Find answers to common questions
+              <p className="text-gray-600 mt-1.5 text-sm max-w-md mx-auto">
+                Common questions about managing your Prophile page.
               </p>
             </div>
-            <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6 space-y-6">
-              <div>
-                <h4 className="text-white font-josefin font-bold mb-1">
-                  How do I change my username?
+            
+            <div className="space-y-3.5">
+              <div className="bg-[#141414] border border-white/10 rounded-2xl p-5">
+                <h4 className="text-white font-josefin font-bold text-base mb-1.5">
+                  How do I customize my page URL?
                 </h4>
                 <p className="text-gray-400 text-sm leading-relaxed">
-                  Go to the Edit Profile tab and update the username field. It
-                  can only be changed once every 7 days.
+                  You can change your username from the <strong>Edit profile</strong> tab. This sets your public URL (e.g., prophile.app/username).
                 </p>
               </div>
-              <div>
-                <h4 className="text-white font-josefin font-bold mb-1">
-                  How many links can I add?
+
+              <div className="bg-[#141414] border border-white/10 rounded-2xl p-5">
+                <h4 className="text-white font-josefin font-bold text-base mb-1.5">
+                  What makes Premium different?
                 </h4>
                 <p className="text-gray-400 text-sm leading-relaxed">
-                  All users can add up to 5 links. Upgrade to Premium in the
-                  Premium tab to enjoy HD cinematic video
-                  backgrounds, visual audio player, and
-                  interactive styling options!
+                  Premium is a one-time unlock that gives you 4K video backgrounds, glassmorphic card styling, custom fonts and colors, and traffic analytics.
                 </p>
               </div>
-              <div>
-                <h4 className="text-white font-josefin font-bold mb-1">
-                  How can I contact support?
+
+              <div className="bg-[#141414] border border-white/10 rounded-2xl p-5">
+                <h4 className="text-white font-josefin font-bold text-base mb-1.5">
+                  How do analytics work?
                 </h4>
                 <p className="text-gray-400 text-sm leading-relaxed">
-                  Email us at support@prophile.app.
+                  The analytics dashboard tracks page views, link clicks, click-through rate (CTR), top referral sources, and visitor geographies.
                 </p>
               </div>
             </div>
@@ -2761,7 +1753,7 @@ function EditPage({
                         }}
                         className={`flex-1 min-w-[70px] py-2 rounded-lg border ${
                           (data.displayNameFont || "font-josefin") === font
-                            ? "bg-white text-black border-white"
+                            ? "bg-[#d4d4d4] text-black border-white"
                             : "bg-[#1a1a1a] text-white border-white/5 hover:border-white/20"
                         } text-sm ${font} transition-colors capitalize relative overflow-hidden`}
                       >
@@ -2852,9 +1844,6 @@ function EditPage({
                       className="bg-transparent flex-1 px-4 py-3 text-white outline-none w-full text-[15px] font-semibold text-center placeholder:text-white/25"
                     />
                   </div>
-                  <p className="text-[13px] text-gray-500 mt-2 px-1 text-center font-mono">
-                    Username can only be changed once every 7 days.
-                  </p>
                 </div>
                 <div>
                   <label className="block text-[18px] font-josefin font-bold tracking-tight text-white mb-3 text-center">
@@ -2878,7 +1867,7 @@ function EditPage({
                     rows={3}
                     value={data.bio}
                     onChange={(e) => onChange({ ...data, bio: e.target.value })}
-                    placeholder="Tell visitors about yourself (interests, bio, links)..."
+                    placeholder="Tell visitors about yourself..."
                     className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl px-4 py-3.5 text-white outline-none focus:border-white/20 transition-colors resize-none text-[15px] font-semibold text-center placeholder:text-white/25"
                   />
                   <p className="text-[12px] text-[#555] mt-1.5 text-center font-mono">
@@ -2926,23 +1915,16 @@ function EditPage({
                     />
                   </div>
                 )}
-                <p className="text-[14px] text-[#888] text-center leading-relaxed mt-4">
-                  MP3, WAV, or OGG · up to 8MB · plays on your public profile
-                  <br />
-                  <span className="text-[12px] opacity-80">Free: Auto-playing background music • Premium: Visual audio player</span>
+                <p className="text-[13px] text-[#888] text-center">
+                  MP3, WAV, or OGG · up to 8MB
                 </p>
               </div>
 
               {/* Video Background Settings */}
               <div className="bg-[#141414] border border-white/5 rounded-[1.5rem] p-6 text-center space-y-4">
                 <label className="block text-[18px] font-josefin font-bold tracking-tight text-white mb-1">
-                  Portrait video background
+                  Video background
                 </label>
-                <p className="text-[13px] text-gray-500 mb-4">
-                  Add a cinematic loops background video to your page.
-                  <br />
-                  <span className="text-[12px] opacity-80">Free: 720p (up to 10MB) • Premium: 4K (up to 50MB)</span>
-                </p>
 
                 <div className="flex items-center justify-between bg-[#1a1a1a] border border-white/5 rounded-xl p-4 mb-4">
                   <span className="text-[15px] font-semibold text-[#a1a1aa]">
@@ -2967,12 +1949,7 @@ function EditPage({
 
                 {data.videoBackgroundEnabled && (
                   <div className="space-y-4">
-                    {/* Upload Custom Video or Paste URL */}
                     <div className="text-left space-y-3">
-                      <span className="text-[12px] font-bold text-gray-500 font-josefin tracking-wider uppercase block">
-                        Custom Video Source
-                      </span>
-
                       <div className="flex items-center gap-2">
                         <DebouncedInput
                           type="text"
@@ -2994,9 +1971,9 @@ function EditPage({
                         />
                       </div>
 
-                      <div className="relative">
+                      <div className="relative flex items-center">
                         <label className="w-full bg-[#1a1a1a] hover:bg-[#252525] border border-white/5 py-3.5 rounded-full flex items-center justify-center gap-2 text-[14px] font-semibold text-white transition-colors cursor-pointer shadow-sm">
-                          <Video size={16} /> Upload custom MP4/WebM
+                          <Video size={16} /> {data.videoBackgroundUrl ? "Replace MP4/WebM" : "Upload MP4/WebM"}
                           <input
                             type="file"
                             accept="video/mp4,video/webm"
@@ -3004,34 +1981,17 @@ function EditPage({
                             onChange={handleVideoUpload}
                           />
                         </label>
-                      </div>
-
-                      {data.videoBackgroundUrl && (
-                        <div className="bg-[#1a1a1a] border border-white/5 rounded-xl p-3 flex items-center justify-between">
-                          <div className="flex items-center gap-2 truncate text-gray-300 text-sm">
-                            <span className="text-[13px] bg-white/10 p-1 rounded-md">
-                              🎥
-                            </span>
-                            <span className="truncate text-xs font-mono text-gray-400">
-                              {data.videoBackgroundUrl.startsWith("data:")
-                                ? "Uploaded File (Optimistic Preview)"
-                                : data.videoBackgroundUrl.includes(
-                                      "supabase.co",
-                                    )
-                                  ? "Uploaded Portrait Video (Cloud Saved)"
-                                  : data.videoBackgroundUrl}
-                            </span>
-                          </div>
+                        {data.videoBackgroundUrl && (
                           <button
                             onClick={() =>
                               onChange({ ...data, videoBackgroundUrl: "" })
                             }
-                            className="text-[#ff4444] hover:text-red-400 p-1.5 bg-[#ff4444]/10 rounded-lg transition-colors cursor-pointer flex items-center justify-center shrink-0"
+                            className="absolute right-2 w-8 h-8 flex items-center justify-center rounded-full bg-black/20 text-[#ff4444] hover:bg-[#ff4444]/10 transition-colors cursor-pointer"
                           >
-                            <Trash2 size={13} />
+                            <Trash2 size={16} />
                           </button>
-                        </div>
-                      )}
+                        )}
+                      </div>
 
                       <div className="pt-2 border-t border-white/5 relative mt-4">
                         <label className="block text-[18px] font-josefin font-bold tracking-tight text-white mb-3 text-center">
@@ -3272,9 +2232,6 @@ function EditPage({
                 disabled={isSaving}
                 className="w-full max-w-[400px] bg-[#1a1a1a] text-white py-4 rounded-[1.5rem] font-josefin font-bold text-[18px] hover:bg-gray-100 hover:text-black transition-colors shadow-xl disabled:opacity-70 flex items-center justify-center gap-2"
               >
-                {isSaving ? (
-                  <Sparkles size={18} className="animate-pulse" />
-                ) : null}
                 {isSaving ? "Saving..." : "Save & publish"}
               </button>
             </div>
@@ -3308,8 +2265,36 @@ export type ProfileData = {
   links: Array<{ id: number; title: string; url: string }>;
 };
 
+import { fetchProfileByUsername } from './lib/api';
+
+function PublicProfileRoute() {
+  const { username } = useParams<{ username: string }>();
+  const [data, setData] = useState<ProfileData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (username) {
+      fetchProfileByUsername(username).then(profile => {
+        setData(profile);
+        setLoading(false);
+      });
+    }
+  }, [username]);
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center bg-black text-white font-josefin text-xl">Loading...</div>;
+  }
+  if (!data) {
+    return <div className="min-h-screen flex items-center justify-center bg-black text-white font-josefin text-xl">Profile not found</div>;
+  }
+
+  return <UserPage data={data} isPublic={true} activePlan={data.activePlan || 'pro'} />;
+}
+
 export default function App() {
-  const [view, setView] = useState<"home" | "profile" | "edit">("edit");
+  const navigate = useNavigate();
+  const location = useLocation();
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
@@ -3409,23 +2394,65 @@ export default function App() {
       }
     };
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      handleSession(session);
-    });
+    if (isSupabaseConfigured) {
+      supabase.auth.getSession()
+        .then(({ data: { session } }) => {
+          handleSession(session);
+        })
+        .catch((err) => {
+          console.warn("Supabase session check error:", err);
+        });
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      handleSession(session);
-    });
+      const {
+        data: { subscription },
+      } = supabase.auth.onAuthStateChange((_event, session) => {
+        handleSession(session);
+      });
 
-    const handleOpenAuth = () => setIsAuthOpen(true);
-    window.addEventListener("open-auth", handleOpenAuth);
+      const handleOpenAuth = () => setIsAuthOpen(true);
+      window.addEventListener("open-auth", handleOpenAuth);
 
-    return () => {
-      subscription.unsubscribe();
-      window.removeEventListener("open-auth", handleOpenAuth);
-    };
+      return () => {
+        subscription?.unsubscribe();
+        window.removeEventListener("open-auth", handleOpenAuth);
+      };
+    } else {
+      // Local demo mode: check if user previously signed in locally
+      const demoEmail = localStorage.getItem("prophile_demo_email");
+      const demoUid = localStorage.getItem("prophile_demo_uid") || "demo-user";
+      if (demoEmail) {
+        setUserEmail(demoEmail);
+        setUserId(demoUid);
+        const saved = localStorage.getItem("prophile_demo_profile");
+        if (saved) {
+          try {
+            setProfileData(JSON.parse(saved));
+          } catch {}
+        }
+      }
+
+      const handleDemoLogin = (e: any) => {
+        const { email, uid } = e.detail || {};
+        if (email) {
+          setUserEmail(email);
+          setUserId(uid || "demo-user");
+          setProfileData((prev) => ({
+            ...prev,
+            username: prev.username || email.split("@")[0].replace(/[^a-zA-Z0-9._]/g, ""),
+            displayName: prev.displayName || email.split("@")[0],
+          }));
+        }
+      };
+      window.addEventListener("demo-login", handleDemoLogin);
+
+      const handleOpenAuth = () => setIsAuthOpen(true);
+      window.addEventListener("open-auth", handleOpenAuth);
+
+      return () => {
+        window.removeEventListener("demo-login", handleDemoLogin);
+        window.removeEventListener("open-auth", handleOpenAuth);
+      };
+    }
   }, []);
 
   const [profileData, setProfileData] = useState<ProfileData>({
@@ -3456,57 +2483,59 @@ export default function App() {
         onClose={() => setIsAuthOpen(false)}
         onSuccess={() => {
           setIsAuthOpen(false);
-          setView("edit");
+          navigate("/edit");
         }}
       />
-      {view === "home" && (
-        <div className="min-h-screen bg-texture text-black relative overflow-x-hidden selection:bg-indigo-500/30 selection:text-indigo-900">
-          <Navbar
+      <Routes>
+        <Route path="/" element={
+          <AmmosLanding
             onLoginClick={() => setIsAuthOpen(true)}
+            onSignUpClick={() => setIsAuthOpen(true)}
             userEmail={userEmail}
             onSignOut={async () => {
-              await supabase.auth.signOut();
+              if (isSupabaseConfigured) {
+                try { await supabase.auth.signOut(); } catch {}
+              }
+              localStorage.removeItem("prophile_demo_email");
+              localStorage.removeItem("prophile_demo_uid");
               setUserEmail(null);
             }}
-            onDashboardClick={() => setView("edit")}
+            onDashboardClick={() => navigate("/edit")}
+            profileData={profileData}
           />
-          <main className="relative z-10">
-            <Hero
-              onNavigate={() => setView("profile")}
-              onLoginClick={() => setIsAuthOpen(true)}
-              data={profileData}
-            />
-            <Features />
-          </main>
-          <Footer />
-        </div>
-      )}
-      {view === "profile" && (
-        <UserPage
-          data={profileData}
-          onBack={() => setView("edit")}
-          onEdit={() => setView("edit")}
-          activePlan={activePlan}
-        />
-      )}
-      {view === "edit" && (
-        <EditPage
-          data={profileData}
-          onChange={setProfileData}
-          onBack={() => setView("profile")}
-          onSignOut={async () => {
-            await supabase.auth.signOut();
-            setUserEmail(null);
-            setUserId(null);
-            setView("home");
-          }}
-          onHome={() => setView("home")}
-          userEmail={userEmail}
-          userId={userId}
-          activePlan={activePlan}
-          setActivePlan={handleSetActivePlan}
-        />
-      )}
+        } />
+        <Route path="/preview" element={
+          <UserPage
+            data={profileData}
+            onBack={() => navigate("/edit")}
+            onEdit={() => navigate("/edit")}
+            activePlan={activePlan}
+          />
+        } />
+        <Route path="/edit" element={
+          <EditPage
+            data={profileData}
+            onChange={setProfileData}
+            onBack={() => navigate("/preview")}
+            onSignOut={async () => {
+              if (isSupabaseConfigured) {
+                try { await supabase.auth.signOut(); } catch {}
+              }
+              localStorage.removeItem("prophile_demo_email");
+              localStorage.removeItem("prophile_demo_uid");
+              setUserEmail(null);
+              setUserId(null);
+              navigate("/");
+            }}
+            onHome={() => navigate("/")}
+            userEmail={userEmail}
+            userId={userId}
+            activePlan={activePlan}
+            setActivePlan={handleSetActivePlan}
+          />
+        } />
+        <Route path="/:username" element={<PublicProfileRoute />} />
+      </Routes>
     </>
   );
 }
